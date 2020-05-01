@@ -23,7 +23,7 @@
 int main(int argc, char** argv)
 {
     OPTICKS_LOG(argc, argv); 
-    G4 g(1000) ; 
+    G4 g(10) ; 
     return 0 ; 
 }
 

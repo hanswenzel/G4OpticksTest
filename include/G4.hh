@@ -18,13 +18,13 @@
  */
 
 #pragma once
-
+#include "G4String.hh"
+#include "L4Cerenkov.hh"
 class G4RunManager ;
 
 struct Ctx ; 
 struct SensitiveDetector ;
 struct DetectorConstruction ;
-class L4Cerenkov ; 
 template <typename T> struct PhysicsList ; 
 struct PrimaryGeneratorAction ;
 
@@ -40,7 +40,8 @@ struct G4
     void beamOn(int nev);
 
     Ctx*                    ctx ; 
-    G4RunManager*            rm ; 
+    G4RunManager*            rm ;
+    G4String               fname;
     const char*             sdn ; 
     SensitiveDetector*       sd ; 
     DetectorConstruction*    dc ; 

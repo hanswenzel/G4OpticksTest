@@ -1,258 +1,271 @@
-/*
- * Copyright (c) 2019 Opticks Team. All Rights Reserved.
- *
- * This file is part of Opticks
- * (see https://bitbucket.org/simoncblyth/opticks).
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); 
- * you may not use this file except in compliance with the License.  
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, 
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
- * See the License for the specific language governing permissions and 
- * limitations under the License.
- */
-
-
-#include <cstring>
-#include <iostream>
-#include "DetectorConstruction.hh"
-
-// detector 
-#include "G4VUserDetectorConstruction.hh"
-#include "G4Element.hh"
-#include "G4Material.hh"
+// -----------------------------------------------------
+//  _    _        _____         _   
+// | |  / \   _ _|_   _|__  ___| |_ 
+// | | / _ \ | '__|| |/ _ \/ __| __|
+// | |/ ___ \| |   | |  __/\__ \ |_ 
+// |_/_/   \_\_|   |_|\___||___/\__|
+//                                  
+// lArTest: A Geant4 application to study and profile  
+//          simulation of physics processes relevant 
+//          to liquid Ar TPCs
+//
+// Author: Hans Wenzel, Fermilab
+// Update: add a gdml interface (S.Y. Jun, Mar. 30, 2017)
+// -----------------------------------------------------
+// Geant4 headers
+#include "G4Tubs.hh"
 #include "G4Box.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
-#include "G4LogicalBorderSurface.hh"
-#include "G4LogicalSkinSurface.hh"
-#include "G4OpticalSurface.hh"
-#include "G4MaterialTable.hh"
-#include "G4SDManager.hh"
-#include "G4PhysicalConstants.hh"
+#include "G4RunManager.hh"
+#include "G4GeometryManager.hh"
+#include "G4PhysicalVolumeStore.hh"
+#include "G4LogicalVolumeStore.hh"
+#include "G4SolidStore.hh"
+#include "G4StepLimiter.hh"
+#include "G4HadronicProcessStore.hh"
+#include "G4VisAttributes.hh"
+#include "G4Colour.hh"
+#include "G4UserLimits.hh"
+#include "G4UnitsTable.hh"
+#include "G4ios.hh"
+#include "G4NistManager.hh"
+#include "G4ParticleTable.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
+#include "G4SDManager.hh"
+#include "globals.hh"
+#include "G4VPhysicalVolume.hh"
+#include "G4ElectricField.hh"
+#include "G4UniformElectricField.hh"
+#include "G4FieldManager.hh"
+#include "G4EqMagElectricField.hh"
+#include "ColorReader.hh"
+#include "G4GDMLParser.hh"
+// project headers
+#include "ConfigurationManager.hh"
+#include "DetectorConstruction.hh"
+#include "TrackerSD.hh"
+#include "PhotonSD.hh"
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+using namespace std;
+//G4LogicalVolume* logicContainer;
 
-DetectorConstruction::DetectorConstruction( const char* sdname_ )
-    :
-    G4VUserDetectorConstruction(),
-    sdname(strdup(sdname_))
-{
+DetectorConstruction::DetectorConstruction(G4String fname) {
+    gdmlFile = fname;
+    sdnames = ConfigurationManager::getInstance()->getSDNames();
 }
 
-G4Material* DetectorConstruction::MakeWater()
-{
-    G4double a, z, density;
-    G4int nelements;
-    G4Element* O = new G4Element("Oxygen"  , "O", z=8 , a=16.00*CLHEP::g/CLHEP::mole);
-    G4Element* H = new G4Element("Hydrogen", "H", z=1 , a=1.01*CLHEP::g/CLHEP::mole);
-    G4Material* mat = new G4Material("Water", density= 1.0*CLHEP::g/CLHEP::cm3, nelements=2);
-    mat->AddElement(H, 2);
-    mat->AddElement(O, 1);
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-    G4MaterialPropertyVector* ri = MakeWaterRI() ; 
-    ri->SetSpline(false);
-
-    AddProperty( mat, "RINDEX" , ri );  
-    return mat ; 
+DetectorConstruction::~DetectorConstruction() {
 }
 
-G4Material* DetectorConstruction::MakeAir()
-{
-    G4double a, z, density;
-    G4int nelements;
-    G4Element* N = new G4Element("Nitrogen", "N", z=7 , a=14.01*CLHEP::g/CLHEP::mole);
-    G4Element* O = new G4Element("Oxygen"  , "O", z=8 , a=16.00*CLHEP::g/CLHEP::mole);
-
-    G4Material* mat = new G4Material("Air", density=1.29*CLHEP::mg/CLHEP::cm3, nelements=2);
-    mat->AddElement(N, 70.*CLHEP::perCent);
-    mat->AddElement(O, 30.*CLHEP::perCent);
-
-    G4MaterialPropertyVector* ri = MakeAirRI() ; 
-    ri->SetSpline(false);
-
-    AddProperty( mat, "RINDEX" , ri );  
-    return mat ; 
+G4VPhysicalVolume* DetectorConstruction::Construct() {
+    ReadGDML();
+    const G4GDMLAuxMapType* auxmap = parser->GetAuxMap();
+    std::cout << "Found " << auxmap->size()
+            << " volume(s) with auxiliary information."
+            << std::endl << std::endl;
+    for (G4GDMLAuxMapType::const_iterator iter = auxmap->begin();
+            iter != auxmap->end(); iter++) {
+        std::cout << "Volume " << ((*iter).first)->GetName()
+                << " has the following list of auxiliary information: "
+                << std::endl;
+        for (G4GDMLAuxListType::const_iterator vit = (*iter).second.begin();
+                vit != (*iter).second.end(); vit++) {
+            std::cout << "--> Type: " << (*vit).type
+                    << " Value: " << (*vit).value << std::endl;
+            if ((*vit).type == "StepLimit") {
+                G4UserLimits *fStepLimit = new G4UserLimits(atof((*vit).value));
+                ((*iter).first)->SetUserLimits(fStepLimit);
+            }
+        }
+    }
+    //   logicTarget = G4LogicalVolumeStore::GetInstance()->GetVolume("volTPCActiveInner");
+    //    logicContainer = G4LogicalVolumeStore::GetInstance()->GetVolume("volContainer");
+    G4VPhysicalVolume* worldPhysVol = parser->GetWorldVolume();
+    //    PrepareLArTest();
+    //    if (ConfigurationManager::getInstance()->GetstepLimit()) {
+    //        G4double mxStep = ConfigurationManager::getInstance()->Getlimitval();
+    //        G4UserLimits *fStepLimit = new G4UserLimits(mxStep);
+    //        logicTarget->SetUserLimits(fStepLimit);
+    //    }
+    return worldPhysVol;
 }
 
-
-G4Material* DetectorConstruction::MakeGlass()
-{
-    // from LXe example
-    G4double a, z, density;
-    G4int nelements;
-    G4Element* H = new G4Element("H", "H", z=1., a=1.01*CLHEP::g/CLHEP::mole);
-    G4Element* C = new G4Element("C", "C", z=6., a=12.01*CLHEP::g/CLHEP::mole);
-
-    G4Material* mat = new G4Material("Glass", density=1.032*CLHEP::g/CLHEP::cm3,nelements=2);
-    mat->AddElement(C,91.533*CLHEP::perCent);
-    mat->AddElement(H,8.467*CLHEP::perCent);
-
-    G4MaterialPropertyVector* ri = MakeGlassRI() ; 
-    ri->SetSpline(false);
-
-    AddProperty( mat, "RINDEX" , ri );  
-    return mat ; 
+void DetectorConstruction::ConstructSDandField() {
+    G4SDManager* SDman = G4SDManager::GetSDMpointer();
+    const G4GDMLAuxMapType* auxmap = parser->GetAuxMap();
+    std::cout << "Found " << auxmap->size()
+            << " volume(s) with auxiliary information."
+            << std::endl << std::endl;
+    for (G4GDMLAuxMapType::const_iterator iter = auxmap->begin();
+            iter != auxmap->end(); iter++) {
+        std::cout << "Volume " << ((*iter).first)->GetName()
+                << " has the following list of auxiliary information: "
+                << std::endl;
+        for (G4GDMLAuxListType::const_iterator vit = (*iter).second.begin();
+                vit != (*iter).second.end(); vit++) {
+            std::cout << "--> Type: " << (*vit).type
+                    << " Value: " << (*vit).value << std::endl;
+            if ((*vit).type == "SensDet") {
+                if ((*vit).value == "PhotonDetector") {
+                    G4String name = ((*iter).first)->GetName() + "_Photondetector";
+                    PhotonSD* aPhotonSD = new PhotonSD(name);
+                    SDman->AddNewDetector(aPhotonSD);
+                    sdnames->push_back(name);
+                    std::cout << "new size: " << sdnames->size() << std::endl;
+                    ((*iter).first)->SetSensitiveDetector(aPhotonSD);
+                    std::cout << "Attaching sensitive Detector: " << (*vit).value
+                            << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                    //DetectorList.push_back(std::make_pair((*iter).first->GetName(), (*vit).value));
+                } else if ((*vit).value == "Tracker") {
+                    G4String name = ((*iter).first)->GetName() + "_Tracker";
+                    TrackerSD* aTrackerSD = new TrackerSD(name);
+                    SDman->AddNewDetector(aTrackerSD);
+                    sdnames->push_back(name);
+                    std::cout << "new size: " << sdnames->size() << std::endl;
+                    ((*iter).first)->SetSensitiveDetector(aTrackerSD);
+                    std::cout << "Attaching sensitive Detector: " << (*vit).value
+                            << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                    //DetectorList.push_back(std::make_pair((*iter).first->GetName(), (*vit).value));
+                }
+            } else if ((*vit).type == "Solid") {
+                if ((*vit).value == "True") {
+                    G4VisAttributes * visibility = new G4VisAttributes();
+                    visibility->SetForceSolid(true);
+                    G4VisAttributes * visatt = new G4VisAttributes(((*iter).first)->GetVisAttributes()->GetColour());
+                    visatt->SetVisibility(true);
+                    visatt->SetForceSolid(true);
+                    visatt->SetForceAuxEdgeVisible(true);
+                    ((*iter).first)->SetVisAttributes(visatt);
+                }
+            } else if ((*vit).type == "Efield") {
+                std::cout << "Setting E-Field of " << ((*iter).first)->GetName() << " to " << (*vit).value << " V/cm" << std::endl;
+                double E = atof((*vit).value.c_str());
+                std::cout << E << std::endl;
+                //                G4ElectricField* fEMfield = new G4UniformElectricField(
+                //                       G4ThreeVector(0.0, E * volt / cm, 0.0));
+                //G4EqMagElectricField* fEquation = new G4EqMagElectricField(fEMfield);
+                //              G4FieldManager* fFieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
+                //               G4bool allLocal = true;
+                //               ((*iter).first)->SetFieldManager(fFieldManager, allLocal);
+            } //else if ((*vit).type == "Spline") {
+            //  if ((*vit).value == "True") {
+            //      ((*iter).first)->GetMaterial()->GetMaterialPropertiesTable()->GetProperty("FASTCOMPONENT")->SetSpline(true);
+            //      ((*iter).first)->GetMaterial()->GetMaterialPropertiesTable()->GetProperty("SLOWCOMPONENT")->SetSpline(true);
+            //  }
+            // }
+        }
+    }
 }
 
-void DetectorConstruction::AddProperty( G4Material* mat , const char* name, G4MaterialPropertyVector* mpv )
-{
-    G4MaterialPropertiesTable* mpt = mat->GetMaterialPropertiesTable(); 
-    if( mpt == NULL ) mpt = new G4MaterialPropertiesTable();
-    mpt->AddProperty(name, mpv );   
-    mat->SetMaterialPropertiesTable(mpt) ;
-}  
+void DetectorConstruction::ReadGDML() {
+    fReader = new ColorReader;
+    parser = new G4GDMLParser(fReader);
+    parser->Read(gdmlFile, false);
+    G4VPhysicalVolume *World = parser->GetWorldVolume();
+    //----- GDML parser makes world invisible, this is a hack to make it
+    //visible again...
+    G4LogicalVolume* pWorldLogical = World->GetLogicalVolume();
+    pWorldLogical->SetVisAttributes(0);
+    std::cout << World->GetTranslation() << std::endl << std::endl;
+    std::cout << "Found World:  " << World-> GetName() << std::endl;
+    std::cout << "World LV:  " << World->GetLogicalVolume()->GetName() << std::endl;
+    G4LogicalVolumeStore *pLVStore = G4LogicalVolumeStore::GetInstance();
+    std::cout << "Found " << pLVStore->size()
+            << " logical volumes."
+            << std::endl << std::endl;
+    G4PhysicalVolumeStore *pPVStore = G4PhysicalVolumeStore::GetInstance();
+    std::cout << "Found " << pPVStore->size()
+            << " physical volumes."
+            << std::endl << std::endl;
+}
+/*
+void DetectorConstruction::PrepareLArTest() {
 
 
+    G4MaterialPropertiesTable* LArMPT = new G4MaterialPropertiesTable();
+    G4MaterialPropertiesTable* LArMPT2 = new G4MaterialPropertiesTable();
+    //
+    //  simple description of scintillation yield  
+    //  [J Chem Phys vol 91 (1989) 1469]
+    //
+    G4double Rindex[] = {1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5};
+    G4double FastScintEnergies[] = {6.7 * eV, 7.1 * eV, 7.4 * eV, 7.7 * eV, 7.9 * eV, 8.1 * eV, 8.4 * eV, 8.5 * eV, 8.6 * eV, 8.8 * eV, 9.0 * eV, 9.1 * eV, 9.4 * eV, 9.8 * eV, 10.4 * eV};
+    G4double FastScintSpectrum[] = {0.04, 0.12, 0.27, 0.44, 0.62, 0.80, 0.91, 0.92, 0.85, 0.70, 0.50, 0.31, 0.13, 0.04, 0.01};
+    assert(sizeof (FastScintSpectrum) == sizeof (FastScintEnergies));
+    assert(sizeof (Rindex) == sizeof (FastScintEnergies));
+    const G4int num = sizeof (FastScintEnergies) / sizeof (G4double);
+    for (int jj = 0; jj < num; jj++) {
+        G4double lam = ((h_Planck * c_light) / FastScintEnergies[jj]) / nm;
+        std::cout << FastScintEnergies[jj] / eV << "  " << ((h_Planck * c_light) / FastScintEnergies[jj]) / nm << "   " << LArRefIndex(lam) << "  " << ArScintillationSpectrum(lam) << std::endl;
+    }
+    LArMPT->AddProperty("RINDEX", FastScintEnergies, Rindex, num);
+    LArMPT2->AddProperty("RINDEX", FastScintEnergies, Rindex, num);
+    LArMPT->AddProperty("FASTCOMPONENT", FastScintEnergies, FastScintSpectrum, num)->SetSpline(true);
+    LArMPT->AddProperty("SLOWCOMPONENT", FastScintEnergies, FastScintSpectrum, num)->SetSpline(true);
+    LArMPT->AddConstProperty("FASTTIMECONSTANT", 7. * ns);
+    LArMPT->AddConstProperty("SLOWTIMECONSTANT", 1400. * ns);
+    LArMPT->AddConstProperty("YIELDRATIO", 0.75);
+    G4double scint_yield = 1.0 / (19.5 * eV);
+    LArMPT->AddConstProperty("SCINTILLATIONYIELD", scint_yield / MeV);
+    LArMPT->DumpTable();
+    //    G4double fano = 0.11;
+    // Doke et al, NIM 134 (1976)353
+    //LArMPT->AddConstProperty("RESOLUTIONSCALE", fano);
+    LArMPT->AddConstProperty("RESOLUTIONSCALE", 1.0);
+    std::cout << "**********************************************************************" << std::endl;
+    //std::cout << logicTarget->GetMaterial()->GetName() << std::endl;
+    std::cout << "**********************************************************************" << std::endl;
+    //logicTarget->GetMaterial()->SetMaterialPropertiesTable(LArMPT);
+    logicContainer->GetMaterial()->SetMaterialPropertiesTable(LArMPT2);
+}
+ */
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-
-
-G4MaterialPropertyVector* DetectorConstruction::MakeGlassRI()
-{
-    return MakeConstantProperty(1.49) ; 
+void DetectorConstruction::UpdateGeometry() {
+    G4RunManager::GetRunManager()->DefineWorldVolume(Construct());
 }
 
-G4MaterialPropertyVector* DetectorConstruction::MakeConstantProperty(float value)
-{
-    using CLHEP::eV ;
- 
-    G4double photonEnergy[]   = { 2.034*eV , 4.136*eV };
-    G4double propertyValue[] ={  value  , value    };     
+// The following 3 functions are described in
+// https://indico.cern.ch/event/44566/contributions/1101918/attachments/943057/1337650/dipompeo.pdf
+// and references therein
+//
 
-    assert(sizeof(photonEnergy) == sizeof(propertyValue));
-    const G4int nEntries = sizeof(photonEnergy)/sizeof(G4double);
-
-    return new G4MaterialPropertyVector(photonEnergy, propertyValue,nEntries ); 
+G4double DetectorConstruction::ArScintillationSpectrum(G4double kk) {
+    G4double waveL;
+    waveL = exp(-0.5 * ((kk - 128.0) / (2.929))*((kk - 128.0) / (2.929)));
+    return waveL;
 }
 
+// Calculates the dielectric constant of LAr from the Bideau-Sellmeier formula.
+// See : A. Bideau-Mehu et al., "Measurement of refractive indices of Ne, Ar,
+// Kr and Xe ...", J. Quant. Spectrosc. Radiat. Transfer, Vol. 25 (1981), 395
 
-
-
-
-
-
-G4MaterialPropertyVector* DetectorConstruction::MakeWaterRI()
-{
-    using CLHEP::eV ; 
-    G4double photonEnergy[] =
-                { 2.034*eV, 2.068*eV, 2.103*eV, 2.139*eV,
-                  2.177*eV, 2.216*eV, 2.256*eV, 2.298*eV,
-                  2.341*eV, 2.386*eV, 2.433*eV, 2.481*eV,
-                  2.532*eV, 2.585*eV, 2.640*eV, 2.697*eV,
-                  2.757*eV, 2.820*eV, 2.885*eV, 2.954*eV,
-                  3.026*eV, 3.102*eV, 3.181*eV, 3.265*eV,
-                  3.353*eV, 3.446*eV, 3.545*eV, 3.649*eV,
-                  3.760*eV, 3.877*eV, 4.002*eV, 4.136*eV };
-
-    const G4int nEntries = sizeof(photonEnergy)/sizeof(G4double);
-
-    G4double refractiveIndex[] =
-            { 1.3435, 1.344,  1.3445, 1.345,  1.3455,
-              1.346,  1.3465, 1.347,  1.3475, 1.348,
-              1.3485, 1.3492, 1.35,   1.3505, 1.351,
-              1.3518, 1.3522, 1.3530, 1.3535, 1.354,
-              1.3545, 1.355,  1.3555, 1.356,  1.3568,
-              1.3572, 1.358,  1.3585, 1.359,  1.3595,
-              1.36,   1.3608};
-
-    assert(sizeof(refractiveIndex) == sizeof(photonEnergy));
-    return new G4MaterialPropertyVector(photonEnergy, refractiveIndex,nEntries ); 
+G4double DetectorConstruction::LArEpsilon(const G4double lambda) {
+    G4double epsilon;
+    G4double lowLambda = 110.0; // lowLambda in  nanometer
+    if (lambda < lowLambda) return 1.0e4; // lambda MUST be > 110.0 nm
+    epsilon = lambda / 1000; // switch to micrometers
+    epsilon = 1.0 / (epsilon * epsilon); // 1 / (lambda)^2
+    epsilon = 1.2055e-2 * (0.2075 / (91.012 - epsilon) +
+            0.0415 / (87.892 - epsilon) +
+            4.3330 / (214.02 - epsilon));
+    epsilon *= (8. / 12.); // Bideau-Sellmeier -> Clausius-Mossotti
+    G4double GArRho = 0.001784; // density in g/cm3
+    G4double LArRho = 1.3954; // density in g/cm3
+    epsilon *= (LArRho / GArRho); // density correction (Ar gas -> LAr liquid)
+    if (epsilon < 0.0 || epsilon > 0.999999) return 4.0e6;
+    epsilon = (1.0 + 2.0 * epsilon) / (1.0 - epsilon); // solve Clausius-Mossotti
+    return epsilon;
 }
+//
+// Calculates the refractive index of LAr
+//
 
-G4MaterialPropertyVector* DetectorConstruction::MakeAirRI()
-{
-    using CLHEP::eV ; 
-    G4double photonEnergy[] =
-                { 2.034*eV, 2.068*eV, 2.103*eV, 2.139*eV,
-                  2.177*eV, 2.216*eV, 2.256*eV, 2.298*eV,
-                  2.341*eV, 2.386*eV, 2.433*eV, 2.481*eV,
-                  2.532*eV, 2.585*eV, 2.640*eV, 2.697*eV,
-                  2.757*eV, 2.820*eV, 2.885*eV, 2.954*eV,
-                  3.026*eV, 3.102*eV, 3.181*eV, 3.265*eV,
-                  3.353*eV, 3.446*eV, 3.545*eV, 3.649*eV,
-                  3.760*eV, 3.877*eV, 4.002*eV, 4.136*eV };
-
-    const G4int nEntries = sizeof(photonEnergy)/sizeof(G4double);
-
-    G4double refractiveIndex[] =
-            { 1.,  1.,  1.,  1., 
-              1.,  1. , 1.,  1., 
-              1.,  1. , 1.,  1., 
-              1.,  1. , 1.,  1., 
-              1.,  1.,  1.,  1., 
-              1.,  1.,  1.,  1., 
-              1.,  1.,  1.,  1., 
-              1.,  1.,  1.,  1,};
-
-    assert(sizeof(refractiveIndex) == sizeof(photonEnergy));
-    return new G4MaterialPropertyVector(photonEnergy, refractiveIndex,nEntries ); 
+G4double DetectorConstruction::LArRefIndex(const G4double lambda) {
+    return ( sqrt(LArEpsilon(lambda))); // square root of dielectric constant
 }
-
-G4VPhysicalVolume* DetectorConstruction::Construct()
-{
-    G4cout << "[ DetectorConstruction::Construct " << G4endl ; 
-
-    G4Material* air = MakeAir(); 
-    G4Box* so_0 = new G4Box("World",1000.,1000.,1000.);
-    G4LogicalVolume* lv_0 = new G4LogicalVolume(so_0,air,"World",0,0,0);
-
-    G4VPhysicalVolume* pv_0 = new G4PVPlacement(0,G4ThreeVector(),lv_0 ,"World",0,false,0);
-
-    G4Material* water = MakeWater(); 
-    G4Box* so_1 = new G4Box("Obj",500.,500.,500.);
-    G4LogicalVolume* lv_1 = new G4LogicalVolume(so_1,water,"Obj",0,0,0);
-    G4VPhysicalVolume* pv_1 = new G4PVPlacement(0,G4ThreeVector(),lv_1 ,"Obj",lv_0,false,0);
-    assert( pv_1 ); 
-
-    G4Material* glass = MakeGlass();    // slab of sensitive glass in the water 
-    //AddProperty(glass, "EFFICIENCY", MakeConstantProperty(0.5)); 
-
-
-    G4Box* so_2 = new G4Box("Det",400.,400.,10.);  // half sizes 
-    G4LogicalVolume* lv_2 = new G4LogicalVolume(so_2,glass,"Det",0,0,0);
-    G4OpticalSurface* scintWrap = new G4OpticalSurface("ScintWrap");
-
-
-    G4VPhysicalVolume* pv_2 = new G4PVPlacement(0,G4ThreeVector(0,0,100.),lv_2 ,"Det",lv_1,false,0);
-    assert( pv_2 ); 
-    new G4LogicalBorderSurface("ScintWrap", pv_1,
-			       pv_2 ,
-			       scintWrap);
-    
-    scintWrap->SetType(dielectric_metal);
-    scintWrap->SetFinish(polished);
-    scintWrap->SetModel(glisur);
-    
-    G4double pp[] = {2.0*eV, 3.5*eV};
-    const G4int num = sizeof(pp)/sizeof(G4double);
-    G4double reflectivity[] = {1., 1.};
-    assert(sizeof(reflectivity) == sizeof(pp));
-    G4double efficiency[] = {0.5, 0.5};
-    assert(sizeof(efficiency) == sizeof(pp));     
-    G4MaterialPropertiesTable* scintWrapProperty 
-      = new G4MaterialPropertiesTable();
-    
-    scintWrapProperty->AddProperty("REFLECTIVITY",pp,reflectivity,num);
-    scintWrapProperty->AddProperty("EFFICIENCY",pp,efficiency,num);
-    scintWrap->SetMaterialPropertiesTable(scintWrapProperty);
-   
- 
-    G4SDManager* SDMan = G4SDManager::GetSDMpointerIfExist();        assert( SDMan && " SDMan should have been created before now " ); 
-    G4VSensitiveDetector* sd = SDMan->FindSensitiveDetector(sdname); assert( sd && " failed for find sd with sdname " ); 
-    lv_2->SetSensitiveDetector(sd); 
-
-
-    const std::string& lv_1_name = lv_1->GetName() ; 
-    //std::cout << " lv_1_name " << lv_1_name << std::endl ; 
-    assert( strcmp( lv_1_name.c_str(), "Obj" ) == 0 ); 
-
-    G4cout << "] DetectorConstruction::Construct " << G4endl ; 
-
-    return pv_0 ; 
-}
-
-
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

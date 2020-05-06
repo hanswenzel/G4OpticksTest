@@ -14,8 +14,9 @@ find_package( G4OK CONFIG REQUIRED )
 include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
+file(GLOB detectors ${PROJECT_SOURCE_DIR}/gdml/*.gdml)
+file(GLOB schemas ${PROJECT_SOURCE_DIR}/gdml/*.xsd)
 
-#set(libsuffix .so)
 add_executable(${name} ${name}.cc ${sources} ${headers})
 
 target_link_libraries(${name} Opticks::G4OK )
@@ -24,7 +25,7 @@ target_compile_definitions( ${name}
       WITH_OPTICKS
  )
 
-install(TARGETS ${name} DESTINATION lib)
-
+install(TARGETS ${name} DESTINATION bin)
+install(FILES ${detectors} ${schemas}   DESTINATION bin)
 
 

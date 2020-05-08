@@ -6,7 +6,7 @@
 # sbatch --nodes=1 --partition gpu --account=g4 $Executable
 #
 #------------------------------------------------------------------------------------
-export WORK_DIR=/home/wenzel/work
+export WORK_DIR=/home/wenzel/work/opticks
 export OptiX_INSTALL_DIR=/srv/software/misc/NVIDIA-OptiX-SDK-6.5.0-linux64
 export OPTICKS_COMPUTE_CAPABILITY=70
 export CUDA_INSTALL_DIR=/srv/software/cuda-10.1/bin

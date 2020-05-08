@@ -9,7 +9,7 @@
 export WORK_DIR=/home/wenzel/work/opticks
 export OptiX_INSTALL_DIR=/srv/software/misc/NVIDIA-OptiX-SDK-6.5.0-linux64
 export OPTICKS_COMPUTE_CAPABILITY=70
-export CUDA_INSTALL_DIR=/srv/software/cuda-10.1/bin
+export CUDA_INSTALL_DIR=/srv/software/cuda-10.1
 export CUDA_SAMPLES=/home/wenzel/NVIDIA_CUDA-10.1_Samples
 #------------------------------------------------------------------------------------
 module load gnu8/8.3.0

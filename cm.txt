@@ -1,1 +1,7 @@
-cmake   -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_PREFIX_PATH="/home/wenzel/gpu/local/opticks/externals;/home/wenzel/gpu/local/opticks" -DOPTICKS_PREFIX=/home/wenzel/gpu/local/opticks -DCMAKE_MODULE_PATH=/home/wenzel/gpu/opticks/cmake/Modules  -DCMAKE_INSTALL_PREFIX=/tmp/wenzel/opticks/examples/G4OpticksTest -DGeant4_DIR=/home/wenzel/gpu/local/opticks/externals/lib/Geant4-10.4.2 ../G4OpticksTest
+cmake   -DCMAKE_BUILD_TYPE=Debug \
+-DCMAKE_PREFIX_PATH="/home/wenzel/gpu/local/opticks/externals;/home/wenzel/gpu/local/opticks" \
+-DOPTICKS_PREFIX=/home/wenzel/gpu/local/opticks \
+-DCMAKE_MODULE_PATH=/home/wenzel/gpu/opticks/cmake/Modules \
+-DCMAKE_INSTALL_PREFIX=/home/wenzel/tt2/G4OpticksTest-install \
+-DGeant4_DIR=/home/wenzel/gpu/local/opticks/externals/lib/Geant4-10.4.2 \
+../G4OpticksTest

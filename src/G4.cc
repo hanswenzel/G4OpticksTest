@@ -36,13 +36,13 @@
 #include "TrackingAction.hh"
 #include "SteppingAction.hh"
 
-G4::G4(int nev)
+G4::G4(G4String fname,int nev) 
     :
     ctx(new Ctx),
     rm(new G4RunManager),
-    fname("/home/wenzel/gpu/opticks/examples/Geant4/G4OpticksTest/gdml/CerenkovMinimal.gdml"),
-    sdn("SD0"),
-    sd(new SensitiveDetector(sdn)),
+
+    //sdn("SD0"),
+    //sd(new SensitiveDetector(sdn)),
     dc(new DetectorConstruction(fname)),
     pl(new PhysicsList<L4Cerenkov>()),
     ga(NULL),
@@ -53,8 +53,6 @@ G4::G4(int nev)
 {
     rm->SetUserInitialization(dc);
     rm->SetUserInitialization(pl);
-    //fname= "/home/wenzel/gpu/opticks/examples/Geant4/CerenkovMinimal/CerenkovMinimal.gdml";
-    //   dc = new DetectorConstruction(fname);
     ga = new PrimaryGeneratorAction(ctx);
     ra = new RunAction(ctx) ;
     ea = new EventAction(ctx) ;

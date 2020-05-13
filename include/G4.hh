@@ -35,15 +35,15 @@ struct SteppingAction ;
 
 struct G4
 {
-    G4(int nev); 
+  G4(G4String fname,int nev); 
     ~G4();
     void beamOn(int nev);
 
     Ctx*                    ctx ; 
     G4RunManager*            rm ;
-    G4String               fname;
-    const char*             sdn ; 
-    SensitiveDetector*       sd ; 
+  //    G4String               fname;
+  //  const char*             sdn ; 
+  //  SensitiveDetector*       sd ; 
     DetectorConstruction*    dc ; 
     PhysicsList<L4Cerenkov>* pl ;
     PrimaryGeneratorAction*  ga ; 

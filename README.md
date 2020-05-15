@@ -1,6 +1,8 @@
 # G4OpticksTest
-Example that demonstrates how to use opticks from within Geant4 for the creation and propagation of optical photons. This requires the opticks environment to be set up properly. 
+Example that demonstrates how to use opticks from within Geant4 for the creation and propagation of optical photons. This requires the opticks environment to be set up properly. (for instructions how to install opticks see e.g. https://cdcvs.fnal.gov/redmine/projects/g4gpu/wiki/Installation_on_the_LQ_cluster )
+The following is a list of external packages and the versions thereof that is required 
 
+To get started : 
 git clone https://github.com/hanswenzel/G4OpticksTest.git
 
 cd G4OpticksTest/

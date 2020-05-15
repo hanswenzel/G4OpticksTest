@@ -8,6 +8,20 @@ nvidia cuda 10.1
 
 geant4 10.4.p02
 
+boost 1.61.0
+
+xercesc 3.2.2
+
+openmesh 6.3
+
+glew 1.13.0
+
+glfw 3.1.1
+
+cmake 3.14.1
+
+
+
 
 To get started : 
 git clone https://github.com/hanswenzel/G4OpticksTest.git

@@ -37,8 +37,7 @@ const char* SensitiveDetector::SDName = NULL ;
 const char* SensitiveDetector::collectionNameA = "OpHitCollectionA" ;
 const char* SensitiveDetector::collectionNameB = "OpHitCollectionB" ;
 
-SensitiveDetector::SensitiveDetector(const char* name) 
-    :
+SensitiveDetector::SensitiveDetector(G4String name)  :
     G4VSensitiveDetector(name),
     m_hit_count(0)
 {
@@ -49,6 +48,40 @@ SensitiveDetector::SensitiveDetector(const char* name)
     G4SDManager* SDMan = G4SDManager::GetSDMpointer() ;
     SDMan->AddNewDetector(this); 
 }
+
+void SensitiveDetector::Initialize(G4HCofThisEvent* HCE)   // invoked by G4EventManager::ProcessOneEvent/G4EventManager::DoProcessing/G4SDManager::PrepareNewEvent/G4SDStructure::Initialize
+{
+    G4cout
+        << "SensitiveDetector::Initialize"
+        << " HCE " << HCE
+        << " HCE.Capacity " << HCE->GetCapacity()
+        << " SensitiveDetectorName " << SensitiveDetectorName
+        << " collectionName[0] " << collectionName[0] 
+        << " collectionName[1] " << collectionName[1] 
+        << G4endl  
+        ; 
+ 
+    hitCollectionA = new OpHitCollection(SensitiveDetectorName,collectionName[0]);
+    hitCollectionB = new OpHitCollection(SensitiveDetectorName,collectionName[1]);
+
+    G4SDManager* SDMan = G4SDManager::GetSDMpointerIfExist() ;
+    assert( SDMan ) ;  
+
+    int hcid_A = SDMan->GetCollectionID(hitCollectionA);
+    HCE->AddHitsCollection(hcid_A, hitCollectionA ); 
+
+    int hcid_B = SDMan->GetCollectionID(hitCollectionB);
+    HCE->AddHitsCollection(hcid_B, hitCollectionB ); 
+
+    G4VHitsCollection* hcA = HCE->GetHC(hcid_A); 
+    assert( hcA == hitCollectionA ); 
+
+    G4VHitsCollection* hcB = HCE->GetHC(hcid_B); 
+    assert( hcB == hitCollectionB ); 
+}
+SensitiveDetector::~SensitiveDetector() {
+}
+
 
 G4bool SensitiveDetector::ProcessHits(G4Step* step,G4TouchableHistory* )
 {
@@ -116,38 +149,6 @@ G4bool SensitiveDetector::ProcessHits(G4Step* step,G4TouchableHistory* )
 }
 
 
-
-
-void SensitiveDetector::Initialize(G4HCofThisEvent* HCE)   // invoked by G4EventManager::ProcessOneEvent/G4EventManager::DoProcessing/G4SDManager::PrepareNewEvent/G4SDStructure::Initialize
-{
-    G4cout
-        << "SensitiveDetector::Initialize"
-        << " HCE " << HCE
-        << " HCE.Capacity " << HCE->GetCapacity()
-        << " SensitiveDetectorName " << SensitiveDetectorName
-        << " collectionName[0] " << collectionName[0] 
-        << " collectionName[1] " << collectionName[1] 
-        << G4endl  
-        ; 
- 
-    hitCollectionA = new OpHitCollection(SensitiveDetectorName,collectionName[0]);
-    hitCollectionB = new OpHitCollection(SensitiveDetectorName,collectionName[1]);
-
-    G4SDManager* SDMan = G4SDManager::GetSDMpointerIfExist() ;
-    assert( SDMan ) ;  
-
-    int hcid_A = SDMan->GetCollectionID(hitCollectionA);
-    HCE->AddHitsCollection(hcid_A, hitCollectionA ); 
-
-    int hcid_B = SDMan->GetCollectionID(hitCollectionB);
-    HCE->AddHitsCollection(hcid_B, hitCollectionB ); 
-
-    G4VHitsCollection* hcA = HCE->GetHC(hcid_A); 
-    assert( hcA == hitCollectionA ); 
-
-    G4VHitsCollection* hcB = HCE->GetHC(hcid_B); 
-    assert( hcB == hitCollectionB ); 
-}
 
 
 void SensitiveDetector::EndOfEvent(G4HCofThisEvent* HCE) // invoked by G4EventManager::ProcessOneEvent/G4EventManager::DoProcessing/G4SDManager::TerminateCurrentEvent/G4SDStructure::Terminate

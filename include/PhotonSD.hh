@@ -26,14 +26,14 @@ class G4HCofThisEvent;
 
 class PhotonSD : public G4VSensitiveDetector {
 public:
-  
-  PhotonSD(G4String name); 
+
+    PhotonSD(G4String name);
 
     ~PhotonSD();
 
     void Initialize(G4HCofThisEvent*);
     G4bool ProcessHits(G4Step*, G4TouchableHistory*);
-    virtual void   EndOfEvent(G4HCofThisEvent* hitCollection);
+    virtual void EndOfEvent(G4HCofThisEvent* hitCollection);
 
 private:
     // we don't create any Hits

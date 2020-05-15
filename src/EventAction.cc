@@ -58,7 +58,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
     int num_hits = ok->propagateOpticalPhotons() ;  
     NPY<float>* hits = ok->getHits(); 
     //    hits->save("/home/wenzel/gpu/opticks/examples/Geant4/G4OpticksTest/hits.npy");
-    //hits->save("hits.npy");
+    hits->save("hits.npy");
     assert( hits == NULL || hits->getNumItems() == unsigned(num_hits) ) ; 
     G4cout 
            << "EventAction::EndOfEventAction"

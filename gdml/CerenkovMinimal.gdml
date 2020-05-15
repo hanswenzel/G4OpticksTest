@@ -54,7 +54,7 @@
             <solidref ref="GlassPlate"/>
             <colorref ref="red"/> 
             <auxiliary auxtype="Solid" auxvalue="True"/>
-            <auxiliary auxtype="SensDet" auxvalue="PhotonDetector"/>
+            <auxiliary auxtype="SensDet" auxvalue="SensitiveDetector"/>
         </volume>
         <volume name="Obj">
             <materialref ref="MyWater"/>

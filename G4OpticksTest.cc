@@ -20,42 +20,38 @@
 #include "OPTICKS_LOG.hh"
 #include "G4.hh"
 #include "G4Timer.hh"
-int main(int argc, char** argv)
-{
-  bool interactive = false;
-  if (argc < 2) {
-    G4cout << "Error! Mandatory input file is not specified!" << G4endl;
-    G4cout << G4endl;
-    G4cout << G4endl;
-    G4cout << "Usage: lArTest <intput_gdml_file:mandatory>" << G4endl;
-    G4cout << G4endl;
-    return -1;
+
+int main(int argc, char** argv) {
+    bool interactive = false;
+    if (argc < 2) {
+        G4cout << "Error! Mandatory input file is not specified!" << G4endl;
+        G4cout << G4endl;
+        G4cout << G4endl;
+        G4cout << "Usage: lArTest <intput_gdml_file:mandatory>" << G4endl;
+        G4cout << G4endl;
+        return -1;
     }
-  G4cout << " gdml file: "<< argv[1]<<G4endl;
-  G4cout << "number of evts: "<< argv[2]<<G4endl;
-  int nev  =
-   atoi(argv[2]);
-  G4cout << "number of evts: "<< nev<<G4endl;
-  //start time
-  G4Timer *eventTimer = new G4Timer;
-  eventTimer->Start();
-  
-    OPTICKS_LOG(argc, argv); 
-    G4 g( argv[1],nev) ;
+    G4cout << " gdml file: " << argv[1] << G4endl;
+    G4cout << "number of evts: " << argv[2] << G4endl;
+    int nev = atoi(argv[2]);
+    G4cout << "number of evts: " << nev << G4endl;
+    //start time
+    G4Timer *eventTimer = new G4Timer;
+    eventTimer->Start();
+
+    OPTICKS_LOG(argc, argv);
+    G4 g(argv[1], nev);
 
     eventTimer->Stop();
-    double totalCPUTime = eventTimer->GetUserElapsed()
-      + eventTimer->GetSystemElapsed();
-    
+    double totalCPUTime = eventTimer->GetUserElapsed() + eventTimer->GetSystemElapsed();
     G4int precision_t = G4cout.precision(3);
     std::ios::fmtflags flags_t = G4cout.flags();
     G4cout.setf(std::ios::fixed, std::ios::floatfield);
-    G4cout << "TimeTotal> " << eventTimer->GetRealElapsed() << " "
-	   << totalCPUTime << G4endl;
+    G4cout << "TimeTotal> " << eventTimer->GetRealElapsed() << " "<< totalCPUTime << G4endl;
     G4cout.setf(flags_t);
     G4cout.precision(precision_t);
     delete eventTimer;
-    return 0 ; 
+    return 0;
 }
 
 

@@ -38,12 +38,12 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(Ctx* ctx_)
     fParticleGun(new G4ParticleGun(1))
 {
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-    G4ParticleDefinition* particle = particleTable->FindParticle("e+");
+    G4ParticleDefinition* particle = particleTable->FindParticle("mu+");
     fParticleGun->SetParticleDefinition(particle);
     fParticleGun->SetParticleTime(0.0*CLHEP::ns);
     fParticleGun->SetParticlePosition(G4ThreeVector(0.0*CLHEP::cm,0.0*CLHEP::cm,0.0*CLHEP::cm));
     fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.0));
-    fParticleGun->SetParticleEnergy(0.8*MeV);   // few photons at ~0.7*MeV loads from ~ 0.8*MeV
+    fParticleGun->SetParticleEnergy(0.8*CLHEP::GeV);   // few photons at ~0.7*MeV loads from ~ 0.8*MeV
 }
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)

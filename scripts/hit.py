@@ -18,15 +18,22 @@ x = b[:,0,0]
 y = b[:,0,1]
 z = b[:,0,2]
 lamb = b[:,2,3]
-
-#fig = plt.figure(figsize=(12, 4))
-#ax2.hist(age, bins='auto')
 print(x.shape)
 print(y.shape)
 print(lamb.shape)
-axs = plt.subplots(2, 2, figsize=(5, 5))
-axs[0, 0].hist(x,50,(-200,200.))
-axs[1, 0].scatter(x, y)
-axs[0, 1].hist(lamb,50,(50,800.))
-axs[1, 1].hist(z)
-axs.show()
+
+#axs = plt.subplots(2, 2, figsize=(5, 5))
+plt.subplot(131)
+plt.ylabel('#Photons')
+plt.xlabel('x-position/mm')
+plt.hist(x,50,(-200,200.))
+plt.subplot(132)
+plt.xlabel('x-position/mm')
+plt.ylabel('y-position/mm')
+plt.scatter(x, y)
+plt.subplot(133)
+plt.xlabel('lambda/nm')
+plt.ylabel('#Photons')
+plt.hist(lamb,50,(50,800.))
+#plt.hist(z)
+plt.show()

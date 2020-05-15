@@ -36,48 +36,45 @@
 #include "Ctx.hh"
 
 EventAction::EventAction(Ctx* ctx_)
-    :
-    ctx(ctx_)
-{
+:
+ctx(ctx_) {
 }
 
-void EventAction::BeginOfEventAction(const G4Event* anEvent)
-{
-    ctx->setEvent(anEvent); 
+void EventAction::BeginOfEventAction(const G4Event* anEvent) {
+    ctx->setEvent(anEvent);
 }
 
-void EventAction::EndOfEventAction(const G4Event* event)
-{
-    G4HCofThisEvent* HCE = event->GetHCofThisEvent() ;
-    assert(HCE); 
+void EventAction::EndOfEventAction(const G4Event* event) {
+    G4HCofThisEvent* HCE = event->GetHCofThisEvent();
+    assert(HCE);
 
 #ifdef WITH_OPTICKS
-    G4cout << "\n###[ EventAction::EndOfEventAction G4Opticks.propagateOpticalPhotons\n" << G4endl ; 
+    G4cout << "\n###[ EventAction::EndOfEventAction G4Opticks.propagateOpticalPhotons\n" << G4endl;
 
-    G4Opticks* ok = G4Opticks::GetOpticks() ;
-    int num_hits = ok->propagateOpticalPhotons() ;  
-    NPY<float>* hits = ok->getHits(); 
-    //    hits->save("/home/wenzel/gpu/opticks/examples/Geant4/G4OpticksTest/hits.npy");
-    hits->save("hits.npy");
-    assert( hits == NULL || hits->getNumItems() == unsigned(num_hits) ) ; 
-    G4cout 
-           << "EventAction::EndOfEventAction"
-           << " num_hits " << num_hits 
-           << " hits " << hits 
-           << G4endl 
-           ; 
+    G4Opticks* ok = G4Opticks::GetOpticks();
+    int num_hits = ok->propagateOpticalPhotons();
+    NPY<float>* hits = ok->getHits();
+    hits->save("/home/wenzel/tt2/G4OpticksTest-install/bin/hits.npy");
+    //hits->save("hits.npy");
+    assert(hits == NULL || hits->getNumItems() == unsigned(num_hits));
+    G4cout
+            << "EventAction::EndOfEventAction"
+            << " num_hits " << num_hits
+            << " hits " << hits
+            << G4endl
+            ;
 
     // TODO: feed the hits into the Hit collection 
 
-    G4cout << "\n###] EventAction::EndOfEventAction G4Opticks.propagateOpticalPhotons\n" << G4endl ; 
+    G4cout << "\n###] EventAction::EndOfEventAction G4Opticks.propagateOpticalPhotons\n" << G4endl;
 #endif
 
     //addDummyHits(HCE);
-    G4cout 
-         << "EventAction::EndOfEventAction"
-         << " DumpHitCollections "
-         << G4endl 
-         ; 
+    G4cout
+            << "EventAction::EndOfEventAction"
+            << " DumpHitCollections "
+            << G4endl
+            ;
     SensitiveDetector::DumpHitCollections(HCE);
 
     // A possible alternative location to invoke the GPU propagation
@@ -94,6 +91,6 @@ void EventAction::addDummyHits(G4HCofThisEvent* HCE)
         HC->insert( OpHit::MakeDummyHit() ) ;
     }
 }
-*/
+ */
 
 

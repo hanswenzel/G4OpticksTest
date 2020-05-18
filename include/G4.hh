@@ -35,9 +35,9 @@ struct SteppingAction ;
 
 struct G4
 {
-  G4(G4String fname,int nev); 
+  G4(G4String fname); 
     ~G4();
-    void beamOn(int nev);
+//    void beamOn(int nev);
 
     Ctx*                    ctx ; 
     G4RunManager*            rm ;

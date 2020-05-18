@@ -16,6 +16,7 @@ file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 file(GLOB detectors ${PROJECT_SOURCE_DIR}/gdml/*.gdml)
 file(GLOB schemas ${PROJECT_SOURCE_DIR}/gdml/*.xsd)
+file(GLOB macros ${PROJECT_SOURCE_DIR}/*.mac)
 
 add_executable(${name} ${name}.cc ${sources} ${headers})
 
@@ -26,6 +27,6 @@ target_compile_definitions( ${name}
  )
 
 install(TARGETS ${name} DESTINATION bin)
-install(FILES ${detectors} ${schemas}   DESTINATION bin)
+install(FILES ${detectors} ${schemas}   ${macros} DESTINATION bin)
 
 

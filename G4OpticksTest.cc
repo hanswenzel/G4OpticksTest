@@ -19,10 +19,14 @@
 
 #include "OPTICKS_LOG.hh"
 #include "G4.hh"
+#include "G4UImanager.hh"
 #include "G4Timer.hh"
+#include "G4UIExecutive.hh"
+#include "G4VisExecutive.hh"
 
 int main(int argc, char** argv) {
     bool interactive = false;
+    G4UIExecutive* ui = nullptr;
     if (argc < 2) {
         G4cout << "Error! Mandatory input file is not specified!" << G4endl;
         G4cout << G4endl;
@@ -31,23 +35,43 @@ int main(int argc, char** argv) {
         G4cout << G4endl;
         return -1;
     }
+
+    if (argc == 2) {
+        interactive = true;
+        ui = new G4UIExecutive(argc, argv);
+    }
     G4cout << " gdml file: " << argv[1] << G4endl;
-    G4cout << "number of evts: " << argv[2] << G4endl;
-    int nev = atoi(argv[2]);
-    G4cout << "number of evts: " << nev << G4endl;
     //start time
     G4Timer *eventTimer = new G4Timer;
     eventTimer->Start();
 
     OPTICKS_LOG(argc, argv);
-    G4 g(argv[1], nev);
+    G4 g(argv[1]);
 
+    G4UImanager* UImanager = G4UImanager::GetUIpointer();
+    if (interactive) {
+        G4VisManager* visManager = new G4VisExecutive;
+        visManager->Initialize();
+        //get the pointer to the User Interface manager
+        //        UImanager->ApplyCommand("/control/execute init_vis.mac");
+        UImanager->ApplyCommand("/control/execute init_vis.mac");
+        ui->SessionStart();
+        delete ui;
+        delete visManager;
+    } else {
+        // batch mode
+        G4String command = "/control/execute ";
+        G4String fileName = argv[2];
+        UImanager->ApplyCommand(command + fileName);
+    }
+
+    //    delete visManager;
     eventTimer->Stop();
     double totalCPUTime = eventTimer->GetUserElapsed() + eventTimer->GetSystemElapsed();
     G4int precision_t = G4cout.precision(3);
     std::ios::fmtflags flags_t = G4cout.flags();
     G4cout.setf(std::ios::fixed, std::ios::floatfield);
-    G4cout << "TimeTotal> " << eventTimer->GetRealElapsed() << " "<< totalCPUTime << G4endl;
+    G4cout << "TimeTotal> " << eventTimer->GetRealElapsed() << " " << totalCPUTime << G4endl;
     G4cout.setf(flags_t);
     G4cout.precision(precision_t);
     delete eventTimer;

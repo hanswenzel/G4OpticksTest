@@ -36,7 +36,7 @@
 #include "TrackingAction.hh"
 #include "SteppingAction.hh"
 
-G4::G4(G4String fname, int nev)
+G4::G4(G4String fname)
 :
 ctx(new Ctx),
 rm(new G4RunManager),
@@ -66,15 +66,15 @@ sa(NULL) {
 
     rm->Initialize();
 
-    beamOn(nev);
+   // beamOn(nev);
 }
 
 G4::~G4() {
     G4GeometryManager::GetInstance()->OpenGeometry();
 }
 
-void G4::beamOn(int nev) {
-    rm->BeamOn(nev);
-}
+//id G4::beamOn(int nev) {
+//  rm->BeamOn(nev);
+//
 
 

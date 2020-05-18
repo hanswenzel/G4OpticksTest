@@ -75,9 +75,9 @@ G4bool PhotonSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     std::map<G4String, int> *mapOfntIDs = cfMgr->getMapOfntIDs();
     //const G4String name = aStep->GetPostStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() + "_Tracker";
     const G4String name = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() + "_Photondetector";
-    
-    std::map<G4String, int>::iterator iter=mapOfntIDs->find(name);
-    G4int ID =  (*mapOfntIDs)[name];
+
+    std::map<G4String, int>::iterator iter = mapOfntIDs->find(name);
+    G4int ID = (*mapOfntIDs)[name];
     /*
     if (cfMgr->GetdoAnalysis()) {
         // get analysis manager
@@ -94,7 +94,7 @@ G4bool PhotonSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
         analysisManager->FillNtupleIColumn(ID, 8, G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID());
         analysisManager->AddNtupleRow(ID);
     }
-*/
+     */
     /*
     PhotonHit* newHit = new PhotonHit();
     newHit->SetProcessID(theCreationProcessid);

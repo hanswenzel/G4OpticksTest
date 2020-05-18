@@ -23,14 +23,12 @@
 #include "Ctx.hh"
 
 SteppingAction::SteppingAction(Ctx* ctx_)
-    :
-    ctx(ctx_)
-{
+:
+ctx(ctx_) {
 }
 
-void SteppingAction::UserSteppingAction(const G4Step* step)
-{
-    ctx->setStep(step); 
+void SteppingAction::UserSteppingAction(const G4Step* step) {
+    ctx->setStep(step);
 }
 
 

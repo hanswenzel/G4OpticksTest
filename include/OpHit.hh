@@ -23,10 +23,10 @@
 #include "G4THitsCollection.hh"
 #include "G4ThreeVector.hh"
 
-struct OpHit : public G4VHit
+class OpHit : public G4VHit
 {
-    static OpHit* MakeDummyHit(); 
-
+//    static OpHit* MakeDummyHit(); 
+    public:
     G4double      ene;     
     G4double      tim;     
     G4ThreeVector pos; 

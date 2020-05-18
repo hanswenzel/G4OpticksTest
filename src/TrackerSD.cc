@@ -82,10 +82,10 @@ G4bool TrackerSD::ProcessHits(G4Step* aStep,
     ConfigurationManager* cfMgr = ConfigurationManager::getInstance();
     std::map<G4String, int> *mapOfntIDs = cfMgr->getMapOfntIDs();
     //const G4String name = aStep->GetPostStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() + "_Tracker";
-     const G4String name = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() + "_Tracker";
+    const G4String name = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() + "_Tracker";
     //G4int ID = 0;
-    std::map<G4String, int>::iterator iter=mapOfntIDs->find(name);
-    G4int ID =  (*mapOfntIDs)[name];
+    std::map<G4String, int>::iterator iter = mapOfntIDs->find(name);
+    G4int ID = (*mapOfntIDs)[name];
     //std::cout <<"ID:  "<<ID<<std::endl;
     //for (std::map<G4String, int>::iterator ii = mapOfntIDs->begin(); ii != mapOfntIDs->end(); ++ii) {
     //    std::cout << (*ii).first << ": " << (*ii).second << std::endl;
@@ -106,7 +106,7 @@ G4bool TrackerSD::ProcessHits(G4Step* aStep,
         analysisManager->FillNtupleIColumn(ID, 7, G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID());
         analysisManager->AddNtupleRow(ID);
     }
-    */
+     */
     return true;
 }
 

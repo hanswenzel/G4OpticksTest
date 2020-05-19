@@ -22,28 +22,24 @@
 #include "L4Cerenkov.hh"
 class G4RunManager ;
 
-struct Ctx ; 
-struct SensitiveDetector ;
-struct DetectorConstruction ;
+class Ctx ; 
+class SensitiveDetector ;
+class DetectorConstruction ;
 template <typename T> struct PhysicsList ; 
-struct PrimaryGeneratorAction ;
-
-struct RunAction ; 
-struct EventAction ; 
-struct TrackingAction ; 
-struct SteppingAction ; 
-
-struct G4
+class PrimaryGeneratorAction ;
+class RunAction ; 
+class EventAction ; 
+class TrackingAction ; 
+class SteppingAction ; 
+class  G4
 {
+public:
   G4(G4String fname); 
     ~G4();
 //    void beamOn(int nev);
 
     Ctx*                    ctx ; 
     G4RunManager*            rm ;
-  //    G4String               fname;
-  //  const char*             sdn ; 
-  //  SensitiveDetector*       sd ; 
     DetectorConstruction*    dc ; 
     PhysicsList<L4Cerenkov>* pl ;
     PrimaryGeneratorAction*  ga ; 

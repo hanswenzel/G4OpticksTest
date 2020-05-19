@@ -23,8 +23,7 @@
 #include "G4ParticleGun.hh"
 
 #include "G4VUserPrimaryGeneratorAction.hh"
-
-struct Ctx;
+class Ctx;
 class G4ParticleGun;
 
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {

@@ -21,13 +21,13 @@
 
 #include "G4UserTrackingAction.hh"
 
-class G4Track ; 
-struct Ctx ; 
+class G4Track;
+class Ctx;
 
-struct TrackingAction : public G4UserTrackingAction
-{
-    TrackingAction(Ctx* ctx_); 
+class TrackingAction : public G4UserTrackingAction {
+public:
+    TrackingAction(Ctx* ctx_);
     virtual void PreUserTrackingAction(const G4Track* track);
     virtual void PostUserTrackingAction(const G4Track* track);
-    Ctx*  ctx ; 
+    Ctx* ctx;
 };

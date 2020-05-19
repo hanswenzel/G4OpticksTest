@@ -20,10 +20,11 @@
 #pragma once
 
 #include "G4UserRunAction.hh"
-struct Ctx ; 
+class Ctx ; 
 
-struct RunAction : public G4UserRunAction
+class  RunAction : public G4UserRunAction
 {
+public: 
     RunAction(Ctx* ctx_); 
     virtual void BeginOfRunAction(const G4Run* run);
     virtual void EndOfRunAction(const G4Run* run);

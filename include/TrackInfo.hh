@@ -28,8 +28,9 @@ TrackInfo
 
 **/
 
-struct TrackInfo : public G4VUserTrackInformation
+class TrackInfo : public G4VUserTrackInformation
 {
+    public:
     TrackInfo( int photon_record_id_ )
         :
         photon_record_id(photon_record_id_)

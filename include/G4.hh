@@ -25,7 +25,7 @@ class G4RunManager ;
 class Ctx ; 
 class SensitiveDetector ;
 class DetectorConstruction ;
-template <typename T> struct PhysicsList ; 
+template <typename T> class PhysicsList ; 
 class PrimaryGeneratorAction ;
 class RunAction ; 
 class EventAction ; 

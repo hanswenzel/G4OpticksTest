@@ -20,7 +20,7 @@
 #pragma once
 
 #include "G4UserEventAction.hh"
-struct Ctx ; 
+class Ctx ; 
 
 class EventAction : public G4UserEventAction
 {

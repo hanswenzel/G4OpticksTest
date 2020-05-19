@@ -1,0 +1,9 @@
+
+/run/initialize 
+/random/setSeeds 7 38 
+
+/gun/particle e+
+/gun/energy 0.8 MeV
+/gun/position 0. 0. 0.
+/gun/direction 0. 0. 1.
+/run/beamOn 1

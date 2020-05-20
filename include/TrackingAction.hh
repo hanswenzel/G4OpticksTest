@@ -27,6 +27,7 @@ class Ctx;
 class TrackingAction : public G4UserTrackingAction {
 public:
     TrackingAction(Ctx* ctx_);
+  //   TrackingAction();
     virtual void PreUserTrackingAction(const G4Track* track);
     virtual void PostUserTrackingAction(const G4Track* track);
     Ctx* ctx;

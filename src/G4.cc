@@ -52,8 +52,8 @@ ta(NULL),
 sa(NULL) {
     rm->SetUserInitialization(dc);
     rm->SetUserInitialization(pl);
-    ga = new PrimaryGeneratorAction(ctx);
-    ra = new RunAction(ctx);
+    ga = new PrimaryGeneratorAction();
+    ra = new RunAction();
     ea = new EventAction(ctx);
     ta = new TrackingAction(ctx);
     sa = new SteppingAction(ctx);

@@ -23,19 +23,20 @@
 #include "G4ParticleGun.hh"
 
 #include "G4VUserPrimaryGeneratorAction.hh"
-class Ctx;
+//class Ctx;
 class G4ParticleGun;
 
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
 public:
-    PrimaryGeneratorAction(Ctx* ctx_);
+  //  PrimaryGeneratorAction(Ctx* ctx_);
+    PrimaryGeneratorAction();
     void GeneratePrimaries(G4Event* anEvent);
     void collectPrimary(const G4Event* anEvent);
 
     G4ParticleGun* GetParticleGun() {
         return fParticleGun;
     };
-    Ctx* ctx;
+//    Ctx* ctx;
     G4ParticleGun* fParticleGun;
 private:
 

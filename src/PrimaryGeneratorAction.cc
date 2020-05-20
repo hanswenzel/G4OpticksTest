@@ -26,11 +26,11 @@
 #endif
 
 using CLHEP::MeV;
-
-PrimaryGeneratorAction::PrimaryGeneratorAction(Ctx* ctx_)
+//PrimaryGeneratorAction::PrimaryGeneratorAction(Ctx* ctx_)
+PrimaryGeneratorAction::PrimaryGeneratorAction()
 :
 G4VUserPrimaryGeneratorAction(),
-ctx(ctx_),
+//ctx(ctx_),
 fParticleGun(new G4ParticleGun(1)) {
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     G4ParticleDefinition* particle = particleTable->FindParticle("mu+");

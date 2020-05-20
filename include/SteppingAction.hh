@@ -20,14 +20,15 @@
 #pragma once
 
 #include "G4UserSteppingAction.hh"
-class Ctx;
+//class Ctx;
 
 class SteppingAction : public G4UserSteppingAction {
 public:
-    SteppingAction(Ctx* ctx_);
+  //  SteppingAction(Ctx* ctx_);
+    SteppingAction();
     virtual void UserSteppingAction(const G4Step* step);
 
-    Ctx* ctx;
+//    Ctx* ctx;
 };
 
 

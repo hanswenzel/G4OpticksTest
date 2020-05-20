@@ -18,7 +18,6 @@
  */
 
 #include "SteppingAction.hh"
-#include "G4Track.hh"
 #include "G4Step.hh"
 #include "Ctx.hh"
 

@@ -27,11 +27,12 @@
 
 #include "RunAction.hh"
 
-RunAction::RunAction(Ctx* ctx_)
-:
-G4UserRunAction(),
-ctx(ctx_) {
-}
+//RunAction::RunAction(Ctx* ctx_)
+RunAction::RunAction()
+:G4UserRunAction(){}
+//G4UserRunAction(),
+//ctx(ctx_) 
+//}
 
 void RunAction::BeginOfRunAction(const G4Run*) {
 #ifdef WITH_OPTICKS

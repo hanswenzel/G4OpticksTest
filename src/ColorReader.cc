@@ -16,7 +16,7 @@
 
 #include "G4LogicalVolume.hh"
 #include "G4VisAttributes.hh"
-
+//#define VERBOSE 1
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 ColorReader::ColorReader()
@@ -35,8 +35,10 @@ ColorReader::~ColorReader() {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void ColorReader::ExtensionRead(const xercesc::DOMElement * const extElement) {
+#ifdef VERBOSE
     G4cout << " ColorReaderReading GDML extension..." << G4endl;
     G4cout << "ColorReader: Reading new GDML extension..." << G4endl;
+#endif
     for (xercesc::DOMNode* iter = extElement->getFirstChild();
             iter != 0; iter = iter->getNextSibling()) {
         if (iter->getNodeType() != xercesc::DOMNode::ELEMENT_NODE) {
@@ -46,7 +48,9 @@ void ColorReader::ExtensionRead(const xercesc::DOMElement * const extElement) {
         const xercesc::DOMElement * const child
                 = dynamic_cast<xercesc::DOMElement*> (iter);
         const G4String tag = Transcode(child->getTagName());
+#ifdef VERBOSE
         G4cout << "G4GDML:" << tag << G4endl;
+#endif
         if (tag == "color") {
             ColorRead(child);
         } else {
@@ -60,7 +64,9 @@ void ColorReader::ExtensionRead(const xercesc::DOMElement * const extElement) {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void ColorReader::VolumeRead(const xercesc::DOMElement * const volumeElement) {
+#ifdef VERBOSE    
     G4cout << "G4GDML: VolumeRead" << G4endl;
+#endif    
     G4VSolid* solidPtr = 0;
     G4Material* materialPtr = 0;
     G4VisAttributes* attrPtr = 0;
@@ -90,14 +96,18 @@ void ColorReader::VolumeRead(const xercesc::DOMElement * const volumeElement) {
             solidPtr = GetSolid(GenerateName(RefRead(child)));
         } else
             if (tag == "colorref") {
+#ifdef VERBOSE      
             G4cout << "G4GDML: found visual attribute ..." << G4endl;
+#endif 
             attrPtr = GetVisAttribute(GenerateName(RefRead(child)));
         }
     }
 
     pMotherLogical = new G4LogicalVolume(solidPtr, materialPtr,
             GenerateName(name), 0, 0, 0);
+#ifdef VERBOSE    
     G4cout << "G4GDML: attaching visual attribute ..." << G4endl;
+#endif   
     pMotherLogical->SetVisAttributes(attrPtr);
 
     if (!auxList.empty()) {
@@ -110,7 +120,9 @@ void ColorReader::VolumeRead(const xercesc::DOMElement * const volumeElement) {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void ColorReader::ColorRead(const xercesc::DOMElement * const colorElement) {
+#ifdef VERBOSE
     G4cout << "G4GDML: ColorRead" << G4endl;
+#endif 
     G4String name;
     G4VisAttributes* color = 0;
     G4double r = 0., g = 0., b = 0., a = 0.;
@@ -148,9 +160,10 @@ void ColorReader::ColorRead(const xercesc::DOMElement * const colorElement) {
             a = eval.Evaluate(attValue);
         }
     }
-
+#ifdef VERBOSE
     G4cout << "Color attribute (R,G,B,A) is: "
             << r << ", " << g << ", " << b << ", " << a << " !" << G4endl;
+#endif 
     color = new G4VisAttributes(G4Color(r, g, b, a));
     fAttribs.insert(std::make_pair(name, color));
 }
@@ -158,7 +171,9 @@ void ColorReader::ColorRead(const xercesc::DOMElement * const colorElement) {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4VisAttributes* ColorReader::GetVisAttribute(const G4String& ref) {
+#ifdef VERBOSE
     G4cout << "G4GDML: GetVisAttribute" << G4endl;
+#endif 
     G4VisAttributes* col = 0;
     std::map<G4String, G4VisAttributes*>::iterator pos = fAttribs.find(ref);
 

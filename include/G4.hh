@@ -19,34 +19,37 @@
 
 #pragma once
 #include "G4String.hh"
-#include "L4Cerenkov.hh"
-class G4RunManager ;
+//#include "L4Cerenkov.hh"
+class G4RunManager;
 
-class Ctx ; 
-class SensitiveDetector ;
-class DetectorConstruction ;
-template <typename T> class PhysicsList ; 
-class PrimaryGeneratorAction ;
-class RunAction ; 
-class EventAction ; 
-class TrackingAction ; 
-class SteppingAction ; 
-class  G4
-{
+class Ctx;
+class SensitiveDetector;
+class DetectorConstruction;
+class DetConOrg;
+class PhysicsList;
+class PrimaryGeneratorAction;
+class RunAction;
+class EventAction;
+class TrackingAction;
+class SteppingAction;
+
+class G4 {
 public:
-  G4(G4String fname); 
+    G4(G4String fname);
     ~G4();
-//    void beamOn(int nev);
+    //    void beamOn(int nev);
 
-    Ctx*                    ctx ; 
-    G4RunManager*            rm ;
-    DetectorConstruction*    dc ; 
-    PhysicsList<L4Cerenkov>* pl ;
-    PrimaryGeneratorAction*  ga ; 
-    RunAction*               ra ; 
-    EventAction*             ea ; 
-    TrackingAction*          ta ; 
-    SteppingAction*          sa ; 
-}; 
+    Ctx* ctx;
+    G4RunManager* rm;
+    const char* sdn;
+  DetectorConstruction*    dc ; 
+  //DetConOrg* dc;
+    PhysicsList* pl;
+    PrimaryGeneratorAction* ga;
+    RunAction* ra;
+    EventAction* ea;
+    TrackingAction* ta;
+    SteppingAction* sa;
+};
 
 

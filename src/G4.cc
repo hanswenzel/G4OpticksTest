@@ -27,7 +27,8 @@
 
 #include "SensitiveDetector.hh"
 #include "DetectorConstruction.hh"
-#include "L4Cerenkov.hh"
+#include "DetConOrg.hh"
+//#include "L4Cerenkov.hh"
 #include "PhysicsList.hh"
 #include "PrimaryGeneratorAction.hh"
 
@@ -41,10 +42,11 @@ G4::G4(G4String fname)
 ctx(new Ctx),
 rm(new G4RunManager),
 
-//sdn("SD0"),
+sdn("SD0"),
 //sd(new SensitiveDetector(sdn)),
 dc(new DetectorConstruction(fname)),
-pl(new PhysicsList<L4Cerenkov>()),
+//dc(new DetConOrg(sdn)),
+pl(new PhysicsList()),
 ga(NULL),
 ra(NULL),
 ea(NULL),
@@ -65,8 +67,7 @@ sa(NULL) {
     rm->SetUserAction(sa);
 
     rm->Initialize();
-
-   // beamOn(nev);
+    // beamOn(nev);
 }
 
 G4::~G4() {

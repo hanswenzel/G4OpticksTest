@@ -87,9 +87,9 @@
 // Class Implementation
 /////////////////////////
 
-        //////////////////////
-        // static data members
-        //////////////////////
+//////////////////////
+// static data members
+//////////////////////
 
 
 //G4bool L4Scintillation::fTrackSecondariesFirst = false;
@@ -101,85 +101,81 @@
 //G4bool L4Scintillation::fStackingFlag = true;
 //G4EmSaturation* L4Scintillation::fEmSaturation = NULL;
 
-        //////////////
-        // Operators
-        //////////////
+//////////////
+// Operators
+//////////////
 
 // L4Scintillation::operator=(const L4Scintillation &right)
 // {
 // }
 
-        /////////////////
-        // Constructors
-        /////////////////
+/////////////////
+// Constructors
+/////////////////
 
 L4Scintillation::L4Scintillation(const G4String& processName,
-                                       G4ProcessType type)
-                  : G4VRestDiscreteProcess(processName, type) ,
-    fTrackSecondariesFirst(false),
-    fFiniteRiseTime(false),
-    fYieldFactor(1.0),
-    fExcitationRatio(1.0),
-    fScintillationByParticleType(false),
-    fScintillationTrackInfo(false),
-    fStackingFlag(true),
-    fNumPhotons(0),
-    fEmSaturation(nullptr)
-{
-        SetProcessSubType(fScintillation);
+        G4ProcessType type)
+: G4VRestDiscreteProcess(processName, type),
+fTrackSecondariesFirst(false),
+fFiniteRiseTime(false),
+fYieldFactor(1.0),
+fExcitationRatio(1.0),
+fScintillationByParticleType(false),
+fScintillationTrackInfo(false),
+fStackingFlag(true),
+fNumPhotons(0),
+fEmSaturation(nullptr) {
+    SetProcessSubType(fScintillation);
 
 #ifdef G4DEBUG_SCINTILLATION
-	ScintTrackEDep = 0.;
-	ScintTrackYield = 0.;
+    ScintTrackEDep = 0.;
+    ScintTrackYield = 0.;
 #endif
 
-        fFastIntegralTable = nullptr;
-        fSlowIntegralTable = nullptr;
+    fFastIntegralTable = nullptr;
+    fSlowIntegralTable = nullptr;
 
-	//        if (verboseLevel>0) {
-           G4cout << GetProcessName() << " is created " << G4endl;
-	   //}
+    //        if (verboseLevel>0) {
+    G4cout << GetProcessName() << " is created " << G4endl;
+    //}
 }
 
-        ////////////////
-        // Destructors
-        ////////////////
+////////////////
+// Destructors
+////////////////
 
-L4Scintillation::~L4Scintillation()
-{
-	if (fFastIntegralTable != nullptr) {
-           fFastIntegralTable->clearAndDestroy();
-           delete fFastIntegralTable;
-        }
-        if (fSlowIntegralTable != nullptr) {
-           fSlowIntegralTable->clearAndDestroy();
-           delete fSlowIntegralTable;
-        }
-}
-
-        ////////////
-        // Methods
-        ////////////
-
-G4bool L4Scintillation::IsApplicable(const G4ParticleDefinition& aParticleType)
-{
-       if (aParticleType.GetParticleName() == "opticalphoton") return false;
-       if (aParticleType.IsShortLived()) return false;
-
-       return true;
-}
-
-void L4Scintillation::BuildPhysicsTable(const G4ParticleDefinition&)
-{
+L4Scintillation::~L4Scintillation() {
     if (fFastIntegralTable != nullptr) {
-       fFastIntegralTable->clearAndDestroy();
-       delete fFastIntegralTable;
-       fFastIntegralTable = nullptr;
+        fFastIntegralTable->clearAndDestroy();
+        delete fFastIntegralTable;
     }
     if (fSlowIntegralTable != nullptr) {
-       fSlowIntegralTable->clearAndDestroy();
-       delete fSlowIntegralTable;
-       fSlowIntegralTable = nullptr;
+        fSlowIntegralTable->clearAndDestroy();
+        delete fSlowIntegralTable;
+    }
+}
+
+////////////
+// Methods
+////////////
+
+G4bool L4Scintillation::IsApplicable(const G4ParticleDefinition& aParticleType) {
+    if (aParticleType.GetParticleName() == "opticalphoton") return false;
+    if (aParticleType.IsShortLived()) return false;
+
+    return true;
+}
+
+void L4Scintillation::BuildPhysicsTable(const G4ParticleDefinition&) {
+    if (fFastIntegralTable != nullptr) {
+        fFastIntegralTable->clearAndDestroy();
+        delete fFastIntegralTable;
+        fFastIntegralTable = nullptr;
+    }
+    if (fSlowIntegralTable != nullptr) {
+        fSlowIntegralTable->clearAndDestroy();
+        delete fSlowIntegralTable;
+        fSlowIntegralTable = nullptr;
     }
     BuildThePhysicsTable();
 }
@@ -188,19 +184,20 @@ void L4Scintillation::BuildPhysicsTable(const G4ParticleDefinition&)
 // AtRestDoIt
 // ----------
 //
+
 G4VParticleChange*
 L4Scintillation::AtRestDoIt(const G4Track& aTrack, const G4Step& aStep)
 
 // This routine simply calls the equivalent PostStepDoIt since all the
 // necessary information resides in aStep.GetTotalEnergyDeposit()
-
 {
-        return L4Scintillation::PostStepDoIt(aTrack, aStep);
+    return L4Scintillation::PostStepDoIt(aTrack, aStep);
 }
 
 // PostStepDoIt
 // -------------
 //
+
 G4VParticleChange*
 L4Scintillation::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep)
 
@@ -208,552 +205,547 @@ L4Scintillation::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep)
 // in a scintillator. A Poisson/Gauss-distributed number of photons is
 // generated according to the scintillation yield formula, distributed
 // evenly along the track segment and uniformly into 4pi.
-
 {
-    G4cout 
-         << "L4Scintillation::PostStepDoIt"
-         << G4endl
-         ;
-        aParticleChange.Initialize(aTrack);
+    G4cout
+            << "L4Scintillation::PostStepDoIt"
+            << G4endl
+            ;
+    aParticleChange.Initialize(aTrack);
 
-        const G4DynamicParticle* aParticle = aTrack.GetDynamicParticle();
-        const G4Material* aMaterial = aTrack.GetMaterial();
-	G4cout 
-         << "L4Scintillation::PostStepDoIt:  "
-	 << aMaterial->GetName()<<" "	  
-         << G4endl
-         ;
+    const G4DynamicParticle* aParticle = aTrack.GetDynamicParticle();
+    const G4Material* aMaterial = aTrack.GetMaterial();
+    G4cout
+            << "L4Scintillation::PostStepDoIt:  "
+            << aMaterial->GetName() << " "
+            << G4endl
+            ;
 
-        G4StepPoint* pPreStepPoint  = aStep.GetPreStepPoint();
-        G4StepPoint* pPostStepPoint = aStep.GetPostStepPoint();
+    G4StepPoint* pPreStepPoint = aStep.GetPreStepPoint();
+    G4StepPoint* pPostStepPoint = aStep.GetPostStepPoint();
 
-        G4ThreeVector x0 = pPreStepPoint->GetPosition();
-        G4ThreeVector p0 = aStep.GetDeltaPosition().unit();
-        G4double      t0 = pPreStepPoint->GetGlobalTime();
+    G4ThreeVector x0 = pPreStepPoint->GetPosition();
+    G4ThreeVector p0 = aStep.GetDeltaPosition().unit();
+    G4double t0 = pPreStepPoint->GetGlobalTime();
 
-        G4double TotalEnergyDeposit = aStep.GetTotalEnergyDeposit();
+    G4double TotalEnergyDeposit = aStep.GetTotalEnergyDeposit();
 
-        G4MaterialPropertiesTable* aMaterialPropertiesTable =
-                               aMaterial->GetMaterialPropertiesTable();
-	aMaterialPropertiesTable->DumpTable();
-        if (!aMaterialPropertiesTable)
-             return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
+    G4MaterialPropertiesTable* aMaterialPropertiesTable =
+            aMaterial->GetMaterialPropertiesTable();
+    G4cout << "L4Scintillation::PostStepDoIt:  predump:   "<<  aMaterial->GetName() << G4endl;
+    aMaterialPropertiesTable->DumpTable();
+    G4cout << "L4Scintillation::PostStepDoIt:  postdump " << G4endl;
 
-        G4MaterialPropertyVector* Fast_Intensity =
-                aMaterialPropertiesTable->GetProperty(kFASTCOMPONENT);
-        G4MaterialPropertyVector* Slow_Intensity =
-                aMaterialPropertiesTable->GetProperty(kSLOWCOMPONENT);
+    if (!aMaterialPropertiesTable)
+        return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
+    G4cout << "L4Scintillation::PostStepDoIt:  Hi Hi " << G4endl;
+    G4MaterialPropertyVector* Fast_Intensity =
+            aMaterialPropertiesTable->GetProperty(kFASTCOMPONENT);
+    G4MaterialPropertyVector* Slow_Intensity =
+            aMaterialPropertiesTable->GetProperty(kSLOWCOMPONENT);
 
-        if (!Fast_Intensity && !Slow_Intensity )
-             return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
 
-        G4int nscnt = 1;
-        if (Fast_Intensity && Slow_Intensity) nscnt = 2;
+    if (!Fast_Intensity && !Slow_Intensity)
+        return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
+    G4cout << "fast " << G4endl;
+    Fast_Intensity->DumpValues();
 
-        G4double ScintillationYield = 0.;
+    G4cout << "slow " << G4endl;
+    Slow_Intensity->DumpValues();
+    G4int nscnt = 1;
+    if (Fast_Intensity && Slow_Intensity) nscnt = 2;
 
-	// Scintillation depends on particle type, energy deposited
-        if (fScintillationByParticleType) {
+    G4double ScintillationYield = 0.;
 
-           ScintillationYield =
-                          GetScintillationYieldByParticleType(aTrack, aStep);
+    // Scintillation depends on particle type, energy deposited
+    if (fScintillationByParticleType) {
 
-           // The default linear scintillation process
-        } else {
+        ScintillationYield =
+                GetScintillationYieldByParticleType(aTrack, aStep);
 
-           ScintillationYield = aMaterialPropertiesTable->
-                                      GetConstProperty(kSCINTILLATIONYIELD);
+        // The default linear scintillation process
+    } else {
 
-           // Units: [# scintillation photons / MeV]
-           ScintillationYield *= fYieldFactor;
-        }
+        ScintillationYield = aMaterialPropertiesTable->
+                GetConstProperty(kSCINTILLATIONYIELD);
 
-        G4double ResolutionScale    = aMaterialPropertiesTable->
-                                      GetConstProperty(kRESOLUTIONSCALE);
+        // Units: [# scintillation photons / MeV]
+        ScintillationYield *= fYieldFactor;
+    }
 
-        // Birks law saturation:
+    G4double ResolutionScale = aMaterialPropertiesTable->
+            GetConstProperty(kRESOLUTIONSCALE);
 
-        //G4double constBirks = 0.0;
+    // Birks law saturation:
 
-        //constBirks = aMaterial->GetIonisation()->GetBirksConstant();
+    //G4double constBirks = 0.0;
 
-        G4double MeanNumberOfPhotons;
+    //constBirks = aMaterial->GetIonisation()->GetBirksConstant();
 
-        // Birk's correction via fEmSaturation and specifying scintillation by
-        // by particle type are physically mutually exclusive
+    G4double MeanNumberOfPhotons;
 
-        if (fScintillationByParticleType)
-           MeanNumberOfPhotons = ScintillationYield;
-        else if (fEmSaturation)
-           MeanNumberOfPhotons = ScintillationYield*
-             (fEmSaturation->VisibleEnergyDepositionAtAStep(&aStep));
-        else
-           MeanNumberOfPhotons = ScintillationYield*TotalEnergyDeposit;
+    // Birk's correction via fEmSaturation and specifying scintillation by
+    // by particle type are physically mutually exclusive
 
-        if (MeanNumberOfPhotons > 10.)
-        {
-          G4double sigma = ResolutionScale * std::sqrt(MeanNumberOfPhotons);
-          fNumPhotons=G4int(G4RandGauss::shoot(MeanNumberOfPhotons,sigma)+0.5);
-        }
-        else
-        {
-          fNumPhotons = G4int(G4Poisson(MeanNumberOfPhotons));
-        }
+    if (fScintillationByParticleType)
+        MeanNumberOfPhotons = ScintillationYield;
+    else if (fEmSaturation)
+        MeanNumberOfPhotons = ScintillationYield *
+            (fEmSaturation->VisibleEnergyDepositionAtAStep(&aStep));
+    else
+        MeanNumberOfPhotons = ScintillationYield*TotalEnergyDeposit;
+
+    if (MeanNumberOfPhotons > 10.) {
+        G4double sigma = ResolutionScale * std::sqrt(MeanNumberOfPhotons);
+        fNumPhotons = G4int(G4RandGauss::shoot(MeanNumberOfPhotons, sigma) + 0.5);
+    } else {
+        fNumPhotons = G4int(G4Poisson(MeanNumberOfPhotons));
+    }
 #ifdef L4LOG
-    G4cout 
-         << "L4Scintillation::PostStepDoIt"
-         << " nscnt "<<nscnt
-         << " t0 " << t0
-         << " x0 " << x0
-         << " step_length " << aStep.GetStepLength()
-         << " MeanNumberOfPhotons " << MeanNumberOfPhotons
-         << " NumPhotons " << fNumPhotons
-         << G4endl
-	     
-         ;
+    G4cout
+            << "L4Scintillation::PostStepDoIt"
+            << " nscnt " << nscnt
+            << " t0 " << t0
+            << " x0 " << x0
+            << " step_length " << aStep.GetStepLength()
+            << " MeanNumberOfPhotons " << MeanNumberOfPhotons
+            << " NumPhotons " << fNumPhotons
+            << G4endl
+
+            ;
 #endif
-        if ( fNumPhotons <= 0 || !fStackingFlag )
-        {
-           // return unchanged particle and no secondaries
+    if (fNumPhotons <= 0 || !fStackingFlag) {
+        // return unchanged particle and no secondaries
 
-           aParticleChange.SetNumberOfSecondaries(0);
-
-           return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
-        }
-
-        ////////////////////////////////////////////////////////////////
-
-        aParticleChange.SetNumberOfSecondaries(fNumPhotons);
-
-        if (fTrackSecondariesFirst) {
-           if (aTrack.GetTrackStatus() == fAlive )
-                  aParticleChange.ProposeTrackStatus(fSuspend);
-        }
-
-        ////////////////////////////////////////////////////////////////
-
-        G4int materialIndex = aMaterial->GetIndex();
-
-        // Retrieve the Scintillation Integral for this material
-        // new G4PhysicsOrderedFreeVector allocated to hold CII's
-
-        G4int Num = fNumPhotons;
-#ifdef WITH_OPTICKS
-	/*
-    unsigned opticks_photon_offset = 0 ; 
-    
-        const G4ParticleDefinition* definition = aParticle->GetDefinition();
-        G4ThreeVector deltaPosition = aStep.GetDeltaPosition();
-        G4cout << "L4Scintillation::PostStepDoIt"
-	  //               << " dp (Pmax-Pmin) " << dp
-               << G4endl
-               ; 
-
-        opticks_photon_offset = G4Opticks::GetOpticks()->getNumPhotons();
-	G4cout << "L4Scintillation:opticks_photon_offset:  " << opticks_photon_offset << G4endl;
-	//  G4ThreeVector deltaPosition = aStep.GetDeltaPosition();
-	  G4int scntId=1;
-        // total number of photons for all gensteps collected before this one
-        // within this OpticksEvent (potentially crossing multiple G4Event)
-	  
-         G4Opticks::GetOpticks()->collectScintillationStep(
-			             1,                  // 0    id:zero means use scintillation step count 				   
-				     aTrack.GetTrackID(),
-				     materialIndex, 
-				     fNumPhotons,
-				     x0.x(),                // 1
-				     x0.y(),
-				     x0.z(),
-				     t0,
-				     deltaPosition.x(),     // 2
-				     deltaPosition.y(),
-				     deltaPosition.z(),
-				     aStep.GetStepLength(),
-				     definition->GetPDGEncoding(),   // 3
-				     definition->GetPDGCharge(),
-				     aTrack.GetWeight(),
-				     pPreStepPoint->GetVelocity(),
-				     scntId,
-				     aMaterialPropertiesTable->GetConstProperty(kYIELDRATIO),      // slowerRatio,
-			             aMaterialPropertiesTable->GetConstProperty(kSLOWTIMECONSTANT),//slowTimeConstant,
-				     aMaterialPropertiesTable->GetConstProperty(kSLOWTIMECONSTANT), //slowerTimeConstant,
-				     aMaterialPropertiesTable->GetConstProperty(kSCINTILLATIONYIELD),//wrong  scintillationTime,
-				     aMaterialPropertiesTable->GetConstProperty(kSCINTILLATIONYIELD),//wrong scintillationIntegrationMax,
-				     0, //spare1
-				     0 // spare2
-        );
-	 
-
-  */     
-#endif
-
-        for (G4int scnt = 1; scnt <= nscnt; scnt++) {
-
-            G4double ScintillationTime = 0.*ns;
-            G4double ScintillationRiseTime = 0.*ns;
-            G4PhysicsOrderedFreeVector* ScintillationIntegral = nullptr;
-            G4ScintillationType ScintillationType = Slow;
-
-            if (scnt == 1) {
-               if (nscnt == 1) {
-                 if (Fast_Intensity) {
-                   ScintillationTime   = aMaterialPropertiesTable->
-                                           GetConstProperty(kFASTTIMECONSTANT);
-                   if (fFiniteRiseTime) {
-                      ScintillationRiseTime = aMaterialPropertiesTable->
-                                  GetConstProperty(kFASTSCINTILLATIONRISETIME);
-                   }
-                   ScintillationType = Fast;
-                   ScintillationIntegral =
-                   (G4PhysicsOrderedFreeVector*)
-                                       ((*fFastIntegralTable)(materialIndex));
-                 }
-                 if (Slow_Intensity) {
-                   ScintillationTime   = aMaterialPropertiesTable->
-                                           GetConstProperty(kSLOWTIMECONSTANT);
-                   if (fFiniteRiseTime) {
-                      ScintillationRiseTime = aMaterialPropertiesTable->
-                                  GetConstProperty(kSLOWSCINTILLATIONRISETIME);
-                   }
-                   ScintillationType = Slow;
-                   ScintillationIntegral =
-                   (G4PhysicsOrderedFreeVector*)
-                                       ((*fSlowIntegralTable)(materialIndex));
-                 }
-               }
-               else {
-                 G4double yieldRatio = aMaterialPropertiesTable->
-                                          GetConstProperty(kYIELDRATIO);
-                 if ( fExcitationRatio == 1.0 || fExcitationRatio == 0.0) {
-                    Num = G4int (std::min(yieldRatio,1.0) * fNumPhotons);
-                 }
-                 else {
-                    Num = G4int (std::min(fExcitationRatio,1.0) * fNumPhotons);
-                 }
-                 ScintillationTime   = aMaterialPropertiesTable->
-                                          GetConstProperty(kFASTTIMECONSTANT);
-                 if (fFiniteRiseTime) {
-                      ScintillationRiseTime = aMaterialPropertiesTable->
-                                 GetConstProperty(kFASTSCINTILLATIONRISETIME);
-                 }
-                 ScintillationType = Fast;
-                 ScintillationIntegral =
-                 (G4PhysicsOrderedFreeVector*)
-                                      ((*fFastIntegralTable)(materialIndex));
-               }
-            }
-            else {
-               Num = fNumPhotons - Num;
-               ScintillationTime   =   aMaterialPropertiesTable->
-                                          GetConstProperty(kSLOWTIMECONSTANT);
-               if (fFiniteRiseTime) {
-                    ScintillationRiseTime = aMaterialPropertiesTable->
-                                 GetConstProperty(kSLOWSCINTILLATIONRISETIME);
-               }
-               ScintillationType = Slow;
-               ScintillationIntegral =
-               (G4PhysicsOrderedFreeVector*)
-                                      ((*fSlowIntegralTable)(materialIndex));
-            }
-
-            if (!ScintillationIntegral) continue;
-
-
-            // Max Scintillation Integral
- 
-            G4double CIImax = ScintillationIntegral->GetMaxValue();
-	    G4cout <<" Num:  "<< Num<<G4endl;
-	     G4cout <<" CIImax:  "<< CIImax<<G4endl;
-            for (G4int i = 0; i < Num; i++) {
-#ifdef WITH_OPTICKS
-	      /*        unsigned record_id = opticks_photon_offset+i ; 
-        //std::cout << "(photon gen loop) " << record_id << std::endl ;
-        G4Opticks::GetOpticks()->setAlignIndex(record_id); 
-	      */
-#endif
-                // Determine photon energy
-
-                G4double CIIvalue = G4UniformRand()*CIImax;
-                G4double sampledEnergy =
-                              ScintillationIntegral->GetEnergy(CIIvalue);
-
-                if (verboseLevel>1) {
-                   G4cout << "sampledEnergy = " << sampledEnergy << G4endl;
-                   G4cout << "CIIvalue =        " << CIIvalue << G4endl;
-                }
-
-                // Generate random photon direction
-
-                G4double cost = 1. - 2.*G4UniformRand();
-                G4double sint = std::sqrt((1.-cost)*(1.+cost));
-
-                G4double phi = twopi*G4UniformRand();
-                G4double sinp = std::sin(phi);
-                G4double cosp = std::cos(phi);
-
-                G4double px = sint*cosp;
-                G4double py = sint*sinp;
-                G4double pz = cost;
-
-                // Create photon momentum direction vector
-
-                G4ParticleMomentum photonMomentum(px, py, pz);
-
-                // Determine polarization of new photon
-
-                G4double sx = cost*cosp;
-                G4double sy = cost*sinp;
-                G4double sz = -sint;
-
-                G4ThreeVector photonPolarization(sx, sy, sz);
-
-                G4ThreeVector perp = photonMomentum.cross(photonPolarization);
-
-                phi = twopi*G4UniformRand();
-                sinp = std::sin(phi);
-                cosp = std::cos(phi);
-
-                photonPolarization = cosp * photonPolarization + sinp * perp;
-
-                photonPolarization = photonPolarization.unit();
-
-                // Generate a new photon:
-
-                G4DynamicParticle* aScintillationPhoton =
-                  new G4DynamicParticle(G4OpticalPhoton::OpticalPhoton(),
-                                                         photonMomentum);
-                aScintillationPhoton->SetPolarization
-                                     (photonPolarization.x(),
-                                      photonPolarization.y(),
-                                      photonPolarization.z());
-
-                aScintillationPhoton->SetKineticEnergy(sampledEnergy);
-
-                // Generate new G4Track object:
-
-                G4double rand;
-
-                if (aParticle->GetDefinition()->GetPDGCharge() != 0) {
-                   rand = G4UniformRand();
-                } else {
-                   rand = 1.0;
-                }
-
-                G4double delta = rand * aStep.GetStepLength();
-                G4double deltaTime = delta / (pPreStepPoint->GetVelocity()+
-                                      rand*(pPostStepPoint->GetVelocity()-
-                                            pPreStepPoint->GetVelocity())/2.);
-
-                // emission time distribution
-                if (ScintillationRiseTime==0.0) {
-                   deltaTime = deltaTime -
-                          ScintillationTime * std::log( G4UniformRand() );
-                } else {
-                   deltaTime = deltaTime +
-                          sample_time(ScintillationRiseTime, ScintillationTime);
-                }
-
-                G4double aSecondaryTime = t0 + deltaTime;
-
-                G4ThreeVector aSecondaryPosition =
-                                    x0 + rand * aStep.GetDeltaPosition();
-
-                G4Track* aSecondaryTrack = new G4Track(aScintillationPhoton,
-                                                       aSecondaryTime,
-                                                       aSecondaryPosition);
-
-                aSecondaryTrack->SetTouchableHandle(
-                                 aStep.GetPreStepPoint()->GetTouchableHandle());
-                // aSecondaryTrack->SetTouchableHandle((G4VTouchable*)0);
-
-                aSecondaryTrack->SetParentID(aTrack.GetTrackID());
-
-                if (fScintillationTrackInfo) aSecondaryTrack->
-                   SetUserInformation(new G4ScintillationTrackInformation(ScintillationType));
-
-                aParticleChange.AddSecondary(aSecondaryTrack);
-#ifdef WITH_OPTICKS
-		/*		aSecondaryTrack->SetUserInformation(new TrackInfo( record_id ) );
-		G4Opticks::GetOpticks()->setAlignIndex(-1); 
-		*/
-#endif
-
-            }
-        }
-
-        if (verboseLevel>0) {
-        G4cout << "\n Exiting from L4Scintillation::DoIt -- NumberOfSecondaries = "
-               << aParticleChange.GetNumberOfSecondaries() << G4endl;
-        }
+        aParticleChange.SetNumberOfSecondaries(0);
 
         return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
+    }
+
+    ////////////////////////////////////////////////////////////////
+
+    aParticleChange.SetNumberOfSecondaries(fNumPhotons);
+
+    if (fTrackSecondariesFirst) {
+        if (aTrack.GetTrackStatus() == fAlive)
+            aParticleChange.ProposeTrackStatus(fSuspend);
+    }
+
+    ////////////////////////////////////////////////////////////////
+
+    G4int materialIndex = aMaterial->GetIndex();
+
+    // Retrieve the Scintillation Integral for this material
+    // new G4PhysicsOrderedFreeVector allocated to hold CII's
+
+    G4int Num = fNumPhotons;
+#ifdef WITH_OPTICKS
+
+    unsigned opticks_photon_offset = 0;
+
+    const G4ParticleDefinition* definition = aParticle->GetDefinition();
+    G4ThreeVector deltaPosition = aStep.GetDeltaPosition();
+    G4cout << "L4Scintillation::PostStepDoIt"
+            //               << " dp (Pmax-Pmin) " << dp
+            << G4endl
+            ;
+
+    opticks_photon_offset = G4Opticks::GetOpticks()->getNumPhotons();
+    G4cout << "L4Scintillation:opticks_photon_offset:  " << opticks_photon_offset << G4endl;
+    //  G4ThreeVector deltaPosition = aStep.GetDeltaPosition();
+    G4int scntId = 1;
+    // total number of photons for all gensteps collected before this one
+    // within this OpticksEvent (potentially crossing multiple G4Event)
+
+    G4Opticks::GetOpticks()->collectScintillationStep(
+            1, // 0    id:zero means use scintillation step count 				   
+            aTrack.GetTrackID(),
+            materialIndex,
+            fNumPhotons,
+            x0.x(), // 1
+            x0.y(),
+            x0.z(),
+            t0,
+            deltaPosition.x(), // 2
+            deltaPosition.y(),
+            deltaPosition.z(),
+            aStep.GetStepLength(),
+            definition->GetPDGEncoding(), // 3
+            definition->GetPDGCharge(),
+            aTrack.GetWeight(),
+            pPreStepPoint->GetVelocity(),
+            scntId,
+            aMaterialPropertiesTable->GetConstProperty(kYIELDRATIO), // slowerRatio,
+            aMaterialPropertiesTable->GetConstProperty(kFASTTIMECONSTANT), // TimeConstant,
+            aMaterialPropertiesTable->GetConstProperty(kSLOWTIMECONSTANT), //slowerTimeConstant,
+            aMaterialPropertiesTable->GetConstProperty(kFASTTIMECONSTANT), //scintillationTime,
+            aMaterialPropertiesTable->GetConstProperty(kSCINTILLATIONYIELD), //wrong but not used scintillationIntegrationMax,
+            0, //spare1
+            0 // spare2
+            );
+
+
+
+#endif
+
+    for (G4int scnt = 1; scnt <= nscnt; scnt++) {
+
+        G4double ScintillationTime = 0. * ns;
+        G4double ScintillationRiseTime = 0. * ns;
+        G4PhysicsOrderedFreeVector* ScintillationIntegral = nullptr;
+        G4ScintillationType ScintillationType = Slow;
+
+        if (scnt == 1) {
+            if (nscnt == 1) {
+                if (Fast_Intensity) {
+                    ScintillationTime = aMaterialPropertiesTable->
+                            GetConstProperty(kFASTTIMECONSTANT);
+                    if (fFiniteRiseTime) {
+                        ScintillationRiseTime = aMaterialPropertiesTable->
+                                GetConstProperty(kFASTSCINTILLATIONRISETIME);
+                    }
+                    ScintillationType = Fast;
+                    ScintillationIntegral =
+                            (G4PhysicsOrderedFreeVector*)
+                            ((*fFastIntegralTable)(materialIndex));
+                }
+                if (Slow_Intensity) {
+                    ScintillationTime = aMaterialPropertiesTable->
+                            GetConstProperty(kSLOWTIMECONSTANT);
+                    if (fFiniteRiseTime) {
+                        ScintillationRiseTime = aMaterialPropertiesTable->
+                                GetConstProperty(kSLOWSCINTILLATIONRISETIME);
+                    }
+                    ScintillationType = Slow;
+                    ScintillationIntegral =
+                            (G4PhysicsOrderedFreeVector*)
+                            ((*fSlowIntegralTable)(materialIndex));
+                }
+            } else {
+                G4double yieldRatio = aMaterialPropertiesTable->
+                        GetConstProperty(kYIELDRATIO);
+                if (fExcitationRatio == 1.0 || fExcitationRatio == 0.0) {
+                    Num = G4int(std::min(yieldRatio, 1.0) * fNumPhotons);
+                } else {
+                    Num = G4int(std::min(fExcitationRatio, 1.0) * fNumPhotons);
+                }
+                ScintillationTime = aMaterialPropertiesTable->
+                        GetConstProperty(kFASTTIMECONSTANT);
+                if (fFiniteRiseTime) {
+                    ScintillationRiseTime = aMaterialPropertiesTable->
+                            GetConstProperty(kFASTSCINTILLATIONRISETIME);
+                }
+                ScintillationType = Fast;
+                ScintillationIntegral =
+                        (G4PhysicsOrderedFreeVector*)
+                        ((*fFastIntegralTable)(materialIndex));
+            }
+        } else {
+            Num = fNumPhotons - Num;
+            ScintillationTime = aMaterialPropertiesTable->
+                    GetConstProperty(kSLOWTIMECONSTANT);
+            if (fFiniteRiseTime) {
+                ScintillationRiseTime = aMaterialPropertiesTable->
+                        GetConstProperty(kSLOWSCINTILLATIONRISETIME);
+            }
+            ScintillationType = Slow;
+            ScintillationIntegral =
+                    (G4PhysicsOrderedFreeVector*)
+                    ((*fSlowIntegralTable)(materialIndex));
+        }
+
+        if (!ScintillationIntegral) continue;
+
+
+        // Max Scintillation Integral
+
+        G4double CIImax = ScintillationIntegral->GetMaxValue();
+        G4cout << " Num:  " << Num << G4endl;
+        G4cout << " CIImax:  " << CIImax << G4endl;
+        for (G4int i = 0; i < Num; i++) {
+#ifdef WITH_OPTICKS
+            unsigned record_id = opticks_photon_offset + i;
+            //std::cout << "(photon gen loop) " << record_id << std::endl ;
+            G4Opticks::GetOpticks()->setAlignIndex(record_id);
+
+#endif
+            // Determine photon energy
+
+            G4double CIIvalue = G4UniformRand() * CIImax;
+            G4double sampledEnergy =
+                    ScintillationIntegral->GetEnergy(CIIvalue);
+
+            if (verboseLevel > 1) {
+                G4cout << "sampledEnergy = " << sampledEnergy << G4endl;
+                G4cout << "CIIvalue =        " << CIIvalue << G4endl;
+            }
+
+            // Generate random photon direction
+
+            G4double cost = 1. - 2. * G4UniformRand();
+            G4double sint = std::sqrt((1. - cost)*(1. + cost));
+
+            G4double phi = twopi * G4UniformRand();
+            G4double sinp = std::sin(phi);
+            G4double cosp = std::cos(phi);
+
+            G4double px = sint*cosp;
+            G4double py = sint*sinp;
+            G4double pz = cost;
+
+            // Create photon momentum direction vector
+
+            G4ParticleMomentum photonMomentum(px, py, pz);
+
+            // Determine polarization of new photon
+
+            G4double sx = cost*cosp;
+            G4double sy = cost*sinp;
+            G4double sz = -sint;
+
+            G4ThreeVector photonPolarization(sx, sy, sz);
+
+            G4ThreeVector perp = photonMomentum.cross(photonPolarization);
+
+            phi = twopi * G4UniformRand();
+            sinp = std::sin(phi);
+            cosp = std::cos(phi);
+
+            photonPolarization = cosp * photonPolarization + sinp * perp;
+
+            photonPolarization = photonPolarization.unit();
+
+            // Generate a new photon:
+
+            G4DynamicParticle* aScintillationPhoton =
+                    new G4DynamicParticle(G4OpticalPhoton::OpticalPhoton(),
+                    photonMomentum);
+            aScintillationPhoton->SetPolarization
+                    (photonPolarization.x(),
+                    photonPolarization.y(),
+                    photonPolarization.z());
+
+            aScintillationPhoton->SetKineticEnergy(sampledEnergy);
+
+            // Generate new G4Track object:
+
+            G4double rand;
+
+            if (aParticle->GetDefinition()->GetPDGCharge() != 0) {
+                rand = G4UniformRand();
+            } else {
+                rand = 1.0;
+            }
+
+            G4double delta = rand * aStep.GetStepLength();
+            G4double deltaTime = delta / (pPreStepPoint->GetVelocity() +
+                    rand * (pPostStepPoint->GetVelocity() -
+                    pPreStepPoint->GetVelocity()) / 2.);
+
+            // emission time distribution
+            if (ScintillationRiseTime == 0.0) {
+                deltaTime = deltaTime -
+                        ScintillationTime * std::log(G4UniformRand());
+            } else {
+                deltaTime = deltaTime +
+                        sample_time(ScintillationRiseTime, ScintillationTime);
+            }
+
+            G4double aSecondaryTime = t0 + deltaTime;
+
+            G4ThreeVector aSecondaryPosition =
+                    x0 + rand * aStep.GetDeltaPosition();
+
+            G4Track* aSecondaryTrack = new G4Track(aScintillationPhoton,
+                    aSecondaryTime,
+                    aSecondaryPosition);
+
+            aSecondaryTrack->SetTouchableHandle(
+                    aStep.GetPreStepPoint()->GetTouchableHandle());
+            // aSecondaryTrack->SetTouchableHandle((G4VTouchable*)0);
+
+            aSecondaryTrack->SetParentID(aTrack.GetTrackID());
+
+            if (fScintillationTrackInfo) aSecondaryTrack->
+                    SetUserInformation(new G4ScintillationTrackInformation(ScintillationType));
+
+            aParticleChange.AddSecondary(aSecondaryTrack);
+#ifdef WITH_OPTICKS
+            aSecondaryTrack->SetUserInformation(new TrackInfo(record_id));
+            G4Opticks::GetOpticks()->setAlignIndex(-1);
+
+#endif
+
+        }
+    }
+
+    if (verboseLevel > 0) {
+        G4cout << "\n Exiting from L4Scintillation::DoIt -- NumberOfSecondaries = "
+                << aParticleChange.GetNumberOfSecondaries() << G4endl;
+    }
+
+    return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
 }
 
 // BuildThePhysicsTable for the scintillation process
 // --------------------------------------------------
 //
 
-void L4Scintillation::BuildThePhysicsTable()
-{
-        if (fFastIntegralTable && fSlowIntegralTable) return;
+void L4Scintillation::BuildThePhysicsTable() {
+    if (fFastIntegralTable && fSlowIntegralTable) return;
 
-        const G4MaterialTable* theMaterialTable =
-                               G4Material::GetMaterialTable();
-        G4int numOfMaterials = G4Material::GetNumberOfMaterials();
+    const G4MaterialTable* theMaterialTable =
+            G4Material::GetMaterialTable();
+    G4int numOfMaterials = G4Material::GetNumberOfMaterials();
 
-        // create new physics table
-	
-        if(!fFastIntegralTable)fFastIntegralTable =
-                                            new G4PhysicsTable(numOfMaterials);
-        if(!fSlowIntegralTable)fSlowIntegralTable =
-                                            new G4PhysicsTable(numOfMaterials);
+    // create new physics table
 
-        // loop for materials
+    if (!fFastIntegralTable)fFastIntegralTable =
+            new G4PhysicsTable(numOfMaterials);
+    if (!fSlowIntegralTable)fSlowIntegralTable =
+            new G4PhysicsTable(numOfMaterials);
 
-        for (G4int i=0 ; i < numOfMaterials; i++)
-        {
-                G4PhysicsOrderedFreeVector* aPhysicsOrderedFreeVector =
-					new G4PhysicsOrderedFreeVector();
-                G4PhysicsOrderedFreeVector* bPhysicsOrderedFreeVector =
-                                        new G4PhysicsOrderedFreeVector();
+    // loop for materials
 
-                // Retrieve vector of scintillation wavelength intensity for
-                // the material from the material's optical properties table.
+    for (G4int i = 0; i < numOfMaterials; i++) {
+        G4PhysicsOrderedFreeVector* aPhysicsOrderedFreeVector =
+                new G4PhysicsOrderedFreeVector();
+        G4PhysicsOrderedFreeVector* bPhysicsOrderedFreeVector =
+                new G4PhysicsOrderedFreeVector();
 
-                G4Material* aMaterial = (*theMaterialTable)[i];
+        // Retrieve vector of scintillation wavelength intensity for
+        // the material from the material's optical properties table.
 
-                G4MaterialPropertiesTable* aMaterialPropertiesTable =
-                                aMaterial->GetMaterialPropertiesTable();
+        G4Material* aMaterial = (*theMaterialTable)[i];
 
-                if (aMaterialPropertiesTable) {
+        G4MaterialPropertiesTable* aMaterialPropertiesTable =
+                aMaterial->GetMaterialPropertiesTable();
 
-                   G4MaterialPropertyVector* theFastLightVector =
-                   aMaterialPropertiesTable->GetProperty(kFASTCOMPONENT);
+        if (aMaterialPropertiesTable) {
 
-                   if (theFastLightVector) {
+            G4MaterialPropertyVector* theFastLightVector =
+                    aMaterialPropertiesTable->GetProperty(kFASTCOMPONENT);
 
-                      // Retrieve the first intensity point in vector
-                      // of (photon energy, intensity) pairs
+            if (theFastLightVector) {
 
-                      G4double currentIN = (*theFastLightVector)[0];
+                // Retrieve the first intensity point in vector
+                // of (photon energy, intensity) pairs
 
-                      if (currentIN >= 0.0) {
+                G4double currentIN = (*theFastLightVector)[0];
 
-                         // Create first (photon energy, Scintillation
-                         // Integral pair
+                if (currentIN >= 0.0) {
 
-                         G4double currentPM = theFastLightVector->Energy(0);
+                    // Create first (photon energy, Scintillation
+                    // Integral pair
 
-                         G4double currentCII = 0.0;
+                    G4double currentPM = theFastLightVector->Energy(0);
 
-                         aPhysicsOrderedFreeVector->
-                                 InsertValues(currentPM , currentCII);
+                    G4double currentCII = 0.0;
 
-                         // Set previous values to current ones prior to loop
+                    aPhysicsOrderedFreeVector->
+                            InsertValues(currentPM, currentCII);
 
-                         G4double prevPM  = currentPM;
-                         G4double prevCII = currentCII;
-                         G4double prevIN  = currentIN;
+                    // Set previous values to current ones prior to loop
 
-                         // loop over all (photon energy, intensity)
-                         // pairs stored for this material
+                    G4double prevPM = currentPM;
+                    G4double prevCII = currentCII;
+                    G4double prevIN = currentIN;
 
-                         for (size_t ii = 1;
-                              ii < theFastLightVector->GetVectorLength();
-                              ++ii)
-                         {
-                                currentPM = theFastLightVector->Energy(ii);
-                                currentIN = (*theFastLightVector)[ii];
+                    // loop over all (photon energy, intensity)
+                    // pairs stored for this material
 
-                                currentCII = 0.5 * (prevIN + currentIN);
+                    for (size_t ii = 1;
+                            ii < theFastLightVector->GetVectorLength();
+                            ++ii) {
+                        currentPM = theFastLightVector->Energy(ii);
+                        currentIN = (*theFastLightVector)[ii];
 
-                                currentCII = prevCII +
-                                             (currentPM - prevPM) * currentCII;
+                        currentCII = 0.5 * (prevIN + currentIN);
 
-                                aPhysicsOrderedFreeVector->
-                                    InsertValues(currentPM, currentCII);
+                        currentCII = prevCII +
+                                (currentPM - prevPM) * currentCII;
 
-                                prevPM  = currentPM;
-                                prevCII = currentCII;
-                                prevIN  = currentIN;
-                         }
+                        aPhysicsOrderedFreeVector->
+                                InsertValues(currentPM, currentCII);
 
-                      }
-                   }
+                        prevPM = currentPM;
+                        prevCII = currentCII;
+                        prevIN = currentIN;
+                    }
 
-                   G4MaterialPropertyVector* theSlowLightVector =
-                   aMaterialPropertiesTable->GetProperty(kSLOWCOMPONENT);
-
-                   if (theSlowLightVector) {
-
-                      // Retrieve the first intensity point in vector
-                      // of (photon energy, intensity) pairs
-
-                      G4double currentIN = (*theSlowLightVector)[0];
-
-                      if (currentIN >= 0.0) {
-
-                         // Create first (photon energy, Scintillation
-                         // Integral pair
-
-                         G4double currentPM = theSlowLightVector->Energy(0);
-
-                         G4double currentCII = 0.0;
-
-                         bPhysicsOrderedFreeVector->
-                                 InsertValues(currentPM , currentCII);
-
-                         // Set previous values to current ones prior to loop
-
-                         G4double prevPM  = currentPM;
-                         G4double prevCII = currentCII;
-                         G4double prevIN  = currentIN;
-
-                         // loop over all (photon energy, intensity)
-                         // pairs stored for this material
-
-                         for (size_t ii = 1;
-                              ii < theSlowLightVector->GetVectorLength();
-                              ++ii)
-                         {
-                                currentPM = theSlowLightVector->Energy(ii);
-                                currentIN = (*theSlowLightVector)[ii];
-
-                                currentCII = 0.5 * (prevIN + currentIN);
-
-                                currentCII = prevCII +
-                                             (currentPM - prevPM) * currentCII;
-
-                                bPhysicsOrderedFreeVector->
-                                    InsertValues(currentPM, currentCII);
-
-                                prevPM  = currentPM;
-                                prevCII = currentCII;
-                                prevIN  = currentIN;
-                         }
-
-                      }
-                   }
                 }
+            }
+
+            G4MaterialPropertyVector* theSlowLightVector =
+                    aMaterialPropertiesTable->GetProperty(kSLOWCOMPONENT);
+
+            if (theSlowLightVector) {
+
+                // Retrieve the first intensity point in vector
+                // of (photon energy, intensity) pairs
+
+                G4double currentIN = (*theSlowLightVector)[0];
+
+                if (currentIN >= 0.0) {
+
+                    // Create first (photon energy, Scintillation
+                    // Integral pair
+
+                    G4double currentPM = theSlowLightVector->Energy(0);
+
+                    G4double currentCII = 0.0;
+
+                    bPhysicsOrderedFreeVector->
+                            InsertValues(currentPM, currentCII);
+
+                    // Set previous values to current ones prior to loop
+
+                    G4double prevPM = currentPM;
+                    G4double prevCII = currentCII;
+                    G4double prevIN = currentIN;
+
+                    // loop over all (photon energy, intensity)
+                    // pairs stored for this material
+
+                    for (size_t ii = 1;
+                            ii < theSlowLightVector->GetVectorLength();
+                            ++ii) {
+                        currentPM = theSlowLightVector->Energy(ii);
+                        currentIN = (*theSlowLightVector)[ii];
+
+                        currentCII = 0.5 * (prevIN + currentIN);
+
+                        currentCII = prevCII +
+                                (currentPM - prevPM) * currentCII;
+
+                        bPhysicsOrderedFreeVector->
+                                InsertValues(currentPM, currentCII);
+
+                        prevPM = currentPM;
+                        prevCII = currentCII;
+                        prevIN = currentIN;
+                    }
+
+                }
+            }
+        }
 
         // The scintillation integral(s) for a given material
         // will be inserted in the table(s) according to the
         // position of the material in the material table.
 
-        fFastIntegralTable->insertAt(i,aPhysicsOrderedFreeVector);
-        fSlowIntegralTable->insertAt(i,bPhysicsOrderedFreeVector);
+        fFastIntegralTable->insertAt(i, aPhysicsOrderedFreeVector);
+        fSlowIntegralTable->insertAt(i, bPhysicsOrderedFreeVector);
 
-        }
+    }
 }
 
-void L4Scintillation::SetScintillationByParticleType(const G4bool scintType)
-{
-        if (fEmSaturation) {
-           G4Exception("L4Scintillation::SetScintillationByParticleType", "Scint02",
-                       JustWarning, "Redefinition: Birks Saturation is replaced by ScintillationByParticleType!");
-           RemoveSaturation();
-        }
-        fScintillationByParticleType = scintType;
+void L4Scintillation::SetScintillationByParticleType(const G4bool scintType) {
+    if (fEmSaturation) {
+        G4Exception("L4Scintillation::SetScintillationByParticleType", "Scint02",
+                JustWarning, "Redefinition: Birks Saturation is replaced by ScintillationByParticleType!");
+        RemoveSaturation();
+    }
+    fScintillationByParticleType = scintType;
 }
 
 // GetMeanFreePath
@@ -761,12 +753,11 @@ void L4Scintillation::SetScintillationByParticleType(const G4bool scintType)
 //
 
 G4double L4Scintillation::GetMeanFreePath(const G4Track&,
-                                          G4double ,
-                                          G4ForceCondition* condition)
-{
-        *condition = StronglyForced;
+        G4double,
+        G4ForceCondition* condition) {
+    *condition = StronglyForced;
 
-        return DBL_MAX;
+    return DBL_MAX;
 
 }
 
@@ -775,203 +766,197 @@ G4double L4Scintillation::GetMeanFreePath(const G4Track&,
 //
 
 G4double L4Scintillation::GetMeanLifeTime(const G4Track&,
-                                          G4ForceCondition* condition)
-{
-        *condition = Forced;
+        G4ForceCondition* condition) {
+    *condition = Forced;
 
-        return DBL_MAX;
+    return DBL_MAX;
 
 }
 
-G4double L4Scintillation::sample_time(G4double tau1, G4double tau2)
-{
-// tau1: rise time and tau2: decay time
+G4double L4Scintillation::sample_time(G4double tau1, G4double tau2) {
+    // tau1: rise time and tau2: decay time
 
-	// Loop checking, 07-Aug-2015, Vladimir Ivanchenko
-        while(1) {
-          // two random numbers
-          G4double ran1 = G4UniformRand();
-          G4double ran2 = G4UniformRand();
-          //
-          // exponential distribution as envelope function: very efficient
-          //
-          G4double d = (tau1+tau2)/tau2;
-          // make sure the envelope function is
-          // always larger than the bi-exponential
-          G4double t = -1.0*tau2*std::log(1-ran1);
-          G4double gg = d*single_exp(t,tau2);
-          if (ran2 <= bi_exp(t,tau1,tau2)/gg) return t;
-        }
-        return -1.0;
+    // Loop checking, 07-Aug-2015, Vladimir Ivanchenko
+    while (1) {
+        // two random numbers
+        G4double ran1 = G4UniformRand();
+        G4double ran2 = G4UniformRand();
+        //
+        // exponential distribution as envelope function: very efficient
+        //
+        G4double d = (tau1 + tau2) / tau2;
+        // make sure the envelope function is
+        // always larger than the bi-exponential
+        G4double t = -1.0 * tau2 * std::log(1 - ran1);
+        G4double gg = d * single_exp(t, tau2);
+        if (ran2 <= bi_exp(t, tau1, tau2) / gg) return t;
+    }
+    return -1.0;
 }
 
 G4double L4Scintillation::
-GetScintillationYieldByParticleType(const G4Track &aTrack, const G4Step &aStep)
-{
-  ////////////////////////////////////////
-  // Get the scintillation yield vector //
-  ////////////////////////////////////////
+GetScintillationYieldByParticleType(const G4Track &aTrack, const G4Step &aStep) {
+    ////////////////////////////////////////
+    // Get the scintillation yield vector //
+    ////////////////////////////////////////
 
-  G4ParticleDefinition *pDef = aTrack.GetDynamicParticle()->GetDefinition();
+    G4ParticleDefinition *pDef = aTrack.GetDynamicParticle()->GetDefinition();
 
-  G4MaterialPropertyVector *Scint_Yield_Vector = nullptr;
+    G4MaterialPropertyVector *Scint_Yield_Vector = nullptr;
 
-  G4MaterialPropertiesTable *aMaterialPropertiesTable
-    = aTrack.GetMaterial()->GetMaterialPropertiesTable();
+    G4MaterialPropertiesTable *aMaterialPropertiesTable
+            = aTrack.GetMaterial()->GetMaterialPropertiesTable();
 
-  // Get the G4MaterialPropertyVector containing the scintillation
-  // yield as a function of the energy deposited and particle type
+    // Get the G4MaterialPropertyVector containing the scintillation
+    // yield as a function of the energy deposited and particle type
 
-  // Protons
-  if(pDef==G4Proton::ProtonDefinition())
-    Scint_Yield_Vector = aMaterialPropertiesTable->
-      GetProperty(kPROTONSCINTILLATIONYIELD);
+    // Protons
+    if (pDef == G4Proton::ProtonDefinition())
+        Scint_Yield_Vector = aMaterialPropertiesTable->
+            GetProperty(kPROTONSCINTILLATIONYIELD);
 
-  // Deuterons
-  else if(pDef==G4Deuteron::DeuteronDefinition())
-    Scint_Yield_Vector = aMaterialPropertiesTable->
-      GetProperty(kDEUTERONSCINTILLATIONYIELD);
+        // Deuterons
+    else if (pDef == G4Deuteron::DeuteronDefinition())
+        Scint_Yield_Vector = aMaterialPropertiesTable->
+            GetProperty(kDEUTERONSCINTILLATIONYIELD);
 
-  // Tritons
-  else if(pDef==G4Triton::TritonDefinition())
-    Scint_Yield_Vector = aMaterialPropertiesTable->
-      GetProperty(kTRITONSCINTILLATIONYIELD);
+        // Tritons
+    else if (pDef == G4Triton::TritonDefinition())
+        Scint_Yield_Vector = aMaterialPropertiesTable->
+            GetProperty(kTRITONSCINTILLATIONYIELD);
 
-  // Alphas
-  else if(pDef==G4Alpha::AlphaDefinition())
-    Scint_Yield_Vector = aMaterialPropertiesTable->
-      GetProperty(kALPHASCINTILLATIONYIELD);
+        // Alphas
+    else if (pDef == G4Alpha::AlphaDefinition())
+        Scint_Yield_Vector = aMaterialPropertiesTable->
+            GetProperty(kALPHASCINTILLATIONYIELD);
 
-  // Ions (particles derived from G4VIon and G4Ions) and recoil ions
-  // below the production cut from neutrons after hElastic
-  else if(pDef->GetParticleType()== "nucleus" ||
-	  pDef==G4Neutron::NeutronDefinition())
-    Scint_Yield_Vector = aMaterialPropertiesTable->
-      GetProperty(kIONSCINTILLATIONYIELD);
+        // Ions (particles derived from G4VIon and G4Ions) and recoil ions
+        // below the production cut from neutrons after hElastic
+    else if (pDef->GetParticleType() == "nucleus" ||
+            pDef == G4Neutron::NeutronDefinition())
+        Scint_Yield_Vector = aMaterialPropertiesTable->
+            GetProperty(kIONSCINTILLATIONYIELD);
 
-  // Electrons (must also account for shell-binding energy
-  // attributed to gamma from standard photoelectric effect)
-  else if(pDef==G4Electron::ElectronDefinition() ||
-	  pDef==G4Gamma::GammaDefinition())
-    Scint_Yield_Vector = aMaterialPropertiesTable->
-      GetProperty(kELECTRONSCINTILLATIONYIELD);
+        // Electrons (must also account for shell-binding energy
+        // attributed to gamma from standard photoelectric effect)
+    else if (pDef == G4Electron::ElectronDefinition() ||
+            pDef == G4Gamma::GammaDefinition())
+        Scint_Yield_Vector = aMaterialPropertiesTable->
+            GetProperty(kELECTRONSCINTILLATIONYIELD);
 
-  // Default for particles not enumerated/listed above
-  else
-    Scint_Yield_Vector = aMaterialPropertiesTable->
-      GetProperty(kELECTRONSCINTILLATIONYIELD);
+        // Default for particles not enumerated/listed above
+    else
+        Scint_Yield_Vector = aMaterialPropertiesTable->
+            GetProperty(kELECTRONSCINTILLATIONYIELD);
 
-  // If the user has specified none of the above particles then the
-  // default is the electron scintillation yield
-  if(!Scint_Yield_Vector)
-    Scint_Yield_Vector = aMaterialPropertiesTable->
-      GetProperty(kELECTRONSCINTILLATIONYIELD);
+    // If the user has specified none of the above particles then the
+    // default is the electron scintillation yield
+    if (!Scint_Yield_Vector)
+        Scint_Yield_Vector = aMaterialPropertiesTable->
+            GetProperty(kELECTRONSCINTILLATIONYIELD);
 
-  // Throw an exception if no scintillation yield vector is found
-  if (!Scint_Yield_Vector) {
-    G4ExceptionDescription ed;
-    ed << "\nL4Scintillation::PostStepDoIt(): "
-       << "Request for scintillation yield for energy deposit and particle\n"
-       << "type without correct entry in MaterialPropertiesTable.\n"
-       << "ScintillationByParticleType requires at minimum that \n"
-       << "ELECTRONSCINTILLATIONYIELD is set by the user\n"
-       << G4endl;
-    G4String comments = "Missing MaterialPropertiesTable entry - No correct entry in MaterialPropertiesTable";
-    G4Exception("L4Scintillation::PostStepDoIt","Scint01",
-		FatalException,ed,comments);
-  }
+    // Throw an exception if no scintillation yield vector is found
+    if (!Scint_Yield_Vector) {
+        G4ExceptionDescription ed;
+        ed << "\nL4Scintillation::PostStepDoIt(): "
+                << "Request for scintillation yield for energy deposit and particle\n"
+                << "type without correct entry in MaterialPropertiesTable.\n"
+                << "ScintillationByParticleType requires at minimum that \n"
+                << "ELECTRONSCINTILLATIONYIELD is set by the user\n"
+                << G4endl;
+        G4String comments = "Missing MaterialPropertiesTable entry - No correct entry in MaterialPropertiesTable";
+        G4Exception("L4Scintillation::PostStepDoIt", "Scint01",
+                FatalException, ed, comments);
+    }
 
-  ///////////////////////////////////////
-  // Calculate the scintillation light //
-  ///////////////////////////////////////
-  // To account for potential nonlinearity and scintillation photon
-  // density along the track, light (L) is produced according to:
-  //
-  // L_currentStep = L(PreStepKE) - L(PreStepKE - EDep)
+    ///////////////////////////////////////
+    // Calculate the scintillation light //
+    ///////////////////////////////////////
+    // To account for potential nonlinearity and scintillation photon
+    // density along the track, light (L) is produced according to:
+    //
+    // L_currentStep = L(PreStepKE) - L(PreStepKE - EDep)
 
-  G4double ScintillationYield = 0.;
+    G4double ScintillationYield = 0.;
 
-  G4double StepEnergyDeposit = aStep.GetTotalEnergyDeposit();
-  G4double PreStepKineticEnergy = aStep.GetPreStepPoint()->GetKineticEnergy();
+    G4double StepEnergyDeposit = aStep.GetTotalEnergyDeposit();
+    G4double PreStepKineticEnergy = aStep.GetPreStepPoint()->GetKineticEnergy();
 
-  if(PreStepKineticEnergy <= Scint_Yield_Vector->GetMaxEnergy()){
-    G4double Yield1 = Scint_Yield_Vector->Value(PreStepKineticEnergy);
-    G4double Yield2 = Scint_Yield_Vector->
-                               Value(PreStepKineticEnergy - StepEnergyDeposit);
-    ScintillationYield = Yield1 - Yield2;
-  } else {
-    G4ExceptionDescription ed;
-    ed << "\nL4Scintillation::GetScintillationYieldByParticleType(): Request\n"
-       <<   "for scintillation light yield above the available energy range\n"
-       <<   "specifed in G4MaterialPropertiesTable. A linear interpolation\n"
-       <<   "will be performed to compute the scintillation light yield using\n"
-       <<   "(L_max / E_max) as the photon yield per unit energy."
-       << G4endl;
-    G4String cmt = "\nScintillation yield may be unphysical!\n";
-    G4Exception("L4Scintillation::GetScintillationYieldByParticleType()",
-		"Scint03", JustWarning, ed, cmt);
+    if (PreStepKineticEnergy <= Scint_Yield_Vector->GetMaxEnergy()) {
+        G4double Yield1 = Scint_Yield_Vector->Value(PreStepKineticEnergy);
+        G4double Yield2 = Scint_Yield_Vector->
+                Value(PreStepKineticEnergy - StepEnergyDeposit);
+        ScintillationYield = Yield1 - Yield2;
+    } else {
+        G4ExceptionDescription ed;
+        ed << "\nL4Scintillation::GetScintillationYieldByParticleType(): Request\n"
+                << "for scintillation light yield above the available energy range\n"
+                << "specifed in G4MaterialPropertiesTable. A linear interpolation\n"
+                << "will be performed to compute the scintillation light yield using\n"
+                << "(L_max / E_max) as the photon yield per unit energy."
+                << G4endl;
+        G4String cmt = "\nScintillation yield may be unphysical!\n";
+        G4Exception("L4Scintillation::GetScintillationYieldByParticleType()",
+                "Scint03", JustWarning, ed, cmt);
 
-    G4double LinearYield = Scint_Yield_Vector->GetMaxValue()
-                                         / Scint_Yield_Vector->GetMaxEnergy();
+        G4double LinearYield = Scint_Yield_Vector->GetMaxValue()
+                / Scint_Yield_Vector->GetMaxEnergy();
 
-    // Units: [# scintillation photons]
-    ScintillationYield = LinearYield * StepEnergyDeposit;
-  }
+        // Units: [# scintillation photons]
+        ScintillationYield = LinearYield * StepEnergyDeposit;
+    }
 
 #ifdef G4DEBUG_SCINTILLATION
 
-  // Increment track aggregators
-  ScintTrackYield += ScintillationYield;
-  ScintTrackEDep += StepEnergyDeposit;
+    // Increment track aggregators
+    ScintTrackYield += ScintillationYield;
+    ScintTrackEDep += StepEnergyDeposit;
 
-  G4cout << "\n--- L4Scintillation::GetScintillationYieldByParticleType() ---\n"
-	 <<   "--\n"
-	 <<   "--  Name         =  " << aTrack.GetParticleDefinition()->GetParticleName() << "\n"
-	 <<   "--  TrackID      =  " << aTrack.GetTrackID() << "\n"
-	 <<   "--  ParentID     =  " << aTrack.GetParentID() << "\n"
-	 <<   "--  Current KE   =  " << aTrack.GetKineticEnergy()/MeV << " MeV\n"
-	 <<   "--  Step EDep    =  " << aStep.GetTotalEnergyDeposit()/MeV << " MeV\n"
-	 <<   "--  Track EDep   =  " << ScintTrackEDep/MeV << " MeV\n"
-	 <<   "--  Vertex KE    =  " << aTrack.GetVertexKineticEnergy()/MeV << " MeV\n"
-	 <<   "--  Step yield   =  " << ScintillationYield << " photons\n"
-	 <<   "--  Track yield  =  " << ScintTrackYield << " photons\n"
-	 << G4endl;
+    G4cout << "\n--- L4Scintillation::GetScintillationYieldByParticleType() ---\n"
+            << "--\n"
+            << "--  Name         =  " << aTrack.GetParticleDefinition()->GetParticleName() << "\n"
+            << "--  TrackID      =  " << aTrack.GetTrackID() << "\n"
+            << "--  ParentID     =  " << aTrack.GetParentID() << "\n"
+            << "--  Current KE   =  " << aTrack.GetKineticEnergy() / MeV << " MeV\n"
+            << "--  Step EDep    =  " << aStep.GetTotalEnergyDeposit() / MeV << " MeV\n"
+            << "--  Track EDep   =  " << ScintTrackEDep / MeV << " MeV\n"
+            << "--  Vertex KE    =  " << aTrack.GetVertexKineticEnergy() / MeV << " MeV\n"
+            << "--  Step yield   =  " << ScintillationYield << " photons\n"
+            << "--  Track yield  =  " << ScintTrackYield << " photons\n"
+            << G4endl;
 
-  // The track has terminated within or has left the scintillator volume
-  if( (aTrack.GetTrackStatus() == fStopButAlive) or
-      (aStep.GetPostStepPoint()->GetStepStatus() == fGeomBoundary) ){
+    // The track has terminated within or has left the scintillator volume
+    if ((aTrack.GetTrackStatus() == fStopButAlive) or
+            (aStep.GetPostStepPoint()->GetStepStatus() == fGeomBoundary)) {
 
-    // Reset aggregators for the next track
-    ScintTrackEDep = 0.;
-    ScintTrackYield = 0.;
-  }
+        // Reset aggregators for the next track
+        ScintTrackEDep = 0.;
+        ScintTrackYield = 0.;
+    }
 
 #endif
 
-  return ScintillationYield;
+    return ScintillationYield;
 }
 
-void L4Scintillation::DumpPhysicsTable() const
-{
-        if (fFastIntegralTable) {
-           G4int PhysicsTableSize = fFastIntegralTable->entries();
-           G4PhysicsOrderedFreeVector *v;
+void L4Scintillation::DumpPhysicsTable() const {
+    if (fFastIntegralTable) {
+        G4int PhysicsTableSize = fFastIntegralTable->entries();
+        G4PhysicsOrderedFreeVector *v;
 
-           for (G4int i = 0 ; i < PhysicsTableSize ; i++ )
-           {
-        	v = (G4PhysicsOrderedFreeVector*)(*fFastIntegralTable)[i];
-        	v->DumpValues();
-           }
-         }
+        for (G4int i = 0; i < PhysicsTableSize; i++) {
+            v = (G4PhysicsOrderedFreeVector*) (*fFastIntegralTable)[i];
+            v->DumpValues();
+        }
+    }
 
-        if (fSlowIntegralTable) {
-           G4int PhysicsTableSize = fSlowIntegralTable->entries();
-           G4PhysicsOrderedFreeVector *v;
+    if (fSlowIntegralTable) {
+        G4int PhysicsTableSize = fSlowIntegralTable->entries();
+        G4PhysicsOrderedFreeVector *v;
 
-           for (G4int i = 0 ; i < PhysicsTableSize ; i++ )
-           {
-                v = (G4PhysicsOrderedFreeVector*)(*fSlowIntegralTable)[i];
-                v->DumpValues();
-           }
-         }
+        for (G4int i = 0; i < PhysicsTableSize; i++) {
+            v = (G4PhysicsOrderedFreeVector*) (*fSlowIntegralTable)[i];
+            v->DumpValues();
+        }
+    }
 }

@@ -21,12 +21,13 @@
 
 #include "G4VUserPhysicsList.hh"
 
-class G4Scintillation;
+class L4Scintillation;
+class L4Cerenkov;
 class G4OpBoundaryProcess;
 class G4OpAbsorption;
 class G4OpRayleigh;
 
-template <typename T>
+//template <typename T>
 class PhysicsList : public G4VUserPhysicsList {
 public:
     PhysicsList();
@@ -39,8 +40,8 @@ public:
 
     G4int fMaxNumPhotonStep;
     G4int fVerboseLevel;
-    T* fCerenkovProcess;
-    G4Scintillation* fScintillationProcess;
+    L4Scintillation* fScintillationProcess;
+    L4Cerenkov* fCerenkovProcess;
     G4OpAbsorption* fAbsorptionProcess;
     G4OpRayleigh* fRayleighProcess;
     G4OpBoundaryProcess* fBoundaryProcess;

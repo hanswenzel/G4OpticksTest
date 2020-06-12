@@ -83,7 +83,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
             }
         }
     }
-    //   logicTarget = G4LogicalVolumeStore::GetInstance()->GetVolume("volTPCActiveInner");
+       logicTarget = G4LogicalVolumeStore::GetInstance()->GetVolume("Obj");
+                   std::cout << "************************************LS Material properties "<< std::endl;
+       logicTarget->GetMaterial()->GetMaterialPropertiesTable()->DumpTable();
+       
     //    logicContainer = G4LogicalVolumeStore::GetInstance()->GetVolume("volContainer");
     G4VPhysicalVolume* worldPhysVol = parser->GetWorldVolume();
     //    PrepareLArTest();

@@ -56,7 +56,7 @@ private:
     DetectorConstruction(const DetectorConstruction&);
 
     G4String gdmlFile;
-    //   G4LogicalVolume* logicTarget;
+    G4LogicalVolume* logicTarget;
     //   G4LogicalVolume* logicWorld;
     //std::vector<std::pair<std::string, std::string> > DetectorList;
     std::vector<G4String> *sdnames;

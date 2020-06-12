@@ -25,13 +25,14 @@
 #include "G4VUserPhysicsList.hh"
 
 #include "G4Version.hh"
-#include "G4Scintillation.hh"
+//#include "G4Scintillation.hh"
 #include "G4OpAbsorption.hh"
 #include "G4OpRayleigh.hh"
 #include "G4OpBoundaryProcess.hh"
+#include "L4Cerenkov.hh"
+#include "L4Scintillation.hh"
 
-template <typename T>
-PhysicsList<T>::PhysicsList()
+PhysicsList::PhysicsList()
 :
 fMaxNumPhotonStep(1000),
 fVerboseLevel(1),
@@ -49,8 +50,9 @@ fBoundaryProcess(NULL) {
 #include "G4IonConstructor.hh"
 #include "G4ShortLivedConstructor.hh"
 
-template <typename T>
-void PhysicsList<T>::ConstructParticle() {
+//template <typename T>
+
+void PhysicsList::ConstructParticle() {
     G4BosonConstructor::ConstructParticle();
     G4LeptonConstructor::ConstructParticle();
     G4MesonConstructor::ConstructParticle();
@@ -58,8 +60,9 @@ void PhysicsList<T>::ConstructParticle() {
     G4IonConstructor::ConstructParticle();
 }
 
-template <typename T>
-void PhysicsList<T>::ConstructProcess() {
+//template <typename T>
+
+void PhysicsList::ConstructProcess() {
     AddTransportation();
     ConstructEM();
     ConstructOp();
@@ -87,8 +90,9 @@ void PhysicsList<T>::ConstructProcess() {
 
 #include "G4hIonisation.hh"
 
-template <typename T>
-void PhysicsList<T>::ConstructEM() {
+//template <typename T>
+
+void PhysicsList::ConstructEM() {
     G4int em_verbosity = 0;
     G4EmParameters* empar = G4EmParameters::Instance();
     empar->SetVerbose(em_verbosity);
@@ -152,13 +156,19 @@ void PhysicsList<T>::ConstructEM() {
     }
 }
 
-template <typename T>
-void PhysicsList<T>::ConstructOp() {
-    fCerenkovProcess = new T("Cerenkov");
+//template <typename T>
+
+void PhysicsList::ConstructOp() {
+  
+    fCerenkovProcess = new L4Cerenkov();
     fCerenkovProcess->SetMaxNumPhotonsPerStep(fMaxNumPhotonStep);
     fCerenkovProcess->SetMaxBetaChangePerStep(10.0);
     fCerenkovProcess->SetTrackSecondariesFirst(true);
     fCerenkovProcess->SetVerboseLevel(fVerboseLevel);
+  
+    fScintillationProcess = new L4Scintillation();
+    fScintillationProcess->SetTrackSecondariesFirst(true);
+    fScintillationProcess->SetVerboseLevel(fVerboseLevel);
 
     fAbsorptionProcess = new G4OpAbsorption();
     fRayleighProcess = new G4OpRayleigh();
@@ -179,11 +189,13 @@ void PhysicsList<T>::ConstructOp() {
         G4String particleName = particle->GetParticleName();
 
         if (fCerenkovProcess && fCerenkovProcess->IsApplicable(*particle)) {
+	  //            G4cout << "***********************PhysicsList add cerenkov " << G4endl;
             pmanager->AddProcess(fCerenkovProcess);
             pmanager->SetProcessOrdering(fCerenkovProcess, idxPostStep);
         }
 
         if (fScintillationProcess && fScintillationProcess->IsApplicable(*particle)) {
+	  //G4cout << "***********************PhysicsList add scintillation " << G4endl;
             pmanager->AddProcess(fScintillationProcess);
             pmanager->SetProcessOrderingToLast(fScintillationProcess, idxAtRest);
             pmanager->SetProcessOrderingToLast(fScintillationProcess, idxPostStep);
@@ -199,7 +211,7 @@ void PhysicsList<T>::ConstructOp() {
     }
 }
 
-
+/*
 
 //#include "G4Cerenkov.hh"
 #include "L4Cerenkov.hh"
@@ -208,3 +220,8 @@ void PhysicsList<T>::ConstructOp() {
 template struct PhysicsList<L4Cerenkov>;
 
 
+
+
+#include "L4Scintillation.hh"
+template struct PhysicsList<L4Scintillation>;
+ */

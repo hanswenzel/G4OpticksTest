@@ -16,10 +16,12 @@ export OPTICKS_INSTALL_PREFIX=$LOCAL_BASE/opticks
 export OPTICKS_BOOST_INCLUDEDIR=${LOCAL_BASE}/opticks/externals/boost/boost_1_61_0/boost/
 export OPTICKS_BOOST_LIBDIR=${LOCAL_BASE}/opticks/externals/boost/boost_1_61_0/libs
 opticks-(){ . ${OPTICKS_HOME}/opticks.bash && opticks-env $* ; }
-opticks-
+#opticks-
+#echo  ${LD_LIBRARY_PATH}| tr : \\n;
+#echo  ${PATH}| tr : \\n;
 op(){ op.sh $* ; }
 o(){ cd $(opticks-home) ; hg st ; }
-. ${LOCAL_BASE}/opticks/externals/bin/geant4.sh
+#. ${LOCAL_BASE}/opticks/externals/bin/geant4.sh
 # make sure to add the compiler options
 new=" -fPIC"
 case ":${CXXFLAGS:=$new}:" in
@@ -38,12 +40,12 @@ case ":${MAKEFLAGS:=$new}:" in
     *) MAKEFLAGS="$MAKEFLAGS:$new"  ;;
 esac
 # deal with the $LD_LIBRARYPATH
-new=${OPTICKS_HOME}/externals/lib
+new=${OptiX_INSTALL_DIR}/lib64/
 case ":${LD_LIBRARY_PATH:=$new}:" in
     *:"$new":*)  ;;
     *) LD_LIBRARY_PATH="$new:$LD_LIBRARY_PATH"  ;;
 esac
-new=${OptiX_INSTALL_DIR}/lib64/
+new=${OPTICKS_HOME}/externals/lib
 case ":${LD_LIBRARY_PATH:=$new}:" in
     *:"$new":*)  ;;
     *) LD_LIBRARY_PATH="$new:$LD_LIBRARY_PATH"  ;;
@@ -58,6 +60,8 @@ case ":${LD_LIBRARY_PATH:=$new}:" in
     *:"$new":*)  ;;
     *) LD_LIBRARY_PATH="$new:$LD_LIBRARY_PATH"  ;;
 esac
+. ${LOCAL_BASE}/opticks/externals/bin/geant4.sh
+opticks-
 new=${CUDA_INSTALL_DIR}/bin
 case ":${PATH:=$new}:" in
     *:"$new":*)  ;;
@@ -101,4 +105,5 @@ oinfo-(){
 }
 #export IDPATH=${WORK_DIR}/geocache
 #source  /home/wenzel/root-build/bin/thisroot.sh
-export OPTICKS_KEY=OKX4Test.X4PhysicalVolume.lWorld0x4bc2710_PV.6c0b1c7e48b32eb1d3eb898e06ad0a33
+#export OPTICKS_KEY=OKX4Test.X4PhysicalVolume.lWorld0x4bc2710_PV.6c0b1c7e48b32eb1d3eb898e06ad0a33
+export OPTICKS_KEY=OKX4Test.X4PhysicalVolume.World_PV.b7ef5072d1d43f5b529c0c24d5432671

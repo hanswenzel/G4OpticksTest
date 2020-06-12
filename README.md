@@ -48,4 +48,6 @@ cmake   -DCMAKE_BUILD_TYPE=Debug \
 
 make install
 
-cd ..
+cd ../G4OpticksTest-install/bin
+
+./G4OpticksTest G4Opticks.gdml muon.mac

@@ -231,7 +231,7 @@ L4Scintillation::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep)
 
     G4MaterialPropertiesTable* aMaterialPropertiesTable =
             aMaterial->GetMaterialPropertiesTable();
-    G4cout << "L4Scintillation::PostStepDoIt:  predump:   "<<  aMaterial->GetName() << G4endl;
+    G4cout << "L4Scintillation::PostStepDoIt:  predump:   " << aMaterial->GetName() << G4endl;
     aMaterialPropertiesTable->DumpTable();
     G4cout << "L4Scintillation::PostStepDoIt:  postdump " << G4endl;
 
@@ -255,19 +255,20 @@ L4Scintillation::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep)
     if (Fast_Intensity && Slow_Intensity) nscnt = 2;
 
     G4double ScintillationYield = 0.;
-
+    G4cout << "kSCINTILLATIONYIELD:  " << kSCINTILLATIONYIELD << G4endl;
+    G4cout << "fScintillationByParticleType:  " << fScintillationByParticleType << G4endl;
     // Scintillation depends on particle type, energy deposited
     if (fScintillationByParticleType) {
-
+        G4cout << "*****************   :  Hi Hi " << G4endl;
         ScintillationYield =
                 GetScintillationYieldByParticleType(aTrack, aStep);
 
         // The default linear scintillation process
     } else {
-
+        G4cout << "*****************   :  Ho    Ho " << G4endl;
         ScintillationYield = aMaterialPropertiesTable->
                 GetConstProperty(kSCINTILLATIONYIELD);
-
+     G4cout << "*****************   :  Ho    Ho " << G4endl;
         // Units: [# scintillation photons / MeV]
         ScintillationYield *= fYieldFactor;
     }

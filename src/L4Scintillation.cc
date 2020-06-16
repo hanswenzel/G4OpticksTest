@@ -339,6 +339,7 @@ L4Scintillation::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep)
     // new G4PhysicsOrderedFreeVector allocated to hold CII's
 
     G4int Num = fNumPhotons;
+    /*
 #ifdef WITH_OPTICKS
 
     unsigned opticks_photon_offset = 0;
@@ -387,7 +388,8 @@ L4Scintillation::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep)
 
 
 #endif
-
+     */
+G4cout << "L4Scintillation::  nscnt: " << nscnt << G4endl;
     for (G4int scnt = 1; scnt <= nscnt; scnt++) {
 
         G4double ScintillationTime = 0. * ns;
@@ -462,6 +464,58 @@ L4Scintillation::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep)
         G4double CIImax = ScintillationIntegral->GetMaxValue();
         G4cout << " Num:  " << Num << G4endl;
         G4cout << " CIImax:  " << CIImax << G4endl;
+        G4cout << " ScintillationTime:  "<<ScintillationTime << G4endl;
+        
+        #ifdef WITH_OPTICKS
+
+    unsigned opticks_photon_offset = 0;
+
+    const G4ParticleDefinition* definition = aParticle->GetDefinition();
+    G4ThreeVector deltaPosition = aStep.GetDeltaPosition();
+    G4cout << "L4Scintillation::PostStepDoIt"
+            //               << " dp (Pmax-Pmin) " << dp
+            << G4endl
+            ;
+
+    opticks_photon_offset = G4Opticks::GetOpticks()->getNumPhotons();
+    G4cout << "L4Scintillation:opticks_photon_offset:  " << opticks_photon_offset << G4endl;
+    //  G4ThreeVector deltaPosition = aStep.GetDeltaPosition();
+    G4int scntId = 1;
+    // total number of photons for all gensteps collected before this one
+    // within this OpticksEvent (potentially crossing multiple G4Event)
+
+    G4Opticks::GetOpticks()->collectScintillationStep(
+            1, // 0    id:zero means use scintillation step count 				   
+            aTrack.GetTrackID(),
+            materialIndex,
+            fNumPhotons,
+            x0.x(), // 1
+            x0.y(),
+            x0.z(),
+            t0,
+            deltaPosition.x(), // 2
+            deltaPosition.y(),
+            deltaPosition.z(),
+            aStep.GetStepLength(),
+            definition->GetPDGEncoding(), // 3
+            definition->GetPDGCharge(),
+            aTrack.GetWeight(),
+            pPreStepPoint->GetVelocity(),
+            scntId,
+            aMaterialPropertiesTable->GetConstProperty(kYIELDRATIO), // slowerRatio,
+            aMaterialPropertiesTable->GetConstProperty(kFASTTIMECONSTANT), // TimeConstant,
+            aMaterialPropertiesTable->GetConstProperty(kSLOWTIMECONSTANT), //slowerTimeConstant,
+            ScintillationTime, //scintillationTime,
+            CIImax, //wrong but not used scintillationIntegrationMax,
+            0, //spare1
+            0 // spare2
+            );
+
+
+
+#endif
+        
+        
         for (G4int i = 0; i < Num; i++) {
 #ifdef WITH_OPTICKS
             unsigned record_id = opticks_photon_offset + i;

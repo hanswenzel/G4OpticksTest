@@ -83,7 +83,7 @@
 #include "G4ParticleDefinition.hh"
 
 #include "L4Cerenkov.hh"
-
+#include "OpticksGenstep.h"
 /////////////////////////
 // Class Implementation  
 /////////////////////////
@@ -304,7 +304,7 @@ L4Cerenkov::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep)
         // within this OpticksEvent (potentially crossing multiple G4Event) 
 
         G4Opticks::GetOpticks()->collectCerenkovStep(
-                0, // 0     id:zero means use cerenkov step count 
+                OpticksGenstep_G4Cerenkov_1042, // 0     id:zero means use cerenkov step count 
                 aTrack.GetTrackID(),
                 materialIndex,
                 NumPhotons,

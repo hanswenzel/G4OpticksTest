@@ -80,7 +80,7 @@
 #include "G4ParticleTypes.hh"
 #include "G4EmProcessSubType.hh"
 #include "G4ScintillationTrackInformation.hh"
-
+#include "OpticksGenstep.h"
 #include "L4Scintillation.hh"
 
 /////////////////////////
@@ -485,7 +485,8 @@ G4cout << "L4Scintillation::  nscnt: " << nscnt << G4endl;
     // within this OpticksEvent (potentially crossing multiple G4Event)
 
     G4Opticks::GetOpticks()->collectScintillationStep(
-            1, // 0    id:zero means use scintillation step count 				   
+						      //1, // 0    id:zero means use scintillation step count
+	    OpticksGenstep_G4Scintillation_1042,	   
             aTrack.GetTrackID(),
             materialIndex,
             fNumPhotons,

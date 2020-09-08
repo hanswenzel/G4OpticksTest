@@ -9,7 +9,7 @@ endif()
 
 
 find_package( G4OK CONFIG REQUIRED )
-
+find_package( GGeo CONFIG REQUIRED )
 
 include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)

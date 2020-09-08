@@ -24,6 +24,19 @@
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
 
+#include "G4PhysListFactoryAlt.hh" 
+#include "G4PhysicsConstructorRegistry.hh"
+#include "G4PhysListRegistry.hh"
+#include "G4OpticalPhysics.hh"
+#include "G4NeutronTrackingCut.hh"
+#include "G4VModularPhysicsList.hh"
+#include "G4StepLimiter.hh"
+#include "G4StepLimiterPhysics.hh"
+#include "G4SystemOfUnits.hh"
+
+//#include <boost/timer/timer.hpp>
+//#include <iostream>
+//using namespace boost::timer;
 int main(int argc, char** argv) {
     bool interactive = false;
     G4UIExecutive* ui = nullptr;
@@ -44,11 +57,14 @@ int main(int argc, char** argv) {
     //start time
     G4Timer *eventTimer = new G4Timer;
     eventTimer->Start();
+    //cpu_timer timer;
+    //    timer.start();
 
     OPTICKS_LOG(argc, argv);
     G4 g(argv[1]);
 
     G4UImanager* UImanager = G4UImanager::GetUIpointer();
+    
     if (interactive) {
         G4VisManager* visManager = new G4VisExecutive;
         visManager->Initialize();
@@ -65,8 +81,9 @@ int main(int argc, char** argv) {
         UImanager->ApplyCommand(command + fileName);
     }
 
-    //    delete visManager;
     eventTimer->Stop();
+    //   timer.stop();
+
     double totalCPUTime = eventTimer->GetUserElapsed() + eventTimer->GetSystemElapsed();
     G4int precision_t = G4cout.precision(3);
     std::ios::fmtflags flags_t = G4cout.flags();
@@ -75,6 +92,7 @@ int main(int argc, char** argv) {
     G4cout.setf(flags_t);
     G4cout.precision(precision_t);
     delete eventTimer;
+    //    std::cout << timer.format() << '\n';
     return 0;
 }
 

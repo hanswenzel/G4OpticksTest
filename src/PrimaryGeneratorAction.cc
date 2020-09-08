@@ -1,54 +1,58 @@
-/*
- * Copyright (c) 2019 Opticks Team. All Rights Reserved.
- *
- * This file is part of Opticks
- * (see https://bitbucket.org/simoncblyth/opticks).
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); 
- * you may not use this file except in compliance with the License.  
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, 
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
- * See the License for the specific language governing permissions and 
- * limitations under the License.
- */
-
-#include "PrimaryGeneratorAction.hh"
-#include "G4ParticleTable.hh"
+// -----------------------------------------------------
+//  _    _        _____         _   
+// | |  / \   _ _|_   _|__  ___| |_ 
+// | | / _ \ | '__|| |/ _ \/ __| __|
+// | |/ ___ \| |   | |  __/\__ \ |_ 
+// |_/_/   \_\_|   |_|\___||___/\__|
+//                                  
+// lArTest: A Geant4 application to study and profile  
+//          simulation of physics processes relevant 
+//          to liquid Ar TPCs
+//
+// Author: Hans Wenzel, Fermilab
+// -----------------------------------------------------
+// Geant4 headers
+#include "G4SystemOfUnits.hh"
 #include "G4ParticleGun.hh"
+// Project headers:
+#include "PrimaryGeneratorAction.hh"
+//#include "Analysis.hh"
+#include "ConfigurationManager.hh"
+//
+#include "Randomize.hh"
+#include <time.h>
+// Geant4 headers:
 
-#ifdef WITH_OPTICKS
-#include "G4Opticks.hh"
-#endif
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+using namespace std;
 
-using CLHEP::MeV;
-//PrimaryGeneratorAction::PrimaryGeneratorAction(Ctx* ctx_)
-PrimaryGeneratorAction::PrimaryGeneratorAction()
-:
-G4VUserPrimaryGeneratorAction(),
-//ctx(ctx_),
-fParticleGun(new G4ParticleGun(1)) {
-    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-    G4ParticleDefinition* particle = particleTable->FindParticle("mu+");
-    fParticleGun->SetParticleDefinition(particle);
-    fParticleGun->SetParticleTime(0.0 * CLHEP::ns);
-    fParticleGun->SetParticlePosition(G4ThreeVector(0.0 * CLHEP::cm, 0.0 * CLHEP::cm, 0.0 * CLHEP::cm));
-    fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0., 0., 1.0));
-    fParticleGun->SetParticleEnergy(0.8 * CLHEP::GeV); // few photons at ~0.7*MeV loads from ~ 0.8*MeV
+PrimaryGeneratorAction::PrimaryGeneratorAction() {
+    particleGun = new G4ParticleGun(1);
+
+    particleGun->SetParticleMomentumDirection(G4ThreeVector(0., 0., 1.));
+    G4double zVertex = -4.55 * m;
+    particleGun->SetParticlePosition(G4ThreeVector(0., 0., zVertex));
 }
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+PrimaryGeneratorAction::~PrimaryGeneratorAction() {
+    delete particleGun;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
-    fParticleGun->GeneratePrimaryVertex(anEvent);
-
-#ifdef WITH_OPTICKS
-    // not strictly required by Opticks, but useful for debugging + visualization of non-opticals
-    //G4Opticks::GetOpticks()->collectPrimaries(anEvent) ;  
-#endif
+    particleGun->GeneratePrimaryVertex(anEvent);
+    ConfigurationManager* cfMgr=ConfigurationManager::getInstance();
+    if (cfMgr->GetdoAnalysis()) {
+        /*
+        Analysis* analysis = Analysis::getInstance();
+        Double_t ener = particleGun->GetParticleEnergy();
+        G4ParticleDefinition* part = particleGun->GetParticleDefinition();
+        analysis->SetPrimGenInfo(ener, part);
+         */
+    }
 }
 
-
-
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

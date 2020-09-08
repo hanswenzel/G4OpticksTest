@@ -26,7 +26,7 @@ class Ctx;
 class SensitiveDetector;
 class DetectorConstruction;
 class DetConOrg;
-class PhysicsList;
+class G4VModularPhysicsList;
 class PrimaryGeneratorAction;
 class RunAction;
 class EventAction;
@@ -44,7 +44,7 @@ public:
     const char* sdn;
   DetectorConstruction*    dc ; 
   //DetConOrg* dc;
-    PhysicsList* pl;
+    G4VModularPhysicsList* pl;
     PrimaryGeneratorAction* ga;
     RunAction* ra;
     EventAction* ea;

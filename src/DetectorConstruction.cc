@@ -46,6 +46,7 @@
 #include "ConfigurationManager.hh"
 #include "DetectorConstruction.hh"
 #include "TrackerSD.hh"
+#include "lArTPCSD.hh"
 #include "PhotonSD.hh"
 #include "SensitiveDetector.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -84,7 +85,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
         }
     }
        logicTarget = G4LogicalVolumeStore::GetInstance()->GetVolume("Obj");
-                   std::cout << "************************************LS Material properties "<< std::endl;
+       std::cout << "************************************LS Material properties "<< std::endl;
        logicTarget->GetMaterial()->GetMaterialPropertiesTable()->DumpTable();
        
     //    logicContainer = G4LogicalVolumeStore::GetInstance()->GetVolume("volContainer");
@@ -134,7 +135,17 @@ void DetectorConstruction::ConstructSDandField() {
                     std::cout << "Attaching sensitive Detector: " << (*vit).value
                             << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
                     //DetectorList.push_back(std::make_pair((*iter).first->GetName(), (*vit).value));
-                } else if ((*vit).value == "SensitiveDetector") {
+                }  else if ((*vit).value == "lArTPC") {
+                    G4String name = ((*iter).first)->GetName() + "_lArTPC";
+                    lArTPCSD* alArTPCSD = new lArTPCSD(name);
+                    SDman->AddNewDetector(alArTPCSD);
+                    sdnames->push_back(name);
+                    std::cout << "new size: " << sdnames->size() << std::endl;
+                    ((*iter).first)->SetSensitiveDetector(alArTPCSD);
+                    std::cout << "Attaching sensitive Detector: " << (*vit).value
+                            << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                    //DetectorList.push_back(std::make_pair((*iter).first->GetName(), (*vit).value));
+                }else if ((*vit).value == "SensitiveDetector") {
                     G4String name = ((*iter).first)->GetName() + "_SensitiveDetector";
                     SensitiveDetector* aSensitiveDetector = new SensitiveDetector(name);
                     SDman->AddNewDetector(aSensitiveDetector);
@@ -145,7 +156,6 @@ void DetectorConstruction::ConstructSDandField() {
                             << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
                     //DetectorList.push_back(std::make_pair((*iter).first->GetName(), (*vit).value));
                 }
-                
             } else if ((*vit).type == "Solid") {
                 if ((*vit).value == "True") {
                     G4VisAttributes * visibility = new G4VisAttributes();
@@ -197,47 +207,7 @@ void DetectorConstruction::ReadGDML() {
             << " physical volumes."
             << std::endl << std::endl;
 }
-/*
-void DetectorConstruction::PrepareLArTest() {
 
-
-    G4MaterialPropertiesTable* LArMPT = new G4MaterialPropertiesTable();
-    G4MaterialPropertiesTable* LArMPT2 = new G4MaterialPropertiesTable();
-    //
-    //  simple description of scintillation yield  
-    //  [J Chem Phys vol 91 (1989) 1469]
-    //
-    G4double Rindex[] = {1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5};
-    G4double FastScintEnergies[] = {6.7 * eV, 7.1 * eV, 7.4 * eV, 7.7 * eV, 7.9 * eV, 8.1 * eV, 8.4 * eV, 8.5 * eV, 8.6 * eV, 8.8 * eV, 9.0 * eV, 9.1 * eV, 9.4 * eV, 9.8 * eV, 10.4 * eV};
-    G4double FastScintSpectrum[] = {0.04, 0.12, 0.27, 0.44, 0.62, 0.80, 0.91, 0.92, 0.85, 0.70, 0.50, 0.31, 0.13, 0.04, 0.01};
-    assert(sizeof (FastScintSpectrum) == sizeof (FastScintEnergies));
-    assert(sizeof (Rindex) == sizeof (FastScintEnergies));
-    const G4int num = sizeof (FastScintEnergies) / sizeof (G4double);
-    for (int jj = 0; jj < num; jj++) {
-        G4double lam = ((h_Planck * c_light) / FastScintEnergies[jj]) / nm;
-        std::cout << FastScintEnergies[jj] / eV << "  " << ((h_Planck * c_light) / FastScintEnergies[jj]) / nm << "   " << LArRefIndex(lam) << "  " << ArScintillationSpectrum(lam) << std::endl;
-    }
-    LArMPT->AddProperty("RINDEX", FastScintEnergies, Rindex, num);
-    LArMPT2->AddProperty("RINDEX", FastScintEnergies, Rindex, num);
-    LArMPT->AddProperty("FASTCOMPONENT", FastScintEnergies, FastScintSpectrum, num)->SetSpline(true);
-    LArMPT->AddProperty("SLOWCOMPONENT", FastScintEnergies, FastScintSpectrum, num)->SetSpline(true);
-    LArMPT->AddConstProperty("FASTTIMECONSTANT", 7. * ns);
-    LArMPT->AddConstProperty("SLOWTIMECONSTANT", 1400. * ns);
-    LArMPT->AddConstProperty("YIELDRATIO", 0.75);
-    G4double scint_yield = 1.0 / (19.5 * eV);
-    LArMPT->AddConstProperty("SCINTILLATIONYIELD", scint_yield / MeV);
-    LArMPT->DumpTable();
-    //    G4double fano = 0.11;
-    // Doke et al, NIM 134 (1976)353
-    //LArMPT->AddConstProperty("RESOLUTIONSCALE", fano);
-    LArMPT->AddConstProperty("RESOLUTIONSCALE", 1.0);
-    std::cout << "**********************************************************************" << std::endl;
-    //std::cout << logicTarget->GetMaterial()->GetName() << std::endl;
-    std::cout << "**********************************************************************" << std::endl;
-    //logicTarget->GetMaterial()->SetMaterialPropertiesTable(LArMPT);
-    logicContainer->GetMaterial()->SetMaterialPropertiesTable(LArMPT2);
-}
- */
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void DetectorConstruction::UpdateGeometry() {

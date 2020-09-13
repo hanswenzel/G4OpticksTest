@@ -29,7 +29,7 @@
 #include "DetectorConstruction.hh"
 #include "DetConOrg.hh"
 //#include "L4Cerenkov.hh"
-#include "PhysicsList.hh"
+//#include "PhysicsList.hh"
 #include "PrimaryGeneratorAction.hh"
 
 #include "RunAction.hh"
@@ -46,8 +46,8 @@
 #include "G4OpAbsorption.hh"
 #include "G4OpRayleigh.hh"
 #include "G4OpBoundaryProcess.hh"
-#include "L4Cerenkov.hh"
-#include "L4Scintillation.hh"
+//#include "L4Cerenkov.hh"
+//#include "L4Scintillation.hh"
 
 //
 
@@ -125,15 +125,15 @@ sa(NULL) {
     opticalPhysics->Configure(kCerenkov, false);
     opticalPhysics->SetCerenkovStackPhotons(true);
     opticalPhysics->Configure(kWLS, false);
-    opticalPhysics->Configure(kScintillation, false);
-    opticalPhysics->SetScintillationYieldFactor(1.0);
-    opticalPhysics->SetScintillationExcitationRatio(0.0);
+    opticalPhysics->Configure(kScintillation, true);
+//    opticalPhysics->SetScintillationYieldFactor(1.0);
+//    opticalPhysics->SetScintillationExcitationRatio(0.0);
     opticalPhysics->Configure(kRayleigh, true);
     opticalPhysics->Configure(kBoundary, true);
     opticalPhysics->Configure(kAbsorption, true);
     opticalPhysics->SetScintillationStackPhotons(false);
     opticalPhysics->SetTrackSecondariesFirst(kCerenkov, true); // only relevant if we actually stack and trace the optical photons
-    opticalPhysics->SetTrackSecondariesFirst(kScintillation, true); // only relevant if we actually stack and trace the optical photons
+    opticalPhysics->SetTrackSecondariesFirst(kScintillation, false); // only relevant if we actually stack and trace the optical photons
     opticalPhysics->SetMaxNumPhotonsPerStep(100);
     opticalPhysics->SetMaxBetaChangePerStep(10.0);
 

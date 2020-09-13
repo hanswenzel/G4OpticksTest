@@ -159,13 +159,16 @@
             <solidref ref="GlassPlate"/>
             <colorref ref="red"/> 
             <auxiliary auxtype="Solid" auxvalue="True"/>
+            <!--
             <auxiliary auxtype="SensDet" auxvalue="SensitiveDetector"/>
+                        -->
         </volume>
         <volume name="Obj">
             <materialref ref="LS0x4b61c70"/>
             <solidref ref="Obj"/>
             <colorref ref="blue"/>
             <auxiliary auxtype="StepLimit" auxvalue="0.4" auxunit="mm"/>
+            <auxiliary auxtype="SensDet" auxvalue="lArTPC"/>
             <physvol name="Det">
                 <volumeref ref="Det"/>
                 <position name="Det" unit="mm" x="0" y="0" z="100"/>

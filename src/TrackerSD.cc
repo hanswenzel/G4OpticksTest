@@ -20,8 +20,8 @@
 #include "G4ios.hh"
 #include "G4RunManager.hh"
 #include "G4Event.hh"
-#include "G4Cerenkov.hh"
-#include "L4Scintillation.hh"
+//#include "G4Cerenkov.hh"
+//#include "L4Scintillation.hh"
 #include "G4SteppingManager.hh"
 #include "G4Track.hh"
 #include "G4UnitsTable.hh"
@@ -63,22 +63,8 @@ G4bool TrackerSD::ProcessHits(G4Step* aStep,
     G4SteppingManager* fpSteppingManager = G4EventManager::GetEventManager()
             ->GetTrackingManager()->GetSteppingManager();
     G4StepStatus stepStatus = fpSteppingManager->GetfStepStatus();
-    if (stepStatus != fAtRestDoItProc) {
-        G4ProcessVector* procPost = fpSteppingManager->GetfPostStepDoItVector();
-        size_t MAXofPostStepLoops = fpSteppingManager->GetMAXofPostStepLoops();
-        for (size_t i3 = 0; i3 < MAXofPostStepLoops; i3++) {
-            /*
-            if ((*procPost)[i3]->GetProcessName() == "Cerenkov") {
-                G4Cerenkov* proc =(G4Cerenkov*) (*procPost)[i3];
-                photons+=proc->GetNumPhotons();
-            }
-             */
-            if ((*procPost)[i3]->GetProcessName() == "Scintillation") {
-                L4Scintillation* proc1 = (L4Scintillation*) (*procPost)[i3];
-                photons += proc1->GetNumPhotons();
-            }
-        }
-    }
+    
+
     ConfigurationManager* cfMgr = ConfigurationManager::getInstance();
     std::map<G4String, int> *mapOfntIDs = cfMgr->getMapOfntIDs();
     //const G4String name = aStep->GetPostStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() + "_Tracker";

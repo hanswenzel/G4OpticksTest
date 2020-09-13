@@ -96,7 +96,7 @@ G4bool SensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*) {
     const G4ThreeVector& pol = point->GetPolarization();
 
     m_hit_count += 1;
-
+    G4cout<<"SensitiveDetector::ProcessHits: " << G4endl;
 #ifdef WITH_OPTICKS
     {
         G4double energy = point->GetKineticEnergy();
@@ -164,7 +164,8 @@ void SensitiveDetector::DumpHitCollections(G4HCofThisEvent* HCE) // static
 
     G4SDManager* SDMan = G4SDManager::GetSDMpointerIfExist();
     assert(SDMan);
-
+ G4cout
+                << "SensitiveDetector::DumpHitCollections"<<G4endl;
     G4HCtable* tab = SDMan->GetHCtable();
     for (G4int i = 0; i < tab->entries(); i++) {
         std::string sdName = tab->GetSDname(i);

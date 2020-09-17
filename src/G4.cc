@@ -122,8 +122,8 @@ sa(NULL) {
     G4cout << phys->GetPhysicsTableDirectory() << G4endl;
     G4OpticalPhysics* opticalPhysics = (G4OpticalPhysics*) phys->GetPhysics("Optical");
     //G4OpticalPhysics* opticalPhysics = (G4OpticalPhysics*) phys->GetPhysics("G4OpticalPhysics");
-    opticalPhysics->Configure(kCerenkov, false);
-    opticalPhysics->SetCerenkovStackPhotons(true);
+    opticalPhysics->Configure(kCerenkov, true);
+    opticalPhysics->SetCerenkovStackPhotons(false);
     opticalPhysics->Configure(kWLS, false);
     opticalPhysics->Configure(kScintillation, true);
 //    opticalPhysics->SetScintillationYieldFactor(1.0);

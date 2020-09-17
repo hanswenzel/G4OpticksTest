@@ -42,7 +42,8 @@
 #include "ConfigurationManager.hh"
 using namespace std;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-int tphotons;
+int tCphotons;
+int tSphotons;
 
 lArTPCSD::lArTPCSD(G4String name)
 : G4VSensitiveDetector(name) {
@@ -61,12 +62,13 @@ void lArTPCSD::Initialize(G4HCofThisEvent* hce) {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4bool lArTPCSD::ProcessHits(G4Step* aStep,G4TouchableHistory*) {
+G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     G4double edep = aStep->GetTotalEnergyDeposit();
     if (edep == 0.) return false;
     // only deal with charged particles
     G4Track* aTrack = aStep->GetTrack();
-    if (aTrack->GetDynamicParticle()->GetCharge() == 0) return false;
+    G4double charge = aTrack->GetDynamicParticle()->GetCharge();
+    if (charge == 0) return false;
     if (first) {
         aMaterial = aTrack->GetMaterial();
         materialIndex = aMaterial->GetIndex();
@@ -76,6 +78,9 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep,G4TouchableHistory*) {
         G4cout << "lArTPCSD::ProcessHits: Name " << aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() << G4endl;
         aMaterialPropertiesTable = aMaterial->GetMaterialPropertiesTable();
         aMaterialPropertiesTable->DumpTable();
+        // 
+        // properties related to Scintillation
+        //
         Fast_Intensity = aMaterialPropertiesTable->GetProperty(kFASTCOMPONENT);
         Slow_Intensity = aMaterialPropertiesTable->GetProperty(kSLOWCOMPONENT);
         YieldRatio = aMaterialPropertiesTable->GetConstProperty(kYIELDRATIO); // slowerRatio,
@@ -83,53 +88,93 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep,G4TouchableHistory*) {
         SlowTimeConstant = aMaterialPropertiesTable->GetConstProperty(kSLOWTIMECONSTANT); //slowerTimeConstant,
         ScintillationType = Slow;
         //          if (!aMaterialPropertiesTable) return false;
+        // 
+        // properties related to Cerenkov
+        //
+        Rindex = aMaterialPropertiesTable->GetProperty("RINDEX");
+        CerenkovAngleIntegrals = (G4PhysicsOrderedFreeVector*) ((*thePhysicsTable)(materialIndex));
+        //G4PhysicsTable * GetPhysicsTable() const;
+        Pmin = Rindex->GetMinLowEdgeEnergy();
+        Pmax = Rindex->GetMaxLowEdgeEnergy();
+        dp = Pmax - Pmin;
+        nMax = Rindex->GetMaxValue();
+        //
         first = false;
     }
-    G4int photons = 0;
+    G4int Sphotons = 0; // number of scintillation photons this step 
+    G4int Cphotons = 0; // number of Cerenkov photons this step 
+
+    //
+    // info needed for generating Cerenkov photons on the GPU;
+    //
+
+    G4double maxCos = 0.0;
+    G4double maxSin2 = 0.0;
+    G4double beta = 0.0;
+    G4double beta1 = 0.0;
+    G4double beta2 = 0.0;
+    G4double BetaInverse = 0.0;
+    G4double MeanNumberOfPhotons1 = 0.0;
+    G4double MeanNumberOfPhotons2 = 0.0;
+
     G4SteppingManager* fpSteppingManager = G4EventManager::GetEventManager()->GetTrackingManager()->GetSteppingManager();
     G4StepStatus stepStatus = fpSteppingManager->GetfStepStatus();
     if (stepStatus != fAtRestDoItProc) {
         G4ProcessVector* procPost = fpSteppingManager->GetfPostStepDoItVector();
         size_t MAXofPostStepLoops = fpSteppingManager->GetMAXofPostStepLoops();
         for (size_t i3 = 0; i3 < MAXofPostStepLoops; i3++) {
-
             if ((*procPost)[i3]->GetProcessName() == "Cerenkov") {
                 G4Cerenkov* proc = (G4Cerenkov*) (*procPost)[i3];
-                photons += proc->GetNumPhotons();
+                Cphotons = proc->GetNumPhotons();
+                if (Cphotons > 0) {
+                    beta1 = aStep->GetPreStepPoint()->GetBeta();
+                    beta2 = aStep->GetPostStepPoint()->GetBeta();
+                    beta = (beta1 + beta2) *0.5;
+                    BetaInverse = 1. / beta;
+                    maxCos = BetaInverse / nMax;
+                    maxSin2 = (1.0 - maxCos) * (1.0 + maxCos);
+                    MeanNumberOfPhotons1 = proc-> GetAverageNumberOfPhotons(charge, beta1, aMaterial, Rindex);
+                    MeanNumberOfPhotons2 = proc-> GetAverageNumberOfPhotons(charge, beta2, aMaterial, Rindex);
+                }
             }
             if ((*procPost)[i3]->GetProcessName() == "Scintillation") {
                 G4Scintillation* proc1 = (G4Scintillation*) (*procPost)[i3];
-                photons += proc1->GetNumPhotons();
+                Sphotons = proc1->GetNumPhotons();
             }
         }
     }
-    tphotons = tphotons + photons;
+    tSphotons += Sphotons;
+    tCphotons += Cphotons;
     //#ifdef WITH_OPTICKS
     unsigned opticks_photon_offset = 0;
     const G4DynamicParticle* aParticle = aTrack->GetDynamicParticle();
     const G4ParticleDefinition* definition = aParticle->GetDefinition();
     G4ThreeVector deltaPosition = aStep->GetDeltaPosition();
     G4double ScintillationTime = 0. * ns;
-//    G4double ScintillationRiseTime = 0. * ns;
-
-    opticks_photon_offset = G4Opticks::GetOpticks()->getNumPhotons();
-    G4cout << "lArTPCSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
-    G4cout << "lArTPCSD::ProcessHits:  photons " << photons << G4endl;
+    //    G4double ScintillationRiseTime = 0. * ns;
     G4int scntId = 1;
     // total number of photons for all gensteps collected before this one
     // within this OpticksEvent (potentially crossing multiple G4Event)
     G4StepPoint* pPreStepPoint = aStep->GetPreStepPoint();
- //   G4StepPoint* pPostStepPoint = aStep->GetPostStepPoint();
+    //   G4StepPoint* pPostStepPoint = aStep->GetPostStepPoint();
     G4ThreeVector x0 = pPreStepPoint->GetPosition();
     G4ThreeVector p0 = aStep->GetDeltaPosition().unit();
     G4double t0 = pPreStepPoint->GetGlobalTime();
-    if (photons > 0) {
+    //
+    // harvest the Scintillation photon gensteps:
+    //
+    if (Sphotons > 0) {
+        // total number of photons for all gensteps collected before this one
+        // within this OpticksEvent (potentially crossing multiple G4Event)
+        opticks_photon_offset = G4Opticks::GetOpticks()->getNumPhotons();
+        G4cout << "lArTPCSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
+        G4cout << "lArTPCSD::ProcessHits:  Scint. photons " << Sphotons << G4endl;
         G4Opticks::GetOpticks()->collectScintillationStep(
                 //1, // 0    id:zero means use scintillation step count
                 OpticksGenstep_G4Scintillation_1042,
                 aTrack->GetTrackID(),
                 materialIndex,
-                photons,
+                Sphotons,
                 x0.x(), // 1
                 x0.y(),
                 x0.z(),
@@ -147,11 +192,37 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep,G4TouchableHistory*) {
                 FastTimeConstant, // TimeConstant,
                 SlowTimeConstant, //slowerTimeConstant,
                 ScintillationTime, //scintillationTime,
-                0.0, //wrong but not used scintillationIntegrationMax,
+                0.0, //not used scintillationIntegrationMax,
                 0, //spare1
                 0 // spare2
                 );
     }
+    //
+    // harvest the Cerenkov photon gensteps:
+    //
+    if (Cphotons > 0) {
+
+        // total number of photons for all gensteps collected before this one
+        // within this OpticksEvent (potentially crossing multiple G4Event)
+        opticks_photon_offset = G4Opticks::GetOpticks()->getNumPhotons();
+        G4cout << "lArTPCSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
+        G4cout << "lArTPCSD::ProcessHits:  Cerenkov photons " << Cphotons << G4endl;
+        G4Opticks::GetOpticks()->collectGenstep_G4Cerenkov_1042(
+                aTrack,
+                aStep,
+                Cphotons,
+
+                BetaInverse,
+                Pmin,
+                Pmax,
+                maxCos,
+
+                maxSin2,
+                MeanNumberOfPhotons1,
+                MeanNumberOfPhotons2
+                );
+    }
+
     //#endif 
 
     return true;
@@ -160,8 +231,8 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep,G4TouchableHistory*) {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void lArTPCSD::EndOfEvent(G4HCofThisEvent*) {
-    G4cout << " tphotons:  " << tphotons << G4endl;
-    tphotons=0;
+    G4cout << " Number of Scintillation Photons:  " << tSphotons << G4endl;
+    G4cout << " Number of Cerenkov Photons:  " << tCphotons << G4endl;
+    tSphotons = 0;
+    tCphotons = 0;
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

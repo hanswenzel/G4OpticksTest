@@ -53,7 +53,7 @@ private:
     //
     G4MaterialPropertyVector* Rindex;
     G4PhysicsOrderedFreeVector* CerenkovAngleIntegrals;
-    G4PhysicsTable* thePhysicsTable;
+    const G4PhysicsTable* thePhysicsTable ;
     G4double Pmin;
     G4double Pmax;
     G4double dp;

@@ -47,6 +47,7 @@ int tSphotons;
 
 lArTPCSD::lArTPCSD(G4String name)
 : G4VSensitiveDetector(name) {
+    first = true;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -92,12 +93,17 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
         // properties related to Cerenkov
         //
         Rindex = aMaterialPropertiesTable->GetProperty("RINDEX");
-        CerenkovAngleIntegrals = (G4PhysicsOrderedFreeVector*) ((*thePhysicsTable)(materialIndex));
+        //        thePhysicsTable    G4PhysicsTable * GetPhysicsTable() const;
+        //        CerenkovAngleIntegrals = (G4PhysicsOrderedFreeVector*) ((*thePhysicsTable)(materialIndex));
         //G4PhysicsTable * GetPhysicsTable() const;
         Pmin = Rindex->GetMinLowEdgeEnergy();
         Pmax = Rindex->GetMaxLowEdgeEnergy();
         dp = Pmax - Pmin;
-        nMax = Rindex->GetMaxValue();
+        G4cout << "nMax: " << nMax
+                << "Pmin: " << Pmin
+                << "Pmax: " << Pmax
+                << "dp: " << dp << G4endl;
+        Rindex->DumpValues();
         //
         first = false;
     }
@@ -124,7 +130,10 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
         size_t MAXofPostStepLoops = fpSteppingManager->GetMAXofPostStepLoops();
         for (size_t i3 = 0; i3 < MAXofPostStepLoops; i3++) {
             if ((*procPost)[i3]->GetProcessName() == "Cerenkov") {
+                G4cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Cerenkov" << G4endl;
                 G4Cerenkov* proc = (G4Cerenkov*) (*procPost)[i3];
+                thePhysicsTable = proc->GetPhysicsTable();
+                CerenkovAngleIntegrals = (G4PhysicsOrderedFreeVector*) ((*thePhysicsTable)(materialIndex));
                 Cphotons = proc->GetNumPhotons();
                 if (Cphotons > 0) {
                     beta1 = aStep->GetPreStepPoint()->GetBeta();

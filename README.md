@@ -39,7 +39,7 @@ mkdir G4OpticksTest-build
 
 cd G4OpticksTest-build
 
-cmake   -DCMAKE_BUILD_TYPE=Debug \
+cmake   -DCMAKE_BUILD_TYPE=Debug \\
 -DCMAKE_PREFIX_PATH="${LOCAL_BASE}/opticks/externals;${LOCAL_BASE}/opticks" \
 -DOPTICKS_PREFIX=${LOCAL_BASE}/opticks \
 -DCMAKE_MODULE_PATH=${OPTICKS_HOME}/cmake/Modules \

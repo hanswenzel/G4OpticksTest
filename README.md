@@ -38,14 +38,14 @@ cd ../
 mkdir G4OpticksTest-build
 
 cd G4OpticksTest-build
-<h3>
+<p>
 cmake   -DCMAKE_BUILD_TYPE=Debug \
 -DCMAKE_PREFIX_PATH="${LOCAL_BASE}/opticks/externals;${LOCAL_BASE}/opticks" \
 -DOPTICKS_PREFIX=${LOCAL_BASE}/opticks \
 -DCMAKE_MODULE_PATH=${OPTICKS_HOME}/cmake/Modules \
 -DCMAKE_INSTALL_PREFIX=../G4OpticksTest-install \
 ../G4OpticksTest
-</h3>
+</p>
 make install
 
 cd ../G4OpticksTest-install/bin

@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 set(name G4OpticksTest)
 project(${name} VERSION 0.1.0)
@@ -28,5 +29,3 @@ target_compile_definitions( ${name}
 
 install(TARGETS ${name} DESTINATION bin)
 install(FILES ${detectors} ${schemas}   ${macros} DESTINATION bin)
-
-

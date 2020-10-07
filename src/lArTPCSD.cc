@@ -16,7 +16,7 @@
 #include "G4Step.hh"
 #include "G4VProcess.hh"
 #include "G4ThreeVector.hh"
-//#include "G4SDManager.hh"
+#include "G4SDManager.hh"
 #include "G4ios.hh"
 #include "G4RunManager.hh"
 #include "G4Event.hh"
@@ -27,12 +27,13 @@
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
+
 //#include "G4MaterialPropertiesTable.hh"
 #include "G4VRestDiscreteProcess.hh"
 //#include "G4ScintillationTrackInformation.hh"
 //#ifdef WITH_OPTICKS
 #include "G4Opticks.hh"
-#include "TrackInfo.hh"    
+#include "TrackInfo.hh"   
 // TrackInfo is a simple struct holding the photon_record_id integer
 //#endif
 #include "OpticksGenstep.h"
@@ -46,7 +47,12 @@ int tCphotons;
 int tSphotons;
 
 lArTPCSD::lArTPCSD(G4String name)
-: G4VSensitiveDetector(name) {
+: G4VSensitiveDetector(name), flArTPCHitsCollection(0), fHCID(0) {
+    G4String HCname = name + "_HC";
+    collectionName.insert(HCname);
+    G4cout << collectionName.size() << "   lArTPCSD name:  " << name << " collection Name: "
+            << HCname << G4endl;
+    fHCID = -1;
     first = true;
 }
 
@@ -59,6 +65,17 @@ lArTPCSD::~lArTPCSD() {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void lArTPCSD::Initialize(G4HCofThisEvent* hce) {
+    flArTPCHitsCollection = new lArTPCHitsCollection(SensitiveDetectorName, collectionName[0]);
+    if (fHCID < 0) {
+        G4cout << "lArTPCSD::Initialize:  " << SensitiveDetectorName << "   "
+                << collectionName[0] << G4endl;
+        fHCID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
+    }
+    hce->AddHitsCollection(fHCID, flArTPCHitsCollection);
+
+
+
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -70,6 +87,10 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     G4Track* aTrack = aStep->GetTrack();
     G4double charge = aTrack->GetDynamicParticle()->GetCharge();
     if (charge == 0) return false;
+    G4double ds = aStep->GetStepLength();
+    G4cout << "Nr of electrons:  " << NumElectrons(edep, ds) << G4endl;
+    lArTPCHit* newHit = new lArTPCHit(NumElectrons(edep, ds), aStep->GetPostStepPoint()->GetPosition().getX(), aStep->GetPostStepPoint()->GetPosition().getY(), aStep->GetPostStepPoint()->GetPosition().getZ());
+    flArTPCHitsCollection->insert(newHit);
     if (first) {
         aMaterial = aTrack->GetMaterial();
         materialIndex = aMaterial->GetIndex();
@@ -244,4 +265,21 @@ void lArTPCSD::EndOfEvent(G4HCofThisEvent*) {
     G4cout << " Number of Cerenkov Photons:  " << tCphotons << G4endl;
     tSphotons = 0;
     tCphotons = 0;
+    G4int NbHits = flArTPCHitsCollection->entries();
+    G4cout << " Number of lArTPCHits:  " << NbHits << G4endl;
+}
+
+double lArTPCSD::NumElectrons(double edep, double ds) {
+    // Nucl.Instrum.Meth.A523:275-286,2004
+    double fGeVToElectrons = 4.237e+07;
+    //double fRecombA = 0.800;
+    //double fRecombk = 0.0486;
+    double fModBoxA = 0.930;
+    double fModBoxB = 0.212;
+    double EFieldStep = 0.5;
+    double dEdx = (ds <= 0.0) ? 0.0 : edep / ds;
+    double Xi = fModBoxB * dEdx / EFieldStep;
+    double recomb = log(fModBoxA + Xi) / Xi;
+    double fNumIonElectrons = fGeVToElectrons * 1000. * edep * recomb;
+    return fNumIonElectrons;
 }

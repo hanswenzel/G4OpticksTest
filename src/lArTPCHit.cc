@@ -70,10 +70,10 @@ void lArTPCHit::Draw() {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void lArTPCHit::Print() {
-    G4cout << " Nr. of electrons: " << fElectrons
+    G4cout << "Nr. of electrons: " << fElectrons
             << "  x position [mm]: " << fPosX
-            << "  x position [mm]: " << fPosX
-            << "  x position [mm]: " << fPosX
+            << "  y position [mm]: " << fPosY
+            << "  z position [mm]: " << fPosZ
             << G4endl;
 }
 

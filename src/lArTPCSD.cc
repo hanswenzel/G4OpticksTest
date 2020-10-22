@@ -41,6 +41,7 @@
 #include "lArTPCSD.hh"
 //#include "Analysis.hh"
 #include "ConfigurationManager.hh"
+#include "RootIO.hh"
 using namespace std;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 int tCphotons;
@@ -59,7 +60,7 @@ lArTPCSD::lArTPCSD(G4String name)
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 lArTPCSD::~lArTPCSD() {
-
+    RootIO::GetInstance()->Close();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -267,6 +268,16 @@ void lArTPCSD::EndOfEvent(G4HCofThisEvent*) {
     tCphotons = 0;
     G4int NbHits = flArTPCHitsCollection->entries();
     G4cout << " Number of lArTPCHits:  " << NbHits << G4endl;
+    std::vector<lArTPCHit*> hitsVector;
+    {
+        G4cout << "\n-------->Storing hits in the ROOT file: in this event there are " << NbHits
+                << " hits in the tracker chambers: " << G4endl;
+        for (G4int i = 0; i < NbHits; i++) (*flArTPCHitsCollection)[i]->Print();
+    }
+    for (G4int i = 0; i < NbHits; i++)
+        hitsVector.push_back((*flArTPCHitsCollection)[i]);
+
+    RootIO::GetInstance()->Write(&hitsVector);
 }
 
 double lArTPCSD::NumElectrons(double edep, double ds) {

@@ -18,7 +18,7 @@ RootIO::RootIO():fNevents(0)
 {
   // initialize ROOT
   TSystem ts;
-  gSystem->Load("libExP01ClassesDict");
+  gSystem->Load("libG4OpticksTestClassesDict");
 
   //gDebug = 1;
 

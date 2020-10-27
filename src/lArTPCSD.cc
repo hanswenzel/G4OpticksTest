@@ -73,10 +73,6 @@ void lArTPCSD::Initialize(G4HCofThisEvent* hce) {
         fHCID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
     }
     hce->AddHitsCollection(fHCID, flArTPCHitsCollection);
-
-
-
-
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -288,9 +284,15 @@ double lArTPCSD::NumElectrons(double edep, double ds) {
     double fModBoxA = 0.930;
     double fModBoxB = 0.212;
     double EFieldStep = 0.5;
+    double recomb = 0.0;
     double dEdx = (ds <= 0.0) ? 0.0 : edep / ds;
-    double Xi = fModBoxB * dEdx / EFieldStep;
-    double recomb = log(fModBoxA + Xi) / Xi;
-    double fNumIonElectrons = fGeVToElectrons * 1000. * edep * recomb;
+    if (dEdx < 1.) dEdx = 1.;
+    if (ds > 0) {
+        double Xi = fModBoxB * dEdx / EFieldStep;
+        recomb = log(fModBoxA + Xi) / Xi;
+    } else {
+        recomb = 0.0;
+    }
+    double fNumIonElectrons = fGeVToElectrons * 1.e-3 * edep * recomb;
     return fNumIonElectrons;
 }

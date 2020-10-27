@@ -28,6 +28,7 @@
 //
 //
 #include "lArTPCHit.hh"
-
+#include "PhotonHit.hh"
+std::vector<PhotonHit*> p;
 std::vector<lArTPCHit*> a;
 #undef __G4String

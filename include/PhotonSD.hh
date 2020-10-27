@@ -16,7 +16,7 @@
 #define PhotonSD_h 1
 
 #include "G4VSensitiveDetector.hh"
-
+#include "PhotonHit.hh"
 
 
 class G4Step;
@@ -36,8 +36,8 @@ public:
     virtual void EndOfEvent(G4HCofThisEvent* hitCollection);
 
 private:
-    // we don't create any Hits
-
+    PhotonHitsCollection* fPhotonHitsCollection;
+    G4int fHCID;
 
 };
 

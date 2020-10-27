@@ -23,13 +23,17 @@
 #include "G4HCofThisEvent.hh"
 #include "G4SDManager.hh"
 #include "G4HCtable.hh"
-
+#include "G4ThreeVector.hh"
 #include "EventAction.hh"
-#include "SensitiveDetector.hh"
-#include "OpHit.hh"
+
+#include "RootIO.hh"
 
 #ifdef WITH_OPTICKS
+#include <vector> 
+#include "PhotonHit.hh"
+#include "OpticksFlags.hh"
 #include "G4Opticks.hh"
+#include "NPho.hpp"
 #include "NPY.hpp"
 #endif
 
@@ -47,25 +51,174 @@ void EventAction::BeginOfEventAction(const G4Event* anEvent) {
 void EventAction::EndOfEventAction(const G4Event* event) {
     G4HCofThisEvent* HCE = event->GetHCofThisEvent();
     assert(HCE);
+    size_t numhc = HCE->GetNumberOfCollections();
+    for (size_t i = 0; i < numhc; i++) {
+        G4cout << "HC: " << HCE->GetHC(i)->GetName() << G4endl;
+        std::string junk = HCE->GetHC(i)->GetName();
+        std::string dname = "Photondetector";
+        if (junk.find(dname) != std::string::npos) {
+            G4cout << "Found Photondetector   " << HCE->GetHC(i)->GetName() << G4endl;
+        }
+    }
+
 
 #ifdef WITH_OPTICKS
+
+
+    /*{
+        G4cout << "\n-------->Storing hits in the ROOT file: in this event there are " << NbHits
+                << " hits in the tracker chambers: " << G4endl;
+        for (G4int i = 0; i < NbHits; i++) (*fPhotonHitsCollection)[i]->Print();
+    }
+    for (G4int i = 0; i < NbHits; i++)
+        hitsVector.push_back((*fPhotonHitsCollection)[i]);
+
+    RootIO::GetInstance()->Write(&hitsVector);
+     */
     G4cout << "\n###[ EventAction::EndOfEventAction G4Opticks.propagateOpticalPhotons\n" << G4endl;
 
     G4Opticks* ok = G4Opticks::GetOpticks();
-    G4int eventid =  event->GetEventID();
+    G4int eventid = event->GetEventID();
     int num_hits = ok->propagateOpticalPhotons(eventid);
+    std::vector<PhotonHit*> hitsVector;
+
     NPY<float>* hits = ok->getHits();
-    hits->save(".","hits.npy");
+    NPho* m_hits = new NPho(hits);
+    unsigned m_num_hits = m_hits->getNumPhotons();
+    //hits->save(".", "hits.npy");
     assert(hits == NULL || hits->getNumItems() == unsigned(num_hits));
-    G4cout
-            << "EventAction::EndOfEventAction"
+    G4cout << "EventAction::EndOfEventAction"
             << " num_hits " << num_hits
+            << "   m_num_hits: " << m_num_hits
             << " hits " << hits
-            << G4endl
-            ;
+            << G4endl;
+    G4ThreeVector position;
+    G4ThreeVector direction;
+    G4ThreeVector polarization;
+    for (unsigned i = 0; i < m_num_hits; i++) {
+        glm::vec4 post = m_hits->getPositionTime(i);
+        //        G4ThreeVector * position = new G4ThreeVector(double(post.x), double(post.y), double(post.z));
+        position.setX(double(post.x));
+        position.setY(double(post.y));
+        position.setZ(double(post.z));
+        //position->set(double(post.x), double(post.y), double(post.z));
+        G4double time = double(post.w);
+        G4cout << "time:  " << time
+                << "  X:  " << position.getX() << G4endl;
+        glm::vec4 dirw = m_hits->getDirectionWeight(i);
+        //G4ThreeVector * direction = new G4ThreeVector(double(dirw.x), double(dirw.y), double(dirw.z));
+        direction.setX(double(dirw.x));
+        direction.setY(double(dirw.y));
+        direction.setZ(double(dirw.z));
+        G4double weight = double(dirw.w);
+        glm::vec4 polw = m_hits->getPolarizationWavelength(i);
+        //G4ThreeVector * polarization = new G4ThreeVector(double(polw.x), double(polw.y), double(polw.z));
+        polarization.setX(double(polw.x));
+        polarization.setY(double(polw.y));
+        polarization.setZ(double(polw.z));
+        G4double wavelength = double(polw.w);
+        G4cout << "wavelength:  " << wavelength
+                << "  polX:  " << polarization.getX() << G4endl;
+        glm::uvec4 flags = m_hits->getFlags(i);
+        G4int flags_x = flags.x;
+        G4int flags_y = flags.y;
+        G4int flags_z = flags.z;
+        G4int flags_w = flags.w;
+        G4bool is_cerenkov = (flags.w & CERENKOV) != 0;
+        G4bool is_reemission = (flags.w & BULK_REEMIT) != 0;
+        G4cout << "weight:  " << flags_w
+                << "  cerenkov:  " << is_cerenkov
+                << "  reemit:  " << is_reemission
+                << G4endl;
+        hitsVector.push_back(new PhotonHit(i,
+                0,
+                wavelength,
+                time,
+                position,
+                direction,
+                polarization));
+          G4cout << " hitsVector.size() :  " <<hitsVector.size()  << G4endl;
+    }
+    RootIO::GetInstance()->Write(&hitsVector);
+    /*
+        G4cout << "EventAction::EndOfEventAction hit:  " << hits->getFloat(0, 0, 0, 0) << G4endl;
+        G4cout << "EventAction::EndOfEventAction hit:  " << hits->getFloat(0, 1, 0, 0) << G4endl;
+        G4cout << "EventAction::EndOfEventAction hit:  " << hits->getFloat(0, 2, 0, 0) << G4endl;
+        G4cout << "EventAction::EndOfEventAction hit:  " << hits->getFloat(0, 3, 0, 0) << G4endl;
+        G4cout << "EventAction::EndOfEventAction hit:  " << hits->getFloat(0, 4, 0, 0) << G4endl;
+        //  assert( i < m_num_hits ); 
+        unsigned i = 1;
+        G4ThreeVector* position;
+        G4double* time;
+        G4ThreeVector* direction;
+        G4double* weight;
+        G4ThreeVector* polarization;
+        G4double* wavelength;
+        G4int* flags_x;
+        G4int* flags_y;
+        G4int* flags_z;
+        G4int* flags_w;
+        G4bool* is_cerenkov;
+        G4bool* is_reemission;
+        glm::vec4 post = m_hits->getPositionTime(i);
+        position->set(double(post.x), double(post.y), double(post.z));
+     *time = double(post.w);
 
-    // TODO: feed the hits into the Hit collection 
+        glm::vec4 dirw = m_hits->getDirectionWeight(i);
+        direction->set(double(dirw.x), double(dirw.y), double(dirw.z));
+     *weight = double(dirw.w);
 
+        glm::vec4 polw = m_hits->getPolarizationWavelength(i);
+        polarization->set(double(polw.x), double(polw.y), double(polw.z));
+     *wavelength = double(polw.w);
+
+        glm::uvec4 flags = m_hits->getFlags(i);
+     *flags_x = flags.x;
+     *flags_y = flags.y;
+     *flags_z = flags.z;
+     *flags_w = flags.w;
+
+     *is_cerenkov = (flags.w & CERENKOV) != 0;
+     *is_reemission = (flags.w & BULK_REEMIT) != 0;
+
+        //G4SDManager* SDman = G4SDManager::GetSDMpointer();
+        //SDman->GetHCtable()
+        //hits->dump();
+        //hits->dump("Message:", 5);
+     */
+    /* 
+         unsigned i = 1;
+         G4ThreeVector* position;
+         G4double* time;
+         G4ThreeVector* direction;
+         G4double* weight;
+         G4ThreeVector* polarization;
+         G4double* wavelength;
+         G4int* flags_x;
+         G4int* flags_y;
+         G4int* flags_z;
+         G4int* flags_w;
+         G4bool* is_cerenkov;
+         G4bool* is_reemission;
+         ok->getHit(i,
+                 position,
+                 time,
+                 direction,
+                 weight,
+                 polarization,
+                 wavelength,
+                 flags_x,
+                 flags_y,
+                 flags_z,
+                 flags_w,
+                 is_cerenkov,
+                 is_reemission);
+     
+     // TODO: feed the hits into the Hit collection 
+     G4cout << "EventAction::EndOfEventAction"
+             << " ----------------------------------------------------------Time:  " << time
+             << G4endl;
+     */
     G4cout << "\n###] EventAction::EndOfEventAction G4Opticks.propagateOpticalPhotons\n" << G4endl;
 #endif
 
@@ -75,7 +228,7 @@ void EventAction::EndOfEventAction(const G4Event* event) {
             << " DumpHitCollections "
             << G4endl
             ;
-    SensitiveDetector::DumpHitCollections(HCE);
+    //    SensitiveDetector::DumpHitCollections(HCE);
 
     // A possible alternative location to invoke the GPU propagation
     // and add hits in bulk to hit collections would be SensitiveDetector::EndOfEvent  

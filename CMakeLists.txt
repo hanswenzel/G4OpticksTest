@@ -89,5 +89,7 @@ endforeach()
 
 install(TARGETS ${name} DESTINATION bin)
 install(FILES ${detectors} ${schemas}   ${macros} DESTINATION bin)
-install(TARGETS G4OpticksTestClassesDict DESTINATION lib)
+install(TARGETS G4OpticksTestClassesDict DESTINATION bin)
 install(TARGETS readHits DESTINATION bin)
+install(FILES ${PROJECT_BINARY_DIR}/G4OpticksTestClasses_rdict.pcm DESTINATION bin)
+

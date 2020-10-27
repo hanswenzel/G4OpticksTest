@@ -4,7 +4,7 @@
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
-//#include "G4ThreeVector.hh"
+#include "G4ThreeVector.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -23,59 +23,22 @@ public:
     virtual void Draw();
     virtual void Print();
 
-    PhotonHit(float xp,
-            float yp,
-            float zp,
-            float en,
-            float ti);
-    
-    void SetTime(float t) {
-        this->time = t;
-    }
-
-    float GetTime() const {
-        return time;
-    }
-
-    void SetEnergy(float e) {
-        this->energy = e;
-    }
-
-    float GetEnergy() const {
-        return energy;
-    }
-
-    void SetZpos(float z) {
-        this->zpos = z;
-    }
-
-    float GetZpos() const {
-        return zpos;
-    }
-
-    void SetYpos(float y) {
-        this->ypos = y;
-    }
-
-    float GetYpos() const {
-        return ypos;
-    }
-
-    void SetXpos(float x) {
-        this->xpos = x;
-    }
-
-    float GetXpos() const {
-        return xpos;
-    }
+    PhotonHit(unsigned id,
+            unsigned pid,
+            G4double wavelength,
+            G4double time,
+            G4ThreeVector position,
+            G4ThreeVector direction,
+            G4ThreeVector polarization);
 
 private:
-
-    float xpos;
-    float ypos;
-    float zpos;
-    float energy;
-    float time;
+    unsigned id;
+    unsigned pid;
+    G4double wavelength;
+    G4double time;
+    G4ThreeVector position;
+    G4ThreeVector direction;
+    G4ThreeVector polarization;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -46,16 +46,24 @@ RootIO* RootIO::GetInstance()
 void RootIO::Write(std::vector<lArTPCHit*>* hcont)
 {
   fNevents++;
-
   std::ostringstream os;
   os << fNevents;
   std::string stevt = "Event_" + os.str(); 
   const char* chevt = stevt.c_str();
-
   G4cout << "writing " << stevt << G4endl;
-
   fFile->WriteObject(hcont, chevt);
+}
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+void RootIO::Write(std::vector<PhotonHit*>* hcont)
+{
+  fNevents++;
+  std::ostringstream os;
+  os << fNevents;
+  std::string stevt = "Event_" + os.str(); 
+  const char* chevt = stevt.c_str();
+  G4cout << "writing " << stevt << G4endl;
+  fFile->WriteObject(hcont, chevt);
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

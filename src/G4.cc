@@ -25,9 +25,9 @@
 #include "Ctx.hh"
 
 
-#include "SensitiveDetector.hh"
+//#include "SensitiveDetector.hh"
 #include "DetectorConstruction.hh"
-#include "DetConOrg.hh"
+//#include "DetConOrg.hh"
 //#include "L4Cerenkov.hh"
 //#include "PhysicsList.hh"
 #include "PrimaryGeneratorAction.hh"

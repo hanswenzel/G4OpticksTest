@@ -48,7 +48,6 @@
 #include "TrackerSD.hh"
 #include "lArTPCSD.hh"
 #include "PhotonSD.hh"
-#include "SensitiveDetector.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 using namespace std;
 //G4LogicalVolume* logicContainer;
@@ -142,16 +141,6 @@ void DetectorConstruction::ConstructSDandField() {
                     sdnames->push_back(name);
                     std::cout << "new size: " << sdnames->size() << std::endl;
                     ((*iter).first)->SetSensitiveDetector(alArTPCSD);
-                    std::cout << "Attaching sensitive Detector: " << (*vit).value
-                            << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
-                    //DetectorList.push_back(std::make_pair((*iter).first->GetName(), (*vit).value));
-                }else if ((*vit).value == "SensitiveDetector") {
-                    G4String name = ((*iter).first)->GetName() + "_SensitiveDetector";
-                    SensitiveDetector* aSensitiveDetector = new SensitiveDetector(name);
-                    SDman->AddNewDetector(aSensitiveDetector);
-                    sdnames->push_back(name);
-                    std::cout << "new size: " << sdnames->size() << std::endl;
-                    ((*iter).first)->SetSensitiveDetector(aSensitiveDetector);
                     std::cout << "Attaching sensitive Detector: " << (*vit).value
                             << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
                     //DetectorList.push_back(std::make_pair((*iter).first->GetName(), (*vit).value));

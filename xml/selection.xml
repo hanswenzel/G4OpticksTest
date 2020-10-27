@@ -4,5 +4,7 @@
 <class name="G4VHit"/>
 <class name="lArTPCHit"/>
 <class name="std::vector<lArTPCHit*>"/>
+<class name="PhotonHit"/>
+<class name="std::vector<PhotonHit*>"/>
 <class name="CLHEP::Hep3Vector"/>
 </lcgdict>

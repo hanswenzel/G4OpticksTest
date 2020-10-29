@@ -27,7 +27,7 @@
 #include "EventAction.hh"
 
 #include "RootIO.hh"
-
+#include "Event.hh"
 #ifdef WITH_OPTICKS
 #include <vector> 
 #include "PhotonHit.hh"
@@ -39,13 +39,31 @@
 
 #include "Ctx.hh"
 
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    return split(s, delim, elems);
+}
+
 EventAction::EventAction(Ctx* ctx_)
 :
 ctx(ctx_) {
+    //    if (instance == 0) {
+    CaTSEvt = new Event();
+    //    }
 }
 
 void EventAction::BeginOfEventAction(const G4Event* anEvent) {
     ctx->setEvent(anEvent);
+    CaTSEvt->SetEventNr(anEvent->GetEventID());
 }
 
 void EventAction::EndOfEventAction(const G4Event* event) {
@@ -80,8 +98,8 @@ void EventAction::EndOfEventAction(const G4Event* event) {
     G4Opticks* ok = G4Opticks::GetOpticks();
     G4int eventid = event->GetEventID();
     int num_hits = ok->propagateOpticalPhotons(eventid);
-    std::vector<PhotonHit*> hitsVector;
-
+    //std::vector<PhotonHit*> hitsVector;
+    std::vector<G4VHit*> hitsVector;
     NPY<float>* hits = ok->getHits();
     NPho* m_hits = new NPho(hits);
     unsigned m_num_hits = m_hits->getNumPhotons();
@@ -137,9 +155,36 @@ void EventAction::EndOfEventAction(const G4Event* event) {
                 position,
                 direction,
                 polarization));
-          G4cout << " hitsVector.size() :  " <<hitsVector.size()  << G4endl;
+        G4cout << " hitsVector.size() :  " << hitsVector.size() << G4endl;
     }
-    RootIO::GetInstance()->Write(&hitsVector);
+    //   RootIO::GetInstance()->Write(&hitsVector);
+    //   event->Print();
+    std::map<G4String, std::vector<G4VHit* > >* hcmap = CaTSEvt->GetHCMap();
+    hcmap->insert(std::make_pair("PhotonDetector", hitsVector));
+ //   G4HCofThisEvent* HCE = event->GetHCofThisEvent();
+ //   std::vector<G4VHit*> hitsVector;
+    G4cout << "Number of collections:  " << HCE->GetNumberOfCollections() << G4endl;
+    for (int i = 0; i < HCE->GetNumberOfCollections(); i++) {
+        hitsVector.clear();
+        G4VHitsCollection* hc = HCE->GetHC(i);
+        G4String hcname = hc->GetName();
+        std::vector<std::string> y = split(hcname, '_');
+        std::string Classname = y[1];
+        if (Classname == "PhotonDetector") {
+            G4int NbHits = hc->GetSize();
+            for (G4int ii = 0; ii < NbHits; ii++) {
+                G4VHit* hit = hc->GetHit(ii);
+                PhotonHit* Hit = dynamic_cast<PhotonHit*> (hit);
+                hitsVector.push_back(Hit);
+            }
+            hcmap->insert(std::make_pair(hcname, hitsVector));
+        } else {
+            G4cout << "SD type: " << Classname << " unknown" << G4endl;
+        }
+    }
+    //   G4cout << "Size of hcmap:  " << hcmap->size() << "  " << EventContainer->GetHCMap()->size() << G4endl;
+    RootIO::GetInstance()->Write(CaTSEvt);
+    CaTSEvt->Reset();
     /*
         G4cout << "EventAction::EndOfEventAction hit:  " << hits->getFloat(0, 0, 0, 0) << G4endl;
         G4cout << "EventAction::EndOfEventAction hit:  " << hits->getFloat(0, 1, 0, 0) << G4endl;
@@ -233,6 +278,7 @@ void EventAction::EndOfEventAction(const G4Event* event) {
     // A possible alternative location to invoke the GPU propagation
     // and add hits in bulk to hit collections would be SensitiveDetector::EndOfEvent  
 }
+
 /*
 void EventAction::addDummyHits(G4HCofThisEvent* HCE)
 {
@@ -246,4 +292,8 @@ void EventAction::addDummyHits(G4HCofThisEvent* HCE)
 }
  */
 
+//EventAction* EventAction::GetInstance() {
+//    if (instance == 0) instance = new EventAction();
+//    return instance;
+//}
 

@@ -20,16 +20,19 @@
 #pragma once
 
 #include "G4UserEventAction.hh"
-class Ctx ; 
+class Ctx;
+class Event;
 
-class EventAction : public G4UserEventAction
-{
+class EventAction : public G4UserEventAction {
 public:
-    EventAction(Ctx* ctx_); 
+    EventAction(Ctx* ctx_);
     virtual void BeginOfEventAction(const G4Event* anEvent);
     virtual void EndOfEventAction(const G4Event* anEvent);
+//    static EventAction* GetInstance();
+    Event* GetEvent(){return CaTSEvt;}
 
-  //    void addDummyHits(G4HCofThisEvent* HCE);
-
-    Ctx*  ctx ; 
+    Ctx* ctx;
+private:
+    Event* CaTSEvt;
+ //   static EventAction* instance;
 };

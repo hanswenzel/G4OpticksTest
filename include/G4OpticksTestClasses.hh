@@ -27,8 +27,13 @@
 /// \brief Declaration of the classes for generating dictionaries
 //
 //
+#include "G4VHit.hh"
 #include "lArTPCHit.hh"
 #include "PhotonHit.hh"
+#include "Event.hh"
+Event e;
 std::vector<PhotonHit*> p;
 std::vector<lArTPCHit*> a;
+std::vector<G4VHit*> vh;
+std::map<G4String, std::vector<G4VHit*> > hcmap; // map of Hit Collections
 #undef __G4String

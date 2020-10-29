@@ -41,7 +41,7 @@
 #include "lArTPCSD.hh"
 //#include "Analysis.hh"
 #include "ConfigurationManager.hh"
-#include "RootIO.hh"
+//#include "RootIO.hh"
 using namespace std;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 int tCphotons;
@@ -60,7 +60,7 @@ lArTPCSD::lArTPCSD(G4String name)
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 lArTPCSD::~lArTPCSD() {
-    RootIO::GetInstance()->Close();
+ //   RootIO::GetInstance()->Close();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -273,7 +273,7 @@ void lArTPCSD::EndOfEvent(G4HCofThisEvent*) {
     for (G4int i = 0; i < NbHits; i++)
         hitsVector.push_back((*flArTPCHitsCollection)[i]);
 
-    RootIO::GetInstance()->Write(&hitsVector);
+  //  RootIO::GetInstance()->Write(&hitsVector);
 }
 
 double lArTPCSD::NumElectrons(double edep, double ds) {

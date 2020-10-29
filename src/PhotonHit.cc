@@ -39,6 +39,7 @@ PhotonHit::PhotonHit(unsigned iid,
     polarization = ipolarization;
 }
 
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PhotonHit::~PhotonHit() {

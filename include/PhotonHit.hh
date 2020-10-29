@@ -31,6 +31,8 @@ public:
             G4ThreeVector direction,
             G4ThreeVector polarization);
 
+    G4double GetWavelength(){return wavelength;};
+
 private:
     unsigned id;
     unsigned pid;

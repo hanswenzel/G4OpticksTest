@@ -193,10 +193,10 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     if (Sphotons > 0) {
         // total number of photons for all gensteps collected before this one
         // within this OpticksEvent (potentially crossing multiple G4Event)
-        opticks_photon_offset = G4Opticks::GetOpticks()->getNumPhotons();
+        opticks_photon_offset = G4Opticks::Get()->getNumPhotons();
         G4cout << "lArTPCSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
         G4cout << "lArTPCSD::ProcessHits:  Scint. photons " << Sphotons << G4endl;
-        G4Opticks::GetOpticks()->collectScintillationStep(
+        G4Opticks::Get()->collectScintillationStep(
                 //1, // 0    id:zero means use scintillation step count
                 OpticksGenstep_G4Scintillation_1042,
                 aTrack->GetTrackID(),
@@ -231,10 +231,10 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
 
         // total number of photons for all gensteps collected before this one
         // within this OpticksEvent (potentially crossing multiple G4Event)
-        opticks_photon_offset = G4Opticks::GetOpticks()->getNumPhotons();
+        opticks_photon_offset = G4Opticks::Get()->getNumPhotons();
         G4cout << "lArTPCSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
         G4cout << "lArTPCSD::ProcessHits:  Cerenkov photons " << Cphotons << G4endl;
-        G4Opticks::GetOpticks()->collectGenstep_G4Cerenkov_1042(
+        G4Opticks::Get()->collectGenstep_G4Cerenkov_1042(
                 aTrack,
                 aStep,
                 Cphotons,

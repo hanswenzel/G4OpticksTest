@@ -71,7 +71,7 @@ G4bool PhotonSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
 void PhotonSD::EndOfEvent(G4HCofThisEvent*) {
     /*
     #ifdef WITH_OPTICKS
-    G4Opticks* ok = G4Opticks::GetOpticks();
+    G4Opticks* ok = G4Opticks::Get();
     NPY<float>* hits = ok->getHits();
  //   hits->save(".", "hits.npy");
     G4cout << "PhotonSD::EndOfEvent"

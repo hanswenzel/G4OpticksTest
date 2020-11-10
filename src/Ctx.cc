@@ -79,7 +79,7 @@ void Ctx::setTrack(const G4Track* track)
     {
 #ifdef WITH_OPTICKS
       /*
-      unsigned num_gs = G4Opticks::GetOpticks()->getNumGensteps() ; 
+      unsigned num_gs = G4Opticks::Get()->getNumGensteps() ; 
         unsigned max_gs = 1 ;   // quick kill for fast dev cycle
         bool kill = num_gs >= max_gs ; 
 
@@ -129,7 +129,7 @@ void Ctx::setTrackOptical(const G4Track* track)
     assert(info) ; 
     _record_id = info->photon_record_id ;  
     //std::cout << "Ctx::setTrackOptical.setAlignIndex " << _record_id << std::endl ;
-    G4Opticks::GetOpticks()->setAlignIndex(_record_id);
+    G4Opticks::Get()->setAlignIndex(_record_id);
 #endif
 }
 
@@ -140,7 +140,7 @@ void Ctx::postTrackOptical(const G4Track* track)
     assert(info) ; 
     assert( _record_id == info->photon_record_id ) ;  
     //std::cout << "Ctx::postTrackOptical " << _record_id << std::endl ;
-    G4Opticks::GetOpticks()->setAlignIndex(-1);
+    G4Opticks::Get()->setAlignIndex(-1);
 #endif
 }
 
@@ -171,7 +171,7 @@ void Ctx::setStep(const G4Step* step)
         G4cout
             << "Ctx::setStep" 
             << " _step_id " << _step_id 
-            << " num_gs " << G4Opticks::GetOpticks()->getNumGensteps() 
+            << " num_gs " << G4Opticks::Get()->getNumGensteps() 
             << G4endl
             ;  
     }

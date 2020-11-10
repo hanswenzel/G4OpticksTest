@@ -41,7 +41,7 @@ void RunAction::BeginOfRunAction(const G4Run*) {
     assert(world);
     //bool standardize_geant4_materials = true; // required for alignment 
     bool standardize_geant4_materials = false; // required for alignment 
-    G4Opticks::GetOpticks()->setGeometry(world, standardize_geant4_materials);
+    G4Opticks::Get()->setGeometry(world, standardize_geant4_materials);
     G4cout << "\n\n###] RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl;
 #endif
 }

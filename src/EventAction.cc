@@ -95,7 +95,7 @@ void EventAction::EndOfEventAction(const G4Event* event) {
      */
     G4cout << "\n###[ EventAction::EndOfEventAction G4Opticks.propagateOpticalPhotons\n" << G4endl;
 
-    G4Opticks* ok = G4Opticks::GetOpticks();
+    G4Opticks* ok = G4Opticks::Get();
     G4int eventid = event->GetEventID();
     int num_hits = ok->propagateOpticalPhotons(eventid);
     //std::vector<PhotonHit*> hitsVector;
@@ -185,6 +185,7 @@ void EventAction::EndOfEventAction(const G4Event* event) {
     //   G4cout << "Size of hcmap:  " << hcmap->size() << "  " << EventContainer->GetHCMap()->size() << G4endl;
     RootIO::GetInstance()->Write(CaTSEvt);
     CaTSEvt->Reset();
+    ok->reset();
     /*
         G4cout << "EventAction::EndOfEventAction hit:  " << hits->getFloat(0, 0, 0, 0) << G4endl;
         G4cout << "EventAction::EndOfEventAction hit:  " << hits->getFloat(0, 1, 0, 0) << G4endl;

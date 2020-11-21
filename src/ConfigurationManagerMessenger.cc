@@ -14,7 +14,7 @@
 // Geant4 headers
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithABool.hh"
-#include "G4UIcmdWithADoubleAndUnit.hh"
+#include "G4UIcmdWithAString.hh"
 // project headers
 #include "ConfigurationManagerMessenger.hh"
 #include "ConfigurationManager.hh"
@@ -26,40 +26,29 @@ ConfigurationManagerMessenger::ConfigurationManagerMessenger(ConfigurationManage
     testDir = new G4UIdirectory("/testConfig/");
     testDir->SetGuidance("Examining stepping in geant 4.");
     //
-    writeHitsCmd = new G4UIcmdWithABool("/testConfig/WriteHits", this);
-    writeHitsCmd->SetGuidance("Set flag for wrting hits");
+    writeHitsCmd = new G4UIcmdWithABool("/testConfig/writeHits", this);
+    writeHitsCmd->SetGuidance("Set flag for writing hits");
     writeHitsCmd->SetParameterName("writeHits", true);
     writeHitsCmd->SetDefaultValue(true);
-    writeHitsCmd->AvailableForStates(G4State_PreInit);
+    writeHitsCmd->AvailableForStates(G4State_Idle);
     //    
-    anaCmd = new G4UIcmdWithABool("/testConfig/DoAnalysis", this);
-    anaCmd->SetGuidance("Let's you select if analysis should be done and root files be created ");
-    anaCmd->SetParameterName("doAnalysis", true);
-    anaCmd->SetDefaultValue(true);
+    enable_opticksCmd = new G4UIcmdWithABool("/testConfig/enable_opticks", this);
+    enable_opticksCmd->SetGuidance("Set flag for enabling opticks");
+    enable_opticksCmd->SetParameterName("enable_opticks", true);
+    enable_opticksCmd->SetDefaultValue(true);
+    enable_opticksCmd->AvailableForStates(G4State_Idle);
     //
-    steplimitCmd = new G4UIcmdWithABool("/testConfig/DoStepLimit", this);
-    steplimitCmd->SetGuidance("Let's you select if step limit should be applied ");
-    steplimitCmd->SetParameterName("stepLimit", true);
-    steplimitCmd->SetDefaultValue(true);
-    steplimitCmd->AvailableForStates(G4State_PreInit);
+    enable_verboseCmd = new G4UIcmdWithABool("/testConfig/enable_verbose", this);
+    enable_verboseCmd->SetGuidance("Set flag for enabling verbose diagnostic printout");
+    enable_verboseCmd->SetParameterName("enable_verbose", true);
+    enable_verboseCmd->SetDefaultValue(true);
+    enable_verboseCmd->AvailableForStates(G4State_Idle);
     //
-    slengthCmd = new G4UIcmdWithADoubleAndUnit("/testConfig/steplengthlimit", this);
-    slengthCmd->SetGuidance("Set maximum step length");
-    slengthCmd->SetParameterName("limitval", false);
-    slengthCmd->SetUnitCategory("Length");
-    slengthCmd->SetRange("limitval>0");
-    //
-    debugEventCmd = new G4UIcmdWithABool("/testConfig/DebugEvent", this);
-    debugEventCmd->SetGuidance("Set flag for debugging Event");
-    debugEventCmd->SetParameterName("debugEvent", false);
-    debugEventCmd->SetDefaultValue(true);
-    debugEventCmd->AvailableForStates(G4State_PreInit);
-    //
-    profileCmd = new G4UIcmdWithABool("/testConfig/DoProfile", this);
-    profileCmd->SetGuidance("Set flag for computing performance profile");
-    profileCmd->SetParameterName("profileFlag", false);
-    profileCmd->SetDefaultValue(true);
-    profileCmd->AvailableForStates(G4State_PreInit);
+    FileNameCmd = new G4UIcmdWithAString("/testConfig/FileName", this);
+    FileNameCmd->SetGuidance("Set flag for writing hits");
+    FileNameCmd->SetParameterName("FileName", true);
+    FileNameCmd->SetDefaultValue("hist.root");
+    FileNameCmd->AvailableForStates(G4State_Idle);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -67,28 +56,18 @@ ConfigurationManagerMessenger::ConfigurationManagerMessenger(ConfigurationManage
 ConfigurationManagerMessenger::~ConfigurationManagerMessenger() {
     delete testDir;
     delete writeHitsCmd;
-    delete anaCmd;
-    delete steplimitCmd;
-    delete slengthCmd;
-    delete debugEventCmd;
-    delete profileCmd;
+    delete enable_opticksCmd;
+    delete enable_verboseCmd;
+    delete FileNameCmd;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void ConfigurationManagerMessenger::SetNewValue(G4UIcommand* command, G4String newValue) {
-    if (command == anaCmd)
-        mgr->SetdoAnalysis(anaCmd->GetNewBoolValue(newValue));
-    else if (command == writeHitsCmd)
-        mgr->SetwriteHits(writeHitsCmd->GetNewBoolValue(newValue));
-//    else if (command == steplimitCmd)
-//        mgr->SetstepLimit(newValue);
-//    else if (command == slengthCmd)
-//        mgr->Setlimitval(slengthCmd->GetNewDoubleValue(newValue));
-    else if (command == debugEventCmd)
-        mgr->SetdebugEvent(debugEventCmd->GetNewBoolValue(newValue));
-    else if (command == profileCmd)
-        mgr->SetdoProfile(profileCmd->GetNewBoolValue(newValue));
+    if (command == writeHitsCmd) mgr->setWriteHits(writeHitsCmd->GetNewBoolValue(newValue));
+    if (command == enable_opticksCmd) mgr->setEnable_opticks(enable_opticksCmd->GetNewBoolValue(newValue));
+    if (command == enable_verboseCmd) mgr->setWriteHits(enable_verboseCmd->GetNewBoolValue(newValue));
+ //   if (command == FileNameCmd) mgr->setWriteHits(FileNameCmd->GetNewBoolValue(newValue));
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

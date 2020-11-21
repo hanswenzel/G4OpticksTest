@@ -50,7 +50,6 @@
 #include "PhotonSD.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 using namespace std;
-//G4LogicalVolume* logicContainer;
 
 DetectorConstruction::DetectorConstruction(G4String fname) {
     gdmlFile = fname;
@@ -83,18 +82,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
             }
         }
     }
-       logicTarget = G4LogicalVolumeStore::GetInstance()->GetVolume("Obj");
-       std::cout << "************************************LS Material properties "<< std::endl;
-       logicTarget->GetMaterial()->GetMaterialPropertiesTable()->DumpTable();
-       
-    //    logicContainer = G4LogicalVolumeStore::GetInstance()->GetVolume("volContainer");
     G4VPhysicalVolume* worldPhysVol = parser->GetWorldVolume();
-    //    PrepareLArTest();
-    //    if (ConfigurationManager::getInstance()->GetstepLimit()) {
-    //        G4double mxStep = ConfigurationManager::getInstance()->Getlimitval();
-    //        G4UserLimits *fStepLimit = new G4UserLimits(mxStep);
-    //        logicTarget->SetUserLimits(fStepLimit);
-    //    }
     return worldPhysVol;
 }
 
@@ -119,31 +107,25 @@ void DetectorConstruction::ConstructSDandField() {
                     PhotonSD* aPhotonSD = new PhotonSD(name);
                     SDman->AddNewDetector(aPhotonSD);
                     sdnames->push_back(name);
-                    std::cout << "new size: " << sdnames->size() << std::endl;
                     ((*iter).first)->SetSensitiveDetector(aPhotonSD);
                     std::cout << "Attaching sensitive Detector: " << (*vit).value
                             << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
-                    //DetectorList.push_back(std::make_pair((*iter).first->GetName(), (*vit).value));
                 } else if ((*vit).value == "Tracker") {
                     G4String name = ((*iter).first)->GetName() + "_Tracker";
                     TrackerSD* aTrackerSD = new TrackerSD(name);
                     SDman->AddNewDetector(aTrackerSD);
                     sdnames->push_back(name);
-                    std::cout << "new size: " << sdnames->size() << std::endl;
                     ((*iter).first)->SetSensitiveDetector(aTrackerSD);
                     std::cout << "Attaching sensitive Detector: " << (*vit).value
                             << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
-                    //DetectorList.push_back(std::make_pair((*iter).first->GetName(), (*vit).value));
                 }  else if ((*vit).value == "lArTPC") {
                     G4String name = ((*iter).first)->GetName() + "_lArTPC";
                     lArTPCSD* alArTPCSD = new lArTPCSD(name);
                     SDman->AddNewDetector(alArTPCSD);
                     sdnames->push_back(name);
-                    std::cout << "new size: " << sdnames->size() << std::endl;
                     ((*iter).first)->SetSensitiveDetector(alArTPCSD);
                     std::cout << "Attaching sensitive Detector: " << (*vit).value
                             << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
-                    //DetectorList.push_back(std::make_pair((*iter).first->GetName(), (*vit).value));
                 }
             } else if ((*vit).type == "Solid") {
                 if ((*vit).value == "True") {
@@ -156,9 +138,8 @@ void DetectorConstruction::ConstructSDandField() {
                     ((*iter).first)->SetVisAttributes(visatt);
                 }
             } else if ((*vit).type == "Efield") {
-                std::cout << "Setting E-Field of " << ((*iter).first)->GetName() << " to " << (*vit).value << " V/cm" << std::endl;
-                double E = atof((*vit).value.c_str());
-                std::cout << E << std::endl;
+//                std::cout << "Setting E-Field of " << ((*iter).first)->GetName() << " to " << (*vit).value << " V/cm" << std::endl;
+//                double E = atof((*vit).value.c_str());
                 //                G4ElectricField* fEMfield = new G4UniformElectricField(
                 //                       G4ThreeVector(0.0, E * volt / cm, 0.0));
                 //G4EqMagElectricField* fEquation = new G4EqMagElectricField(fEMfield);

@@ -37,6 +37,7 @@
 //#include <boost/timer/timer.hpp>
 //#include <iostream>
 //using namespace boost::timer;
+
 int main(int argc, char** argv) {
     bool interactive = false;
     G4UIExecutive* ui = nullptr;
@@ -64,12 +65,11 @@ int main(int argc, char** argv) {
     G4 g(argv[1]);
 
     G4UImanager* UImanager = G4UImanager::GetUIpointer();
-    
+
     if (interactive) {
         G4VisManager* visManager = new G4VisExecutive;
         visManager->Initialize();
         //get the pointer to the User Interface manager
-        //        UImanager->ApplyCommand("/control/execute init_vis.mac");
         UImanager->ApplyCommand("/control/execute init_vis.mac");
         ui->SessionStart();
         delete ui;

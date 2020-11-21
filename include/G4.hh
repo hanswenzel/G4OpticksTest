@@ -42,8 +42,8 @@ public:
     Ctx* ctx;
     G4RunManager* rm;
     const char* sdn;
-  DetectorConstruction*    dc ; 
-  //DetConOrg* dc;
+    DetectorConstruction* dc;
+    //DetConOrg* dc;
     G4VModularPhysicsList* pl;
     PrimaryGeneratorAction* ga;
     RunAction* ra;

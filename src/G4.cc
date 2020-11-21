@@ -25,11 +25,7 @@
 #include "Ctx.hh"
 
 
-//#include "SensitiveDetector.hh"
 #include "DetectorConstruction.hh"
-//#include "DetConOrg.hh"
-//#include "L4Cerenkov.hh"
-//#include "PhysicsList.hh"
 #include "PrimaryGeneratorAction.hh"
 
 #include "RunAction.hh"
@@ -42,12 +38,9 @@
 #include "G4VUserPhysicsList.hh"
 
 #include "G4Version.hh"
-//#include "G4Scintillation.hh"
 #include "G4OpAbsorption.hh"
 #include "G4OpRayleigh.hh"
 #include "G4OpBoundaryProcess.hh"
-//#include "L4Cerenkov.hh"
-//#include "L4Scintillation.hh"
 
 //
 
@@ -138,13 +131,6 @@ sa(NULL) {
     opticalPhysics->SetMaxBetaChangePerStep(10.0);
 
 
-    /*
-    G4NeutronTrackingCut * neutrcut = (G4NeutronTrackingCut*) phys->GetPhysics("neutronTrackingCut");
-    //    G4NeutronTrackingCut * neutrcut = (G4NeutronTrackingCut*) phys->GetPhysics("G4NeutronTrackingCut");
-    neutrcut->SetTimeLimit(10000);
-    //G4cout << "step limiter enabled limit: " << ConfigurationManager::getInstance()->Getlimitval() * cm << " cm" << G4endl;
-    //
-     */
     phys->DumpList();
     
     rm->SetUserInitialization(dc);
@@ -169,8 +155,6 @@ G4::~G4() {
     G4GeometryManager::GetInstance()->OpenGeometry();
 }
 
-//id G4::beamOn(int nev) {
-//  rm->BeamOn(nev);
-//
+
 
 

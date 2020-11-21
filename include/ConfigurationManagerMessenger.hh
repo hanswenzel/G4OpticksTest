@@ -17,12 +17,10 @@
 #define ConfigurationManagerMessenger_h 1
 
 #include "G4UImessenger.hh"
-
 class ConfigurationManager;
 class G4UIdirectory;
 class G4UIcmdWithABool;
-class G4UIcmdWithADoubleAndUnit;
-
+class G4UIcmdWithAString;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 class ConfigurationManagerMessenger : public G4UImessenger {
@@ -30,7 +28,6 @@ public:
 
     ConfigurationManagerMessenger(ConfigurationManager*);
     virtual ~ConfigurationManagerMessenger();
-
     void SetNewValue(G4UIcommand*, G4String);
 
 private:
@@ -39,11 +36,9 @@ private:
 
     G4UIdirectory* testDir;
     G4UIcmdWithABool* writeHitsCmd;
-    G4UIcmdWithABool* anaCmd;
-    G4UIcmdWithABool* steplimitCmd;
-    G4UIcmdWithABool* debugEventCmd;
-    G4UIcmdWithABool* profileCmd;
-    G4UIcmdWithADoubleAndUnit* slengthCmd;
+    G4UIcmdWithABool* enable_opticksCmd;
+    G4UIcmdWithABool* enable_verboseCmd;
+    G4UIcmdWithAString* FileNameCmd;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -21,19 +21,43 @@ using namespace std;
 
 ConfigurationManager* ConfigurationManager::instance = 0;
 
-
 ConfigurationManager::ConfigurationManager() {
     confMessenger = new ConfigurationManagerMessenger(this);
-    writeHits = true;       // by default we write hits
-    doAnalysis = true;      // by default we do analysis
-    debugEvent = false;     // by default we do not debug event
-    doProfile = false;      // by default we do not profile
+    writeHits = true; // by default we write hits
     SDNames = new std::vector<G4String>();
-    mapOfntIDs = new std::map<G4String, int>();
-//    stepLimit = true;       // by default we enable the step limiter
-//    limitval = 0.1 * mm;
 }
 
+void ConfigurationManager::setFileName(G4String FileName) {
+    this->FileName = FileName;
+}
+
+G4String ConfigurationManager::getFileName() const {
+    return FileName;
+}
+
+void ConfigurationManager::setEnable_verbose(bool enable_verbose) {
+    this->enable_verbose = enable_verbose;
+}
+
+bool ConfigurationManager::isEnable_verbose() const {
+    return enable_verbose;
+}
+
+void ConfigurationManager::setEnable_opticks(bool enable_opticks) {
+    this->enable_opticks = enable_opticks;
+}
+
+bool ConfigurationManager::isEnable_opticks() const {
+    return enable_opticks;
+}
+
+void ConfigurationManager::setWriteHits(bool writeHits) {
+    this->writeHits = writeHits;
+}
+
+bool ConfigurationManager::isWriteHits() const {
+    return writeHits;
+}
 
 
 

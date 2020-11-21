@@ -14,7 +14,6 @@
 #ifndef ConfigurationManager_h
 #define ConfigurationManager_h 1
 #include <vector>
-#include <map>
 #include "G4String.hh"
 class ConfigurationManagerMessenger;
 
@@ -22,81 +21,29 @@ class ConfigurationManager {
 private:
 
     static ConfigurationManager* instance;
-    bool writeHits; // variable determines if hits are written
-    //bool stepLimit;  // variable determines if step limits are applied
-    bool doAnalysis; // variable determines if analysis is done and root file written out
-    bool debugEvent; // variable determines if debugging is done
-    bool doProfile; // variable determines if computing profiling is done
+    bool writeHits; // variable determines if hits are written out into Root File
+    bool enable_opticks; // use opticks if available 
+    bool enable_verbose; // switch on/off diagnostic printouts
+    G4String FileName;   // File name for root io
     std::vector<G4String> *SDNames;
-    std::map<G4String, G4int> *mapOfntIDs;
-    //double limitval; // value of the step limit in mm
     ConfigurationManagerMessenger* confMessenger;
 
 public:
     ConfigurationManager();
     ~ConfigurationManager();
     static ConfigurationManager* getInstance();
-    /*
-        bool GetstepLimit() {
-            return stepLimit;
-        }
-     */
-
-    /*
-    void SetstepLimit(bool value) {
-        stepLimit = value;
-    }
-     */
-    void SetwriteHits(bool value) {
-        writeHits = value;
-    }
-
-    bool GetwriteHits() {
-        return writeHits;
-    }
-
-    bool GetdoAnalysis() {
-        return doAnalysis;
-    }
-
-    void SetdoAnalysis(bool value) {
-        doAnalysis = value;
-    }
-
-    bool GetdebugEvent() {
-        return debugEvent;
-    }
-
-    void SetdebugEvent(bool value) {
-        debugEvent = value;
-    }
-
-    bool GetdoProfile() {
-        return doProfile;
-    }
-
-    void SetdoProfile(bool value) {
-        doProfile = value;
-    }
-
     std::vector<G4String>* getSDNames() {
         return SDNames;
     }
+    void setFileName(G4String FileName);
+    G4String getFileName() const;
+    void setEnable_verbose(bool enable_verbose);
+    bool isEnable_verbose() const;
+    void setEnable_opticks(bool enable_opticks);
+    bool isEnable_opticks() const;
+    void setWriteHits(bool writeHits);
+    bool isWriteHits() const;
 
-    std::map<G4String, int>* getMapOfntIDs() {
-        return mapOfntIDs;
-    }
-
-
-    /*
-        double Getlimitval() {
-            return limitval;
-        }
-
-        void Setlimitval(double value) {
-            limitval = value;
-        }
-     */
 };
 
 #endif /* /CONFIGURATIONMANAGER */

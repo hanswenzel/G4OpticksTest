@@ -21,27 +21,20 @@
 #include "G4RunManager.hh"
 #include "G4Event.hh"
 #include "G4Cerenkov.hh"
-//#include "G4Scintillation.hh"
 #include "G4SteppingManager.hh"
 #include "G4Track.hh"
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
-
-//#include "G4MaterialPropertiesTable.hh"
 #include "G4VRestDiscreteProcess.hh"
-//#include "G4ScintillationTrackInformation.hh"
 //#ifdef WITH_OPTICKS
 #include "G4Opticks.hh"
-#include "TrackInfo.hh"   
-// TrackInfo is a simple struct holding the photon_record_id integer
+#include "TrackInfo.hh"
 //#endif
 #include "OpticksGenstep.h"
 // project headers
 #include "lArTPCSD.hh"
-//#include "Analysis.hh"
 #include "ConfigurationManager.hh"
-//#include "RootIO.hh"
 using namespace std;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 int tCphotons;
@@ -60,7 +53,6 @@ lArTPCSD::lArTPCSD(G4String name)
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 lArTPCSD::~lArTPCSD() {
- //   RootIO::GetInstance()->Close();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -85,7 +77,7 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     G4double charge = aTrack->GetDynamicParticle()->GetCharge();
     if (charge == 0) return false;
     G4double ds = aStep->GetStepLength();
-    G4cout << "Nr of electrons:  " << NumElectrons(edep, ds) << G4endl;
+   // G4cout << "Nr of electrons:  " << NumElectrons(edep, ds) << G4endl;
     lArTPCHit* newHit = new lArTPCHit(NumElectrons(edep, ds), aStep->GetPostStepPoint()->GetPosition().getX(), aStep->GetPostStepPoint()->GetPosition().getY(), aStep->GetPostStepPoint()->GetPosition().getZ());
     flArTPCHitsCollection->insert(newHit);
     if (first) {
@@ -148,7 +140,6 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
         size_t MAXofPostStepLoops = fpSteppingManager->GetMAXofPostStepLoops();
         for (size_t i3 = 0; i3 < MAXofPostStepLoops; i3++) {
             if ((*procPost)[i3]->GetProcessName() == "Cerenkov") {
-                G4cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Cerenkov" << G4endl;
                 G4Cerenkov* proc = (G4Cerenkov*) (*procPost)[i3];
                 thePhysicsTable = proc->GetPhysicsTable();
                 CerenkovAngleIntegrals = (G4PhysicsOrderedFreeVector*) ((*thePhysicsTable)(materialIndex));
@@ -173,7 +164,7 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     tSphotons += Sphotons;
     tCphotons += Cphotons;
     //#ifdef WITH_OPTICKS
-    unsigned opticks_photon_offset = 0;
+ //   unsigned opticks_photon_offset = 0;
     const G4DynamicParticle* aParticle = aTrack->GetDynamicParticle();
     const G4ParticleDefinition* definition = aParticle->GetDefinition();
     G4ThreeVector deltaPosition = aStep->GetDeltaPosition();
@@ -193,9 +184,9 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     if (Sphotons > 0) {
         // total number of photons for all gensteps collected before this one
         // within this OpticksEvent (potentially crossing multiple G4Event)
-        opticks_photon_offset = G4Opticks::Get()->getNumPhotons();
-        G4cout << "lArTPCSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
-        G4cout << "lArTPCSD::ProcessHits:  Scint. photons " << Sphotons << G4endl;
+//        opticks_photon_offset = G4Opticks::Get()->getNumPhotons();
+//        G4cout << "lArTPCSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
+//        G4cout << "lArTPCSD::ProcessHits:  Scint. photons " << Sphotons << G4endl;
         G4Opticks::Get()->collectScintillationStep(
                 //1, // 0    id:zero means use scintillation step count
                 OpticksGenstep_G4Scintillation_1042,
@@ -231,9 +222,9 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
 
         // total number of photons for all gensteps collected before this one
         // within this OpticksEvent (potentially crossing multiple G4Event)
-        opticks_photon_offset = G4Opticks::Get()->getNumPhotons();
-        G4cout << "lArTPCSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
-        G4cout << "lArTPCSD::ProcessHits:  Cerenkov photons " << Cphotons << G4endl;
+//        opticks_photon_offset = G4Opticks::Get()->getNumPhotons();
+//        G4cout << "lArTPCSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
+//        G4cout << "lArTPCSD::ProcessHits:  Cerenkov photons " << Cphotons << G4endl;
         G4Opticks::Get()->collectGenstep_G4Cerenkov_1042(
                 aTrack,
                 aStep,
@@ -263,17 +254,16 @@ void lArTPCSD::EndOfEvent(G4HCofThisEvent*) {
     tSphotons = 0;
     tCphotons = 0;
     G4int NbHits = flArTPCHitsCollection->entries();
-    G4cout << " Number of lArTPCHits:  " << NbHits << G4endl;
+//    G4cout << " Number of lArTPCHits:  " << NbHits << G4endl;
     std::vector<lArTPCHit*> hitsVector;
     {
         G4cout << "\n-------->Storing hits in the ROOT file: in this event there are " << NbHits
                 << " hits in the tracker chambers: " << G4endl;
-        for (G4int i = 0; i < NbHits; i++) (*flArTPCHitsCollection)[i]->Print();
+ //       for (G4int i = 0; i < NbHits; i++) (*flArTPCHitsCollection)[i]->Print();
     }
     for (G4int i = 0; i < NbHits; i++)
         hitsVector.push_back((*flArTPCHitsCollection)[i]);
 
-  //  RootIO::GetInstance()->Write(&hitsVector);
 }
 
 double lArTPCSD::NumElectrons(double edep, double ds) {

@@ -18,7 +18,6 @@
  */
 
 #pragma once
-
 #include "G4UserEventAction.hh"
 class Ctx;
 class Event;
@@ -28,11 +27,9 @@ public:
     EventAction(Ctx* ctx_);
     virtual void BeginOfEventAction(const G4Event* anEvent);
     virtual void EndOfEventAction(const G4Event* anEvent);
-//    static EventAction* GetInstance();
     Event* GetEvent(){return CaTSEvt;}
-
     Ctx* ctx;
+    bool enable_IO;
 private:
     Event* CaTSEvt;
- //   static EventAction* instance;
 };

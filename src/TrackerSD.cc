@@ -20,8 +20,6 @@
 #include "G4ios.hh"
 #include "G4RunManager.hh"
 #include "G4Event.hh"
-//#include "G4Cerenkov.hh"
-//#include "L4Scintillation.hh"
 #include "G4SteppingManager.hh"
 #include "G4Track.hh"
 #include "G4UnitsTable.hh"
@@ -29,8 +27,7 @@
 #include "G4PhysicalConstants.hh"
 // project headers
 #include "TrackerSD.hh"
-//#include "Analysis.hh"
-#include "ConfigurationManager.hh"
+//#include "ConfigurationManager.hh"
 using namespace std;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -59,40 +56,26 @@ G4bool TrackerSD::ProcessHits(G4Step* aStep,
     //std::cout<<"TrackerDS:  "<<aStep->GetPostStepPoint()->GetPhysicalVolume()->GetLogicalVolume()<<std::endl;
     if (edep == 0.) return false;
     if (aStep->GetTrack()->GetDynamicParticle()->GetCharge() == 0) return false;
-    G4int photons = 0;
+    /*
+ //   G4int photons = 0;
     G4SteppingManager* fpSteppingManager = G4EventManager::GetEventManager()
             ->GetTrackingManager()->GetSteppingManager();
-    G4StepStatus stepStatus = fpSteppingManager->GetfStepStatus();
+   // G4StepStatus stepStatus = fpSteppingManager->GetfStepStatus();
     
 
-    ConfigurationManager* cfMgr = ConfigurationManager::getInstance();
-    std::map<G4String, int> *mapOfntIDs = cfMgr->getMapOfntIDs();
+  //  ConfigurationManager* cfMgr = ConfigurationManager::getInstance();
+   // std::map<G4String, int> *mapOfntIDs = cfMgr->getMapOfntIDs();
     //const G4String name = aStep->GetPostStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() + "_Tracker";
-    const G4String name = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() + "_Tracker";
+    //const G4String name = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() + "_Tracker";
     //G4int ID = 0;
-    std::map<G4String, int>::iterator iter = mapOfntIDs->find(name);
-    G4int ID = (*mapOfntIDs)[name];
+    //std::map<G4String, int>::iterator iter = mapOfntIDs->find(name);
+    //G4int ID = (*mapOfntIDs)[name];
     //std::cout <<"ID:  "<<ID<<std::endl;
     //for (std::map<G4String, int>::iterator ii = mapOfntIDs->begin(); ii != mapOfntIDs->end(); ++ii) {
     //    std::cout << (*ii).first << ": " << (*ii).second << std::endl;
     //}
     //mapOfntIDs[name];
-    /*
-    if (cfMgr->GetdoAnalysis()) {
-        // get analysis manager
-        auto analysisManager = G4AnalysisManager::Instance();
-        // fill ntuple
-        analysisManager->FillNtupleDColumn(ID, 0, edep / MeV);
-        analysisManager->FillNtupleDColumn(ID, 1, aStep->GetTrack()->GetPosition().x() / cm);
-        analysisManager->FillNtupleDColumn(ID, 2, aStep->GetTrack()->GetPosition().y() / cm);
-        analysisManager->FillNtupleDColumn(ID, 3, aStep->GetTrack()->GetPosition().z() / cm);
-        analysisManager->FillNtupleDColumn(ID, 4, aStep->GetTrack()->GetGlobalTime() / ns);
-        analysisManager->FillNtupleDColumn(ID, 5, aStep->GetStepLength() / cm);
-        analysisManager->FillNtupleIColumn(ID, 6, photons);
-        analysisManager->FillNtupleIColumn(ID, 7, G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID());
-        analysisManager->AddNtupleRow(ID);
-    }
-     */
+*/
     return true;
 }
 

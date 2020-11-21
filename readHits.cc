@@ -68,7 +68,8 @@ int main(int argc, char** argv) {
             if ((*hciter).first == "PhotonDetector") {
                 for (G4int ii = 0; ii < NbHits; ii++) {
                     PhotonHit* pHit = dynamic_cast<PhotonHit*> (hits[ii]);
-                    wl->Fill(pHit->GetWavelength());            
+                    wl->Fill(pHit->GetWavelength());   
+                    pos2 ->Fill(pHit->GetPosition().getY(),pHit->GetPosition().getZ());
                 }
             }
             if ((*hciter).first == "Obj_lArTPC_HC") {

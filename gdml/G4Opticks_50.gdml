@@ -12,7 +12,7 @@
     </extension>
 
     <define>
-        <matrix name="SY"  coldim="1" values="500/MeV" />
+        <matrix name="SY"  coldim="1" values="50/MeV" />
         <matrix name="RS"  coldim="1" values="1.0" />
         <matrix name="FTC" coldim="1" values="7.*ns" />
         <matrix name="STC" coldim="1" values="1400.*ns" />
@@ -74,8 +74,8 @@
     </define>
     <materials>
         <material name="MyWater" >
-            <D value="1.0"/>
-            <fraction n="1." ref="G4_WATER"/>
+            <D value="1.40" unit="g/cm3"/>
+            <fraction n="1.0000" ref="G4_Ar"/>
             <property name="RINDEX" ref="WaterRINDEX"/>
             <property name="SLOWCOMPONENT" ref="SCINT"/>
             <property name="SCINTILLATIONYIELD" ref="SY" />
@@ -166,27 +166,27 @@
             <colorref ref="blue"/>
             <auxiliary auxtype="StepLimit" auxvalue="0.4" auxunit="mm"/>
             <auxiliary auxtype="SensDet" auxvalue="lArTPC"/>
-            <physvol name="Det" copynumber="1" >
+            <physvol name="Det1" >
                 <volumeref ref="Det"/>
                 <position name="Det1" unit="mm" x="497.5" y="0" z="0"/>
                 <rotationref ref="rPMTRotation1"/>
             </physvol>
-            <physvol name="Det" copynumber="2" >
+            <physvol name="Det2">
                 <volumeref ref="Det"/>
                 <position name="Det2" unit="mm" x="497.5" y="450" z="450"/>
                 <rotationref ref="rPMTRotation1"/>
             </physvol>
-            <physvol name="Det" copynumber="3" >
+            <physvol name="Det3" >
                 <volumeref ref="Det"/>
                 <position name="Det3" unit="mm" x="497.5" y="450" z="-450"/>
                 <rotationref ref="rPMTRotation1"/>
             </physvol>
-            <physvol name="Det" copynumber="4" >
+            <physvol name="Det4" >
                 <volumeref ref="Det"/>
                 <position name="Det4" unit="mm" x="497.5" y="-450" z="450"/>
                 <rotationref ref="rPMTRotation1"/>
             </physvol>
-            <physvol name="Det" copynumber="5" >
+            <physvol name="Det5" >
                 <volumeref ref="Det"/>
                 <position name="Det5" unit="mm" x="497.5" y="-450" z="-450"/>
                 <rotationref ref="rPMTRotation1"/>
@@ -199,9 +199,25 @@
                 <volumeref ref="Obj"/>
             </physvol>
         </volume>
-        <bordersurface name="ScintWrap" surfaceproperty="ScintWrap">
+        <bordersurface name="ScintWrap1" surfaceproperty="ScintWrap">
             <physvolref ref="Obj"/>
-            <physvolref ref="Det"/>
+            <physvolref ref="Det1"/>
+        </bordersurface>
+        <bordersurface name="ScintWrap2" surfaceproperty="ScintWrap">
+            <physvolref ref="Obj"/>
+            <physvolref ref="Det2"/>
+        </bordersurface>
+        <bordersurface name="ScintWrap3" surfaceproperty="ScintWrap">
+            <physvolref ref="Obj"/>
+            <physvolref ref="Det3"/>
+        </bordersurface>
+        <bordersurface name="ScintWrap4" surfaceproperty="ScintWrap">
+            <physvolref ref="Obj"/>
+            <physvolref ref="Det4"/>
+        </bordersurface>
+        <bordersurface name="ScintWrap5" surfaceproperty="ScintWrap">
+            <physvolref ref="Obj"/>
+            <physvolref ref="Det5"/>
         </bordersurface>
     </structure>
 

@@ -40,7 +40,8 @@ int main(int argc, char** argv) {
     TFile* outfile = new TFile(argv[2], "RECREATE");
     outfile->cd();
     TH1F* wl = new TH1F("wl", "wavelength", 100, 0.0, 1000.);
-    TH2F* pos = new TH2F("position", "position of charge deposit", 100, -5., 5.,400,0,500);
+    TH2F* pos = new TH2F("position", "position of charge deposit", 100, -5., 5., 400, 0, 500);
+    TH2F* pos2 = new TH2F("pposition", "position of charge deposit", 400, -500., 500., 400, -500, 500);
     TFile fo(argv[1]);
 
     std::vector<lArTPCHit*>* hits;
@@ -67,14 +68,14 @@ int main(int argc, char** argv) {
             if ((*hciter).first == "PhotonDetector") {
                 for (G4int ii = 0; ii < NbHits; ii++) {
                     PhotonHit* pHit = dynamic_cast<PhotonHit*> (hits[ii]);
-                    wl->Fill(pHit->GetWavelength());
+                    wl->Fill(pHit->GetWavelength());            
                 }
             }
             if ((*hciter).first == "Obj_lArTPC_HC") {
                 for (G4int ii = 0; ii < NbHits; ii++) {
                     lArTPCHit* tpcHit = dynamic_cast<lArTPCHit*> (hits[ii]);
-                    pos->Fill(tpcHit->GetPosY(),tpcHit->GetPosZ());
-                    
+                    pos->Fill(tpcHit->GetPosY(), tpcHit->GetPosZ());
+
                     //wl->Fill(pHit->GetWavelength());
                 }
             }

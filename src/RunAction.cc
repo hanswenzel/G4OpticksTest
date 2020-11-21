@@ -27,14 +27,11 @@
 
 #include "RunAction.hh"
 
-//RunAction::RunAction(Ctx* ctx_)
 RunAction::RunAction()
 :G4UserRunAction(){}
-//G4UserRunAction(),
-//ctx(ctx_) 
-//}
 
 void RunAction::BeginOfRunAction(const G4Run*) {
+
 #ifdef WITH_OPTICKS
     G4cout << "\n\n###[ RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl;
     G4VPhysicalVolume* world = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume();

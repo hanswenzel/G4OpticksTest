@@ -27,11 +27,11 @@
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4VRestDiscreteProcess.hh"
-//#ifdef WITH_OPTICKS
+#ifdef WITH_OPTICKS
 #include "G4Opticks.hh"
 #include "TrackInfo.hh"
-//#endif
 #include "OpticksGenstep.h"
+#endif
 // project headers
 #include "lArTPCSD.hh"
 #include "ConfigurationManager.hh"
@@ -163,7 +163,7 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     }
     tSphotons += Sphotons;
     tCphotons += Cphotons;
-    //#ifdef WITH_OPTICKS
+ #ifdef WITH_OPTICKS
  //   unsigned opticks_photon_offset = 0;
     const G4DynamicParticle* aParticle = aTrack->GetDynamicParticle();
     const G4ParticleDefinition* definition = aParticle->GetDefinition();
@@ -241,7 +241,7 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
                 );
     }
 
-    //#endif 
+#endif 
 
     return true;
 }

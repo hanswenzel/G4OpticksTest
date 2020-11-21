@@ -23,6 +23,58 @@ direction(0),
 polarization(0) {
 }
 
+void PhotonHit::SetPolarization(G4ThreeVector polarization) {
+    this->polarization = polarization;
+}
+
+G4ThreeVector PhotonHit::GetPolarization() const {
+    return polarization;
+}
+
+void PhotonHit::SetDirection(G4ThreeVector direction) {
+    this->direction = direction;
+}
+
+G4ThreeVector PhotonHit::GetDirection() const {
+    return direction;
+}
+
+void PhotonHit::SetPosition(G4ThreeVector position) {
+    this->position = position;
+}
+
+G4ThreeVector PhotonHit::GetPosition() const {
+    return position;
+}
+
+void PhotonHit::SetTime(G4double time) {
+    this->time = time;
+}
+
+G4double PhotonHit::GetTime() const {
+    return time;
+}
+
+void PhotonHit::SetWavelength(G4double wavelength) {
+    this->wavelength = wavelength;
+}
+
+void PhotonHit::SetPid(unsigned pid) {
+    this->pid = pid;
+}
+
+unsigned PhotonHit::GetPid() const {
+    return pid;
+}
+
+void PhotonHit::SetId(unsigned id) {
+    this->id = id;
+}
+
+unsigned PhotonHit::GetId() const {
+    return id;
+}
+
 PhotonHit::PhotonHit(unsigned iid,
         unsigned ipid,
         G4double iwavelength,

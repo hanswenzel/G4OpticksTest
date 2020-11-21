@@ -31,7 +31,20 @@ public:
             G4ThreeVector direction,
             G4ThreeVector polarization);
 
-    G4double GetWavelength(){return wavelength;};
+    G4double GetWavelength(){return wavelength;}
+    void SetPolarization(G4ThreeVector polarization);
+    G4ThreeVector GetPolarization() const;
+    void SetDirection(G4ThreeVector direction);
+    G4ThreeVector GetDirection() const;
+    void SetPosition(G4ThreeVector position);
+    G4ThreeVector GetPosition() const;
+    void SetTime(G4double time);
+    G4double GetTime() const;
+    void SetWavelength(G4double wavelength);
+    void SetPid(unsigned pid);
+    unsigned GetPid() const;
+    void SetId(unsigned id);
+    unsigned GetId() const;;
 
 private:
     unsigned id;

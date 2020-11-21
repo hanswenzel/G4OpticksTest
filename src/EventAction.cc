@@ -18,20 +18,17 @@
  */
 
 #include <string>
-
 #include "G4Event.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4SDManager.hh"
 #include "G4HCtable.hh"
 #include "G4ThreeVector.hh"
 #include "EventAction.hh"
-
 #include "RootIO.hh"
 #include "Event.hh"
 #include <vector> 
 #include "PhotonHit.hh"
 #ifdef WITH_OPTICKS
-
 #include "OpticksFlags.hh"
 #include "G4Opticks.hh"
 #include "NPho.hpp"
@@ -59,11 +56,10 @@ EventAction::EventAction(Ctx* ctx_)
 :
 ctx(ctx_) {
     CaTSEvt = new Event();
-    enable_IO = ConfigurationManager::getInstance()->isWriteHits();
-    G4cout<<"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"<<enable_IO<<G4endl;
 }
 
 void EventAction::BeginOfEventAction(const G4Event* anEvent) {
+    enable_IO = ConfigurationManager::getInstance()->isWriteHits();
     ctx->setEvent(anEvent);
     CaTSEvt->SetEventNr(anEvent->GetEventID());
 }
@@ -91,7 +87,6 @@ void EventAction::EndOfEventAction(const G4Event* event) {
     NPho* m_hits = new NPho(hits);
     unsigned m_num_hits = m_hits->getNumPhotons();
     //hits->save(".", "hits.npy");
-    enable_IO=true;
     if (enable_IO) {
         assert(hits == NULL || hits->getNumItems() == unsigned(num_hits));
         G4cout << "EventAction::EndOfEventAction"
@@ -178,11 +173,6 @@ void EventAction::EndOfEventAction(const G4Event* event) {
     G4cout
             << "EventAction::EndOfEventAction"
             << " DumpHitCollections "
-            << G4endl
-            ;
-    //    SensitiveDetector::DumpHitCollections(HCE);
-
-    // A possible alternative location to invoke the GPU propagation
-    // and add hits in bulk to hit collections would be SensitiveDetector::EndOfEvent  
+            << G4endl;
 }
 

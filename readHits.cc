@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
     outfile->cd();
     TH1F* wl = new TH1F("wl", "wavelength", 100, 0.0, 1000.);
     TH2F* pos = new TH2F("position", "position of charge deposit", 100, -5., 5., 400, 0, 500);
-    TH2F* pos2 = new TH2F("pposition", "position of charge deposit", 400, -500., 500., 400, -500, 500);
+    TH2F* pos2 = new TH2F("pposition", "position of Photon Hits", 400, -500., 500., 400, -500, 500);
     TFile fo(argv[1]);
 
     std::vector<lArTPCHit*>* hits;

@@ -50,6 +50,7 @@ file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc )
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 file(GLOB detectors ${PROJECT_SOURCE_DIR}/gdml/*.gdml)
 file(GLOB schemas ${PROJECT_SOURCE_DIR}/gdml/*.xsd)
+file(GLOB scripts ${PROJECT_SOURCE_DIR}/scripts/*)
 file(GLOB macros ${PROJECT_SOURCE_DIR}/*.mac)
 
 
@@ -88,7 +89,7 @@ endforeach()
 
 
 install(TARGETS ${name} DESTINATION bin)
-install(FILES ${detectors} ${schemas}   ${macros} DESTINATION bin)
+install(FILES ${detectors} ${schemas}  ${scripts} ${macros} DESTINATION bin)
 install(TARGETS G4OpticksTestClassesDict DESTINATION bin)
 install(TARGETS readHits DESTINATION bin)
 install(FILES ${PROJECT_BINARY_DIR}/G4OpticksTestClasses_rdict.pcm DESTINATION bin)

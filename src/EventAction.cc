@@ -65,6 +65,7 @@ void EventAction::BeginOfEventAction(const G4Event* anEvent) {
 }
 
 void EventAction::EndOfEventAction(const G4Event* event) {
+    G4cout<<"Event:   "<< event->GetEventID()<<G4endl;
     G4HCofThisEvent* HCE = event->GetHCofThisEvent();
     assert(HCE);
     size_t numhc = HCE->GetNumberOfCollections();

@@ -1,9 +1,9 @@
 
 /run/initialize 
 /random/setSeeds 7 38 
-#/testConfig/writeHits false
+/testConfig/writeHits false
 /gun/particle mu+
 /gun/energy 1. GeV
 /gun/position 0. 0. 0.
 /gun/direction 0. 0. 1.
-/run/beamOn 1000
+/run/beamOn 500

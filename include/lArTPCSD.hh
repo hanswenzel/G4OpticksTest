@@ -24,7 +24,6 @@ class G4HCofThisEvent;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-/// B2Tracker sensitive detector class
 
 class lArTPCSD : public G4VSensitiveDetector {
 public:

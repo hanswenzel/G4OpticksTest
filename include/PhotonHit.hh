@@ -59,9 +59,7 @@ private:
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 using PhotonHitsCollection = G4THitsCollection<PhotonHit>;
-
 extern G4ThreadLocal G4Allocator<PhotonHit>* PhotonHitAllocator;
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline void* PhotonHit::operator new(size_t){

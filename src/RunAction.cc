@@ -26,28 +26,33 @@
 #endif
 
 #include "RunAction.hh"
+#include "ConfigurationManager.hh"
 
 RunAction::RunAction()
-:G4UserRunAction(){}
+: G4UserRunAction() {
+}
 
 void RunAction::BeginOfRunAction(const G4Run*) {
-
+    if (ConfigurationManager::getInstance()->isEnable_opticks()) {
 #ifdef WITH_OPTICKS
-    G4cout << "\n\n###[ RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl;
-    G4VPhysicalVolume* world = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume();
-    assert(world);
-    //bool standardize_geant4_materials = true; // required for alignment 
-    bool standardize_geant4_materials = false; // required for alignment 
-    G4Opticks::Get()->setGeometry(world, standardize_geant4_materials);
-    G4cout << "\n\n###] RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl;
+        G4cout << "\n\n###[ RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl;
+        G4VPhysicalVolume* world = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume();
+        assert(world);
+        //bool standardize_geant4_materials = true; // required for alignment 
+        bool standardize_geant4_materials = false; // required for alignment 
+        G4Opticks::Get()->setGeometry(world, standardize_geant4_materials);
+        G4cout << "\n\n###] RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl;
 #endif
+    }
 }
 
 void RunAction::EndOfRunAction(const G4Run*) {
+    if (ConfigurationManager::getInstance()->isEnable_opticks()) {
 #ifdef WITH_OPTICKS
-    G4cout << "\n\n###[ RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
-    G4Opticks::Finalize();
-    G4cout << "\n\n###] RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
+        G4cout << "\n\n###[ RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
+        G4Opticks::Finalize();
+        G4cout << "\n\n###] RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
 #endif
+    }
 }
 

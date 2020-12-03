@@ -35,8 +35,11 @@ include_directories(${CMAKE_CURRENT_LIST_DIR}/include
   ${ROOT_INCLUDE_DIRS}
   ${OPTICKS_PREFIX}/include/G4OK/
   ${OPTICKS_PREFIX}/include/GGEO/
+  ${OPTICKS_PREFIX}/include/NPY/
+ ${OPTICKS_PREFIX}/include/SysRap/
   ${OPTICKS_PREFIX}/include/OpticksCore/
   ${OPTICKS_PREFIX}/externals/plog/include/
+  ${OPTICKS_PREFIX}/externals/glm/glm/
   ${PROJECT_SOURCE_DIR}/include
   ${Geant4_INCLUDE_DIR}
   ${ROOT_INCLUDE_DIRS}
@@ -72,8 +75,13 @@ add_executable(readHits readHits.cc  ${sources} ${headers})
 target_link_libraries(readHits G4OpticksTestClassesDict  Opticks::G4OK ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 link_directories( ${ROOT_LIBRARY_DIR} )
+add_compile_definitions(WITH_OPTICKS)
 target_compile_definitions( ${name} 
-  PRIVATE 
+  PRIVATE
+      WITH_OPTICKS
+ )
+target_compile_definitions( readHits
+  PRIVATE
       WITH_OPTICKS
  )
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)

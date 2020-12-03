@@ -73,7 +73,6 @@ ra(NULL),
 ea(NULL),
 ta(NULL),
 sa(NULL) {
-  //dc(new DetConOrg(sdn)),
 //
     // Access to registries and factories
     //

@@ -47,6 +47,7 @@
 #include "DetectorConstruction.hh"
 #include "TrackerSD.hh"
 #include "lArTPCSD.hh"
+#include "RadiatorSD.hh"
 #include "PhotonSD.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 using namespace std;
@@ -118,7 +119,7 @@ void DetectorConstruction::ConstructSDandField() {
                     ((*iter).first)->SetSensitiveDetector(aTrackerSD);
                     std::cout << "Attaching sensitive Detector: " << (*vit).value
                             << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
-                }  else if ((*vit).value == "lArTPC") {
+                } else if ((*vit).value == "lArTPC") {
                     G4String name = ((*iter).first)->GetName() + "_lArTPC";
                     lArTPCSD* alArTPCSD = new lArTPCSD(name);
                     SDman->AddNewDetector(alArTPCSD);
@@ -126,7 +127,16 @@ void DetectorConstruction::ConstructSDandField() {
                     ((*iter).first)->SetSensitiveDetector(alArTPCSD);
                     std::cout << "Attaching sensitive Detector: " << (*vit).value
                             << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                } else if ((*vit).value == "Radiator") {
+                    G4String name = ((*iter).first)->GetName() + "_Radiator";
+                    RadiatorSD* aRadiatorSD = new RadiatorSD(name);
+                    SDman->AddNewDetector(aRadiatorSD);
+                    sdnames->push_back(name);
+                    ((*iter).first)->SetSensitiveDetector(aRadiatorSD);
+                    std::cout << "Attaching sensitive Detector: " << (*vit).value
+                            << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
                 }
+
             } else if ((*vit).type == "Solid") {
                 if ((*vit).value == "True") {
                     G4VisAttributes * visibility = new G4VisAttributes();
@@ -138,8 +148,8 @@ void DetectorConstruction::ConstructSDandField() {
                     ((*iter).first)->SetVisAttributes(visatt);
                 }
             } else if ((*vit).type == "Efield") {
-//                std::cout << "Setting E-Field of " << ((*iter).first)->GetName() << " to " << (*vit).value << " V/cm" << std::endl;
-//                double E = atof((*vit).value.c_str());
+                //                std::cout << "Setting E-Field of " << ((*iter).first)->GetName() << " to " << (*vit).value << " V/cm" << std::endl;
+                //                double E = atof((*vit).value.c_str());
                 //                G4ElectricField* fEMfield = new G4UniformElectricField(
                 //                       G4ThreeVector(0.0, E * volt / cm, 0.0));
                 //G4EqMagElectricField* fEquation = new G4EqMagElectricField(fEMfield);

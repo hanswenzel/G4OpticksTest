@@ -24,6 +24,7 @@ ConfigurationManager* ConfigurationManager::instance = 0;
 ConfigurationManager::ConfigurationManager() {
     confMessenger = new ConfigurationManagerMessenger(this);
     writeHits = true; // by default we write hits
+    enable_opticks = true; //bydefault we use opticks
     SDNames = new std::vector<G4String>();
 }
 
@@ -58,8 +59,6 @@ void ConfigurationManager::setWriteHits(bool writeHits) {
 bool ConfigurationManager::isWriteHits() const {
     return writeHits;
 }
-
-
 
 ConfigurationManager* ConfigurationManager::getInstance() {
     if (instance == 0) instance = new ConfigurationManager;

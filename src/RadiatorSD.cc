@@ -33,63 +33,48 @@
 #include "OpticksGenstep.h"
 #endif
 // project headers
-#include "lArTPCSD.hh"
+#include "RadiatorSD.hh"
 #include "ConfigurationManager.hh"
-//#include <vector>
+#define UNUSED(expr) do { (void)(expr); } while (0)
 using namespace std;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-int tCphotons;
-int tSphotons;
+//int tCphotons;
+//int tSphotons;
 
-lArTPCSD::lArTPCSD(G4String name)
-: G4VSensitiveDetector(name), flArTPCHitsCollection(0), fHCID(0) {
-    G4String HCname = name + "_HC";
-    collectionName.insert(HCname);
-    G4cout << collectionName.size() << "   lArTPCSD name:  " << name << " collection Name: "
-            << HCname << G4endl;
-    fHCID = -1;
-    first = true;
+RadiatorSD::RadiatorSD(G4String name)
+: G4VSensitiveDetector(name) {
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-lArTPCSD::~lArTPCSD() {
+RadiatorSD::~RadiatorSD() {
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void lArTPCSD::Initialize(G4HCofThisEvent* hce) {
-    flArTPCHitsCollection = new lArTPCHitsCollection(SensitiveDetectorName, collectionName[0]);
-    if (fHCID < 0) {
-        G4cout << "lArTPCSD::Initialize:  " << SensitiveDetectorName << "   "
-                << collectionName[0] << G4endl;
-        fHCID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
-    }
-    hce->AddHitsCollection(fHCID, flArTPCHitsCollection);
+void RadiatorSD::Initialize(G4HCofThisEvent* hce) {
+    UNUSED(hce); // avoiding unused parameter ‘HCE’ compiler message 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
+G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     G4double edep = aStep->GetTotalEnergyDeposit();
     if (edep == 0.) return false;
-    // only deal with charged particles
-    G4Track* aTrack = aStep->GetTrack();
-    G4double charge = aTrack->GetDynamicParticle()->GetCharge();
-    if (charge == 0) return false;
-    G4double ds = aStep->GetStepLength();
-    // G4cout << "Nr of electrons:  " << NumElectrons(edep, ds) << G4endl;
-    lArTPCHit* newHit = new lArTPCHit(NumElectrons(edep, ds), aStep->GetPostStepPoint()->GetPosition().getX(), aStep->GetPostStepPoint()->GetPosition().getY(), aStep->GetPostStepPoint()->GetPosition().getZ());
-    flArTPCHitsCollection->insert(newHit);
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
 #ifdef WITH_OPTICKS
+        // only deal with charged particles
+        G4Track* aTrack = aStep->GetTrack();
+        G4double charge = aTrack->GetDynamicParticle()->GetCharge();
+        if (charge == 0) return false;
+        // G4cout << "Nr of electrons:  " << NumElectrons(edep, ds) << G4endl;
         if (first) {
             aMaterial = aTrack->GetMaterial();
             materialIndex = aMaterial->GetIndex();
-            G4cout << "lArTPCSD::ProcessHits initializing Material:  "
+            G4cout << "RadiatorSD::ProcessHits initializing Material:  "
                     << aMaterial->GetName() << " "
                     << G4endl;
-            G4cout << "lArTPCSD::ProcessHits: Name " << aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() << G4endl;
+            G4cout << "RadiatorSD::ProcessHits: Name " << aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() << G4endl;
             aMaterialPropertiesTable = aMaterial->GetMaterialPropertiesTable();
             aMaterialPropertiesTable->DumpTable();
             // 
@@ -164,8 +149,8 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
                 }
             }
         }
-        tSphotons += Sphotons;
-        tCphotons += Cphotons;
+        //    tSphotons += Sphotons;
+        //    tCphotons += Cphotons;
 
         //   unsigned opticks_photon_offset = 0;
         const G4DynamicParticle* aParticle = aTrack->GetDynamicParticle();
@@ -188,8 +173,8 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
             // total number of photons for all gensteps collected before this one
             // within this OpticksEvent (potentially crossing multiple G4Event)
             //        opticks_photon_offset = G4Opticks::Get()->getNumPhotons();
-            //        G4cout << "lArTPCSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
-            //        G4cout << "lArTPCSD::ProcessHits:  Scint. photons " << Sphotons << G4endl;
+            //        G4cout << "RadiatorSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
+            //        G4cout << "RadiatorSD::ProcessHits:  Scint. photons " << Sphotons << G4endl;
             G4Opticks::Get()->collectScintillationStep(
                     //1, // 0    id:zero means use scintillation step count
                     OpticksGenstep_G4Scintillation_1042,
@@ -226,8 +211,8 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
             // total number of photons for all gensteps collected before this one
             // within this OpticksEvent (potentially crossing multiple G4Event)
             //        opticks_photon_offset = G4Opticks::Get()->getNumPhotons();
-            //        G4cout << "lArTPCSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
-            //        G4cout << "lArTPCSD::ProcessHits:  Cerenkov photons " << Cphotons << G4endl;
+            //        G4cout << "RadiatorSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
+            //        G4cout << "RadiatorSD::ProcessHits:  Cerenkov photons " << Cphotons << G4endl;
             G4Opticks::Get()->collectGenstep_G4Cerenkov_1042(
                     aTrack,
                     aStep,
@@ -251,34 +236,5 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void lArTPCSD::EndOfEvent(G4HCofThisEvent*) {
-    //G4cout << " Number of Scintillation Photons:  " << tSphotons << G4endl;
-    //G4cout << " Number of Cerenkov Photons:  " << tCphotons << G4endl;
-    tSphotons = 0;
-    tCphotons = 0;
-    G4int NbHits = flArTPCHitsCollection->entries();
-    G4cout << " Number of lArTPCHits:  " << NbHits << G4endl;
-    //   std::vector<lArTPCHit*> hitsVector;
-    //   for (G4int i = 0; i < NbHits; i++) hitsVector.push_back((*flArTPCHitsCollection)[i]);
-}
-
-double lArTPCSD::NumElectrons(double edep, double ds) {
-    // Nucl.Instrum.Meth.A523:275-286,2004
-    double fGeVToElectrons = 4.237e+07;
-    //double fRecombA = 0.800;
-    //double fRecombk = 0.0486;
-    double fModBoxA = 0.930;
-    double fModBoxB = 0.212;
-    double EFieldStep = 0.5;
-    double recomb = 0.0;
-    double dEdx = (ds <= 0.0) ? 0.0 : edep / ds;
-    if (dEdx < 1.) dEdx = 1.;
-    if (ds > 0) {
-        double Xi = fModBoxB * dEdx / EFieldStep;
-        recomb = log(fModBoxA + Xi) / Xi;
-    } else {
-        recomb = 0.0;
-    }
-    double fNumIonElectrons = fGeVToElectrons * 1.e-3 * edep * recomb;
-    return fNumIonElectrons;
+void RadiatorSD::EndOfEvent(G4HCofThisEvent*) {
 }

@@ -81,7 +81,7 @@ PhotonHit::PhotonHit(unsigned iid,
         G4double itime,
         G4ThreeVector iposition,
         G4ThreeVector idirection,
-        G4ThreeVector ipolarization):G4VHit() {
+        G4ThreeVector ipolarization) : G4VHit() {
     id = iid;
     pid = ipid;
     wavelength = iwavelength;
@@ -133,22 +133,31 @@ G4bool PhotonHit::operator==(const PhotonHit& right) const {
 
 void PhotonHit::Draw() {
     G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
-    
-        if (pVVisManager) {
-            G4Circle circle(position);
-            circle.SetScreenSize(2.);
-            circle.SetFillStyle(G4Circle::filled);
-            G4Colour colour(1., 0., 0.);
-            G4VisAttributes attribs(colour);
-            circle.SetVisAttributes(attribs);
-            pVVisManager->Draw(circle);
-        }
-     
+
+    if (pVVisManager) {
+        G4Circle circle(position);
+        circle.SetScreenSize(2.);
+        circle.SetFillStyle(G4Circle::filled);
+        G4Colour colour(1., 0., 0.);
+        G4VisAttributes attribs(colour);
+        circle.SetVisAttributes(attribs);
+        pVVisManager->Draw(circle);
+    }
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void PhotonHit::Print() {
+    G4cout << "id: " << id
+            << " pid: " << pid
+            << " wavelength: " << wavelength
+            << " time: " << time
+            << G4endl;
+    //    position.
+    //    G4ThreeVector position;
+    //    G4ThreeVector direction;
+    //    G4ThreeVector polarization;
     //  G4cout << "  trackID: " << fTrackID << "  chamberNb: " << fChamberNb
     //          << "  wavelength deposit[MeV]: " << fEdep
     //          << "  position[mm]: " << fPos << G4endl;

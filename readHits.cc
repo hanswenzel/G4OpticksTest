@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
             G4int NbHits = hits.size();
             cout << (*hciter).first << " Number of Hits:  " << NbHits << endl;
 
-            if ((*hciter).first == "PhotonDetector") {
+            if ((*hciter).first == "Det_Photondetector_HC") {
                 for (G4int ii = 0; ii < NbHits; ii++) {
                     PhotonHit* pHit = dynamic_cast<PhotonHit*> (hits[ii]);
                     wl->Fill(pHit->GetWavelength());   

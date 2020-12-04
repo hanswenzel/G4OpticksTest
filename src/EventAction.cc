@@ -164,6 +164,7 @@ void EventAction::EndOfEventAction(const G4Event* event) {
         G4String hcname = hc->GetName();
         std::vector<std::string> y = split(hcname, '_');
         std::string Classname = y[1];
+         G4cout<< "Classname: " << Classname<<G4endl;
         if (Classname == "lArTPC") {
             G4int NbHits = hc->GetSize();
             for (G4int ii = 0; ii < NbHits; ii++) {
@@ -174,6 +175,7 @@ void EventAction::EndOfEventAction(const G4Event* event) {
             hcmap->insert(std::make_pair(hcname, hitsVector));
         } else if (Classname == "Photondetector") {
             G4int NbHits = hc->GetSize();
+            G4cout<< "Photondetector size: " << hc->GetSize()<<G4endl;
             for (G4int ii = 0; ii < NbHits; ii++) {
                 G4VHit* hit = hc->GetHit(ii);
                 PhotonHit* Hit = dynamic_cast<PhotonHit*> (hit);

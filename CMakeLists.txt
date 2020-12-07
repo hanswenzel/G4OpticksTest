@@ -36,7 +36,7 @@ include_directories(${CMAKE_CURRENT_LIST_DIR}/include
   ${OPTICKS_PREFIX}/include/G4OK/
   ${OPTICKS_PREFIX}/include/GGEO/
   ${OPTICKS_PREFIX}/include/NPY/
- ${OPTICKS_PREFIX}/include/SysRap/
+  ${OPTICKS_PREFIX}/include/SysRap/
   ${OPTICKS_PREFIX}/include/OpticksCore/
   ${OPTICKS_PREFIX}/externals/plog/include/
   ${OPTICKS_PREFIX}/externals/glm/glm/
@@ -54,7 +54,7 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 file(GLOB detectors ${PROJECT_SOURCE_DIR}/gdml/*.gdml)
 file(GLOB schemas ${PROJECT_SOURCE_DIR}/gdml/*.xsd)
 file(GLOB scripts ${PROJECT_SOURCE_DIR}/scripts/*)
-file(GLOB macros ${PROJECT_SOURCE_DIR}/*.mac)
+file(GLOB macros ${PROJECT_SOURCE_DIR}/macros/*.mac)
 
 
 #----------------------------------------------------------------------------

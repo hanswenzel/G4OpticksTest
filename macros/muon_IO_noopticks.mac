@@ -1,6 +1,5 @@
+/testConfig/enable_verbose false
 /run/initialize 
-#
-# the scintillation process is needed even when we run on GPU (to get the number of photons to be produced) but we don't put optical photons on the stack
 #
 /process/activate Scintillation
 /process/optical/scintillation/verbose 0
@@ -13,16 +12,23 @@
 /process/optical/cerenkov/verbose 0
 /process/optical/cerenkov/setStackPhotons true
 /process/optical/cerenkov/setTrackSecondariesFirst true
+#
 /process/optical/rayleigh/verbose 0
 /process/optical/absorption/verbose 0
 /process/optical/boundary/verbose 0
-
+#
+/process/activate OpAbsorption
+/process/activate OpRayleigh
+/process/activate OpBoundary
+/process/activate OpMieHG
+#
 /run/initialize 
 /random/setSeeds 7 38 
+/testConfig/FileName NewHitsG4.root
 /testConfig/writeHits true
 /testConfig/enable_opticks false
 /gun/particle mu+
 /gun/energy 1. GeV
 /gun/position 0. 0. 0.
 /gun/direction 0. 0. 1.
-/run/beamOn 50
+/run/beamOn 5

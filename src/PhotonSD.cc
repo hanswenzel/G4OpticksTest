@@ -38,13 +38,14 @@ PhotonSD::PhotonSD(G4String name)
     G4cout << collectionName.size() << "   PhotonSD name:  " << name << " collection Name: "
             << HCname << G4endl;
     fHCID = -1;
+    verbose = ConfigurationManager::getInstance()->isEnable_verbose();
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void PhotonSD::Initialize(G4HCofThisEvent* hce) {
     fPhotonHitsCollection = new PhotonHitsCollection(SensitiveDetectorName, collectionName[0]);
     if (fHCID < 0) {
-        G4cout << "PhotonSD::Initialize:  " << SensitiveDetectorName << "   "
+        if (verbose) G4cout << "PhotonSD::Initialize:  " << SensitiveDetectorName << "   "
                 << collectionName[0] << G4endl;
         fHCID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
     }
@@ -92,16 +93,15 @@ G4bool PhotonSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-
 void PhotonSD::EndOfEvent(G4HCofThisEvent*) {
     G4int NbHits = fPhotonHitsCollection->entries();
-    G4cout << " Number of PhotonHits:  " << NbHits << G4endl;
-//    std::vector<PhotonHit*> hitsVector;
-//    for (G4int i = 0; i < NbHits; i++) hitsVector.push_back((*fPhotonHitsCollection)[i]);
+    if (verbose) G4cout << " Number of PhotonHits:  " << NbHits << G4endl;
+    //    std::vector<PhotonHit*> hitsVector;
+    //    for (G4int i = 0; i < NbHits; i++) hitsVector.push_back((*fPhotonHitsCollection)[i]);
 }
-double PhotonSD::etolambda(double E)
-{
-  // input  photon energy in MeV
-  // return   wavelength in nm 
- return (h*c)/(E*1.e-9);
+
+double PhotonSD::etolambda(double E) {
+    // input  photon energy in MeV
+    // return   wavelength in nm 
+    return (h * c) / (E * 1.e-9);
 }

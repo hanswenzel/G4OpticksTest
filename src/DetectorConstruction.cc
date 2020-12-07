@@ -55,6 +55,7 @@ using namespace std;
 DetectorConstruction::DetectorConstruction(G4String fname) {
     gdmlFile = fname;
     sdnames = ConfigurationManager::getInstance()->getSDNames();
+    verbose = ConfigurationManager::getInstance()->isEnable_verbose();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -65,18 +66,24 @@ DetectorConstruction::~DetectorConstruction() {
 G4VPhysicalVolume* DetectorConstruction::Construct() {
     ReadGDML();
     const G4GDMLAuxMapType* auxmap = parser->GetAuxMap();
-    std::cout << "Found " << auxmap->size()
-            << " volume(s) with auxiliary information."
-            << std::endl << std::endl;
+    if (verbose) {
+        std::cout << "Found " << auxmap->size()
+                << " volume(s) with auxiliary information."
+                << std::endl << std::endl;
+    }
     for (G4GDMLAuxMapType::const_iterator iter = auxmap->begin();
             iter != auxmap->end(); iter++) {
-        std::cout << "Volume " << ((*iter).first)->GetName()
-                << " has the following list of auxiliary information: "
-                << std::endl;
+        if (verbose) {
+            std::cout << "Volume " << ((*iter).first)->GetName()
+                    << " has the following list of auxiliary information: "
+                    << std::endl;
+        }
         for (G4GDMLAuxListType::const_iterator vit = (*iter).second.begin();
                 vit != (*iter).second.end(); vit++) {
-            std::cout << "--> Type: " << (*vit).type
-                    << " Value: " << (*vit).value << std::endl;
+            if (verbose) {
+                std::cout << "--> Type: " << (*vit).type
+                        << " Value: " << (*vit).value << std::endl;
+            }
             if ((*vit).type == "StepLimit") {
                 G4UserLimits *fStepLimit = new G4UserLimits(atof((*vit).value));
                 ((*iter).first)->SetUserLimits(fStepLimit);
@@ -90,18 +97,24 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
 void DetectorConstruction::ConstructSDandField() {
     G4SDManager* SDman = G4SDManager::GetSDMpointer();
     const G4GDMLAuxMapType* auxmap = parser->GetAuxMap();
-    std::cout << "Found " << auxmap->size()
-            << " volume(s) with auxiliary information."
-            << std::endl << std::endl;
+    if (verbose) {
+        std::cout << "Found " << auxmap->size()
+                << " volume(s) with auxiliary information."
+                << std::endl << std::endl;
+    }
     for (G4GDMLAuxMapType::const_iterator iter = auxmap->begin();
             iter != auxmap->end(); iter++) {
-        std::cout << "Volume " << ((*iter).first)->GetName()
-                << " has the following list of auxiliary information: "
-                << std::endl;
+        if (verbose) {
+            std::cout << "Volume " << ((*iter).first)->GetName()
+                    << " has the following list of auxiliary information: "
+                    << std::endl;
+        }
         for (G4GDMLAuxListType::const_iterator vit = (*iter).second.begin();
                 vit != (*iter).second.end(); vit++) {
-            std::cout << "--> Type: " << (*vit).type
-                    << " Value: " << (*vit).value << std::endl;
+            if (verbose) {
+                std::cout << "--> Type: " << (*vit).type
+                        << " Value: " << (*vit).value << std::endl;
+            }
             if ((*vit).type == "SensDet") {
                 if ((*vit).value == "PhotonDetector") {
                     G4String name = ((*iter).first)->GetName() + "_Photondetector";
@@ -109,32 +122,40 @@ void DetectorConstruction::ConstructSDandField() {
                     SDman->AddNewDetector(aPhotonSD);
                     sdnames->push_back(name);
                     ((*iter).first)->SetSensitiveDetector(aPhotonSD);
-                    std::cout << "Attaching sensitive Detector: " << (*vit).value
-                            << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                    if (verbose) {
+                        std::cout << "Attaching sensitive Detector: " << (*vit).value
+                                << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                    }
                 } else if ((*vit).value == "Tracker") {
                     G4String name = ((*iter).first)->GetName() + "_Tracker";
                     TrackerSD* aTrackerSD = new TrackerSD(name);
                     SDman->AddNewDetector(aTrackerSD);
                     sdnames->push_back(name);
                     ((*iter).first)->SetSensitiveDetector(aTrackerSD);
-                    std::cout << "Attaching sensitive Detector: " << (*vit).value
-                            << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                    if (verbose) {
+                        std::cout << "Attaching sensitive Detector: " << (*vit).value
+                                << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                    }
                 } else if ((*vit).value == "lArTPC") {
                     G4String name = ((*iter).first)->GetName() + "_lArTPC";
                     lArTPCSD* alArTPCSD = new lArTPCSD(name);
                     SDman->AddNewDetector(alArTPCSD);
                     sdnames->push_back(name);
                     ((*iter).first)->SetSensitiveDetector(alArTPCSD);
-                    std::cout << "Attaching sensitive Detector: " << (*vit).value
-                            << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                    if (verbose) {
+                        std::cout << "Attaching sensitive Detector: " << (*vit).value
+                                << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                    }
                 } else if ((*vit).value == "Radiator") {
                     G4String name = ((*iter).first)->GetName() + "_Radiator";
                     RadiatorSD* aRadiatorSD = new RadiatorSD(name);
                     SDman->AddNewDetector(aRadiatorSD);
                     sdnames->push_back(name);
                     ((*iter).first)->SetSensitiveDetector(aRadiatorSD);
-                    std::cout << "Attaching sensitive Detector: " << (*vit).value
-                            << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                    if (verbose) {
+                        std::cout << "Attaching sensitive Detector: " << (*vit).value
+                                << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                    }
                 }
 
             } else if ((*vit).type == "Solid") {
@@ -176,16 +197,22 @@ void DetectorConstruction::ReadGDML() {
     G4LogicalVolume* pWorldLogical = World->GetLogicalVolume();
     pWorldLogical->SetVisAttributes(0);
     std::cout << World->GetTranslation() << std::endl << std::endl;
-    std::cout << "Found World:  " << World-> GetName() << std::endl;
-    std::cout << "World LV:  " << World->GetLogicalVolume()->GetName() << std::endl;
+    if (verbose) {
+        std::cout << "Found World:  " << World-> GetName() << std::endl;
+        std::cout << "World LV:  " << World->GetLogicalVolume()->GetName() << std::endl;
+    }
     G4LogicalVolumeStore *pLVStore = G4LogicalVolumeStore::GetInstance();
-    std::cout << "Found " << pLVStore->size()
-            << " logical volumes."
-            << std::endl << std::endl;
+    if (verbose) {
+        std::cout << "Found " << pLVStore->size()
+                << " logical volumes."
+                << std::endl << std::endl;
+    }
     G4PhysicalVolumeStore *pPVStore = G4PhysicalVolumeStore::GetInstance();
-    std::cout << "Found " << pPVStore->size()
-            << " physical volumes."
-            << std::endl << std::endl;
+    if (verbose) {
+        std::cout << "Found " << pPVStore->size()
+                << " physical volumes."
+                << std::endl << std::endl;
+    }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -59,6 +59,7 @@ private:
     G4double dp;
     G4double nMax;
     bool first;
+    bool verbose;
     double NumElectrons(double e, double ds);
     lArTPCHitsCollection* flArTPCHitsCollection;
     G4int fHCID;

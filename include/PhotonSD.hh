@@ -40,6 +40,7 @@ private:
     G4int fHCID;
     const double c = 299792458.; // speed of light in m/sec
     const double h = 4.13566743E-15; // Planck constant in eVsec
+    bool verbose;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

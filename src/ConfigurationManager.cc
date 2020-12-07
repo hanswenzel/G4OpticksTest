@@ -23,9 +23,11 @@ ConfigurationManager* ConfigurationManager::instance = 0;
 
 ConfigurationManager::ConfigurationManager() {
     confMessenger = new ConfigurationManagerMessenger(this);
-    writeHits = true; // by default we write hits
-    enable_opticks = true; //bydefault we use opticks
+    writeHits = true;       // by default we write hits
+    enable_opticks = true;  // by default we use opticks
+    enable_verbose = false; // by default we run quiet 
     SDNames = new std::vector<G4String>();
+    FileName="hits.root";
 }
 
 void ConfigurationManager::setFileName(G4String FileName) {

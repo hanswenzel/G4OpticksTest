@@ -42,10 +42,10 @@ ConfigurationManagerMessenger::ConfigurationManagerMessenger(ConfigurationManage
     enable_verboseCmd->SetGuidance("Set flag for enabling verbose diagnostic printout");
     enable_verboseCmd->SetParameterName("enable_verbose", true);
     enable_verboseCmd->SetDefaultValue(true);
-    enable_verboseCmd->AvailableForStates(G4State_Idle);
+    enable_verboseCmd->AvailableForStates(G4State_PreInit,G4State_Init,G4State_Idle);
     //
     FileNameCmd = new G4UIcmdWithAString("/testConfig/FileName", this);
-    FileNameCmd->SetGuidance("Set flag for writing hits");
+    FileNameCmd->SetGuidance("Enter file name for Hits collections ");
     FileNameCmd->SetParameterName("FileName", true);
     FileNameCmd->SetDefaultValue("hist.root");
     FileNameCmd->AvailableForStates(G4State_Idle);
@@ -66,8 +66,8 @@ ConfigurationManagerMessenger::~ConfigurationManagerMessenger() {
 void ConfigurationManagerMessenger::SetNewValue(G4UIcommand* command, G4String newValue) {
     if (command == writeHitsCmd) mgr->setWriteHits(writeHitsCmd->GetNewBoolValue(newValue));
     if (command == enable_opticksCmd) mgr->setEnable_opticks(enable_opticksCmd->GetNewBoolValue(newValue));
-    if (command == enable_verboseCmd) mgr->setWriteHits(enable_verboseCmd->GetNewBoolValue(newValue));
- //   if (command == FileNameCmd) mgr->setWriteHits(FileNameCmd->GetNewBoolValue(newValue));
+    if (command == enable_verboseCmd) mgr->setEnable_verbose(enable_verboseCmd->GetNewBoolValue(newValue));
+    if (command == FileNameCmd) mgr->setFileName(newValue);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

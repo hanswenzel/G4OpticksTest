@@ -1,11 +1,14 @@
 #include <sstream>
-
+#include <cstring>
 #include "RootIO.hh"
+#include "ConfigurationManager.hh"
 //
+/*
 #include "G4SDManager.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4EventManager.hh"
 #include "G4Event.hh"
+ */
 //
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -20,7 +23,9 @@ RootIO::RootIO() : fNevents(0) {
     // initialize ROOT
     TSystem ts;
     gSystem->Load("libG4OpticksTestClassesDict");
-    fFile = new TFile("hits.root", "RECREATE");
+    G4String FileName = ConfigurationManager::getInstance()->getFileName();
+    G4cout<< "Opening File: "<< FileName<< G4endl;
+    fFile = new TFile(FileName.c_str(), "RECREATE");
     TTree::SetMaxTreeSize(1000 * Long64_t(2000000000));
     // Create a ROOT Tree and one superbranch
     ftree = new TTree("Events", "ROOT tree containing Hit collections");

@@ -57,12 +57,11 @@ private:
 
     G4String gdmlFile;
     G4LogicalVolume* logicTarget;
-    //   G4LogicalVolume* logicWorld;
-    //std::vector<std::pair<std::string, std::string> > DetectorList;
     std::vector<G4String> *sdnames;
     // GDMLparser
     G4GDMLParser *parser;
     ColorReader* fReader;
+    bool verbose;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....

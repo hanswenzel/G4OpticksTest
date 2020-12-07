@@ -1,0 +1,29 @@
+/testConfig/enable_verbose false
+/run/initialize 
+
+#
+# the scintillation process is needed even when we run on GPU but we don't put optical photons on the stack
+#
+/process/activate Scintillation
+/process/optical/scintillation/setStackPhotons false
+#
+# the Cerenkov process is needed even when we run on GPU but we don't put optical photons on the stack
+#
+/process/activate  Cerenkov 
+/process/optical/cerenkov/setStackPhotons false
+/process/inactivate OpAbsorption
+/process/inactivate OpRayleigh
+/process/inactivate OpBoundary
+/process/inactivate OpMieHG
+/process/optical/rayleigh/verbose 0
+/process/optical/absorption/verbose 0
+/process/optical/boundary/verbose 0
+/random/setSeeds 7 38 
+/testConfig/enable_opticks true
+/testConfig/writeHits true
+/testConfig/FileName NewHits.root
+/gun/particle mu+
+/gun/energy 1. GeV
+/gun/position 0. 0. 0.
+/gun/direction 0. 0. 1.
+/run/beamOn 5

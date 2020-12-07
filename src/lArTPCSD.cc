@@ -45,8 +45,11 @@ lArTPCSD::lArTPCSD(G4String name)
 : G4VSensitiveDetector(name), flArTPCHitsCollection(0), fHCID(0) {
     G4String HCname = name + "_HC";
     collectionName.insert(HCname);
-    G4cout << collectionName.size() << "   lArTPCSD name:  " << name << " collection Name: "
-            << HCname << G4endl;
+    verbose = ConfigurationManager::getInstance()->isEnable_verbose();
+    if (verbose) {
+        G4cout << collectionName.size() << "   lArTPCSD name:  " << name << " collection Name: "
+                << HCname << G4endl;
+    }
     fHCID = -1;
     first = true;
 }
@@ -61,8 +64,10 @@ lArTPCSD::~lArTPCSD() {
 void lArTPCSD::Initialize(G4HCofThisEvent* hce) {
     flArTPCHitsCollection = new lArTPCHitsCollection(SensitiveDetectorName, collectionName[0]);
     if (fHCID < 0) {
-        G4cout << "lArTPCSD::Initialize:  " << SensitiveDetectorName << "   "
-                << collectionName[0] << G4endl;
+        if (verbose) {
+            G4cout << "lArTPCSD::Initialize:  " << SensitiveDetectorName << "   "
+                    << collectionName[0] << G4endl;
+        }
         fHCID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
     }
     hce->AddHitsCollection(fHCID, flArTPCHitsCollection);
@@ -86,12 +91,16 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
         if (first) {
             aMaterial = aTrack->GetMaterial();
             materialIndex = aMaterial->GetIndex();
-            G4cout << "lArTPCSD::ProcessHits initializing Material:  "
-                    << aMaterial->GetName() << " "
-                    << G4endl;
-            G4cout << "lArTPCSD::ProcessHits: Name " << aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() << G4endl;
+            if (verbose) {
+                G4cout << "lArTPCSD::ProcessHits initializing Material:  "
+                        << aMaterial->GetName() << " "
+                        << G4endl;
+                G4cout << "lArTPCSD::ProcessHits: Name " << aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() << G4endl;
+            }
             aMaterialPropertiesTable = aMaterial->GetMaterialPropertiesTable();
-            aMaterialPropertiesTable->DumpTable();
+            if (verbose) {
+                aMaterialPropertiesTable->DumpTable();
+            }
             // 
             // properties related to Scintillation
             //
@@ -112,11 +121,13 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
             Pmin = Rindex->GetMinLowEdgeEnergy();
             Pmax = Rindex->GetMaxLowEdgeEnergy();
             dp = Pmax - Pmin;
-            G4cout << "nMax: " << nMax
-                    << "Pmin: " << Pmin
-                    << "Pmax: " << Pmax
-                    << "dp: " << dp << G4endl;
-            Rindex->DumpValues();
+            if (verbose) {
+                G4cout << "nMax: " << nMax
+                        << "Pmin: " << Pmin
+                        << "Pmax: " << Pmax
+                        << "dp: " << dp << G4endl;
+                Rindex->DumpValues();
+            }
             //
             first = false;
         }
@@ -257,9 +268,9 @@ void lArTPCSD::EndOfEvent(G4HCofThisEvent*) {
     tSphotons = 0;
     tCphotons = 0;
     G4int NbHits = flArTPCHitsCollection->entries();
-    G4cout << " Number of lArTPCHits:  " << NbHits << G4endl;
-    //   std::vector<lArTPCHit*> hitsVector;
-    //   for (G4int i = 0; i < NbHits; i++) hitsVector.push_back((*flArTPCHitsCollection)[i]);
+    if (verbose) {
+        G4cout << " Number of lArTPCHits:  " << NbHits << G4endl;
+    }
 }
 
 double lArTPCSD::NumElectrons(double edep, double ds) {

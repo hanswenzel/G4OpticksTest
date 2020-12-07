@@ -66,26 +66,14 @@ void EventAction::BeginOfEventAction(const G4Event* anEvent) {
 
 void EventAction::EndOfEventAction(const G4Event* event) {
     G4cout << "Event:   " << event->GetEventID() << G4endl;
+    bool verbose = ConfigurationManager::getInstance()->isEnable_verbose();
     G4HCofThisEvent* HCE = event->GetHCofThisEvent();
     assert(HCE);
-    /*
-    size_t numhc = HCE->GetNumberOfCollections();
-    for (size_t i = 0; i < numhc; i++) {
-        G4cout << "HC: " << HCE->GetHC(i)->GetName() << G4endl;
-        std::string junk = HCE->GetHC(i)->GetName();
-        std::string dname = "Photondetector";
-        if (junk.find(dname) != std::string::npos) {
-            G4cout << "Found Photondetector   " << HCE->GetHC(i)->GetName() << G4endl;
-        }
-    }
-    */
     std::vector<G4VHit*> hitsVector;
     std::map<G4String, std::vector<G4VHit* > >* hcmap = CaTSEvt->GetHCMap();
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
 
 #ifdef WITH_OPTICKS
-
-        G4cout << "\n###[ EventAction::EndOfEventAction G4Opticks.propagateOpticalPhotons\n" << G4endl;
         G4Opticks* ok = G4Opticks::Get();
         G4int eventid = event->GetEventID();
         int num_hits = ok->propagateOpticalPhotons(eventid);
@@ -93,14 +81,14 @@ void EventAction::EndOfEventAction(const G4Event* event) {
         NPY<float>* hits = ok->getHits();
         NPho* m_hits = new NPho(hits);
         unsigned m_num_hits = m_hits->getNumPhotons();
-        //hits->save(".", "hits.npy");
-
         assert(hits == NULL || hits->getNumItems() == unsigned(num_hits));
-        G4cout << "EventAction::EndOfEventAction"
-                << " num_hits " << num_hits
-                << "   m_num_hits: " << m_num_hits
-                << " hits " << hits
-                << G4endl;
+        if (verbose) {
+            G4cout << "EventAction::EndOfEventAction"
+                    << " num_hits " << num_hits
+                    << "   m_num_hits: " << m_num_hits
+                    << " hits " << hits
+                    << G4endl;
+        }
         G4ThreeVector position;
         G4ThreeVector direction;
         G4ThreeVector polarization;
@@ -112,22 +100,16 @@ void EventAction::EndOfEventAction(const G4Event* event) {
             position.setZ(double(post.z));
             //position->set(double(post.x), double(post.y), double(post.z));
             G4double time = double(post.w);
-            //        G4cout << "time:  " << time
-            //                << "  X:  " << position.getX() << G4endl;
             glm::vec4 dirw = m_hits->getDirectionWeight(i);
-            //G4ThreeVector * direction = new G4ThreeVector(double(dirw.x), double(dirw.y), double(dirw.z));
             direction.setX(double(dirw.x));
             direction.setY(double(dirw.y));
             direction.setZ(double(dirw.z));
             G4double weight = double(dirw.w);
             glm::vec4 polw = m_hits->getPolarizationWavelength(i);
-            //G4ThreeVector * polarization = new G4ThreeVector(double(polw.x), double(polw.y), double(polw.z));
             polarization.setX(double(polw.x));
             polarization.setY(double(polw.y));
             polarization.setZ(double(polw.z));
             G4double wavelength = double(polw.w);
-            //        G4cout << "wavelength:  " << wavelength
-            //                << "  polX:  " << polarization.getX() << G4endl;
             glm::uvec4 flags = m_hits->getFlags(i);
             G4int flags_x = flags.x;
             G4int flags_y = flags.y;
@@ -149,14 +131,13 @@ void EventAction::EndOfEventAction(const G4Event* event) {
         }
 
         hcmap->insert(std::make_pair("PhotonDetector", hitsVector));
-
-#endif
         ok->reset();
+#endif 
     }
     //
     // Now we deal with The geant4 Hit collections. 
     //
-   // G4cout << "Number of collections:  " << HCE->GetNumberOfCollections() << G4endl;
+    // G4cout << "Number of collections:  " << HCE->GetNumberOfCollections() << G4endl;
 
     for (int i = 0; i < HCE->GetNumberOfCollections(); i++) {
         hitsVector.clear();
@@ -164,7 +145,9 @@ void EventAction::EndOfEventAction(const G4Event* event) {
         G4String hcname = hc->GetName();
         std::vector<std::string> y = split(hcname, '_');
         std::string Classname = y[1];
-         G4cout<< "Classname: " << Classname<<G4endl;
+        if (verbose) {
+            G4cout << "Classname: " << Classname << G4endl;
+        }
         if (Classname == "lArTPC") {
             G4int NbHits = hc->GetSize();
             for (G4int ii = 0; ii < NbHits; ii++) {
@@ -175,7 +158,7 @@ void EventAction::EndOfEventAction(const G4Event* event) {
             hcmap->insert(std::make_pair(hcname, hitsVector));
         } else if (Classname == "Photondetector") {
             G4int NbHits = hc->GetSize();
-            G4cout<< "Photondetector size: " << hc->GetSize()<<G4endl;
+            if (verbose) G4cout << "Photondetector size: " << hc->GetSize() << G4endl;
             for (G4int ii = 0; ii < NbHits; ii++) {
                 G4VHit* hit = hc->GetHit(ii);
                 PhotonHit* Hit = dynamic_cast<PhotonHit*> (hit);
@@ -190,9 +173,5 @@ void EventAction::EndOfEventAction(const G4Event* event) {
         RootIO::GetInstance()->Write(CaTSEvt);
     }
     CaTSEvt->Reset();
-
-    //       G4cout << "\n###] EventAction::EndOfEventAction G4Opticks.propagateOpticalPhotons\n" << G4endl;
-
-
 }
 

@@ -37,5 +37,6 @@ cmake -DCMAKE_BUILD_TYPE=Debug \
 make install
 
 cd ../G4OpticksTest-install/bin
-./G4OpticksTest G4Opticks.gdml muon.mac
+export G4OPTICKS_DEBUG='--rngmax 10'
+time ./G4OpticksTest G4Opticks_5000.gdml muon_IO.mac
 ```

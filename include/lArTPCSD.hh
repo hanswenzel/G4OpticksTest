@@ -24,7 +24,6 @@ class G4HCofThisEvent;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-
 class lArTPCSD : public G4VSensitiveDetector {
 public:
     lArTPCSD(G4String name);
@@ -60,6 +59,9 @@ private:
     G4double nMax;
     bool first;
     bool verbose;
+    int tCphotons;
+    int tSphotons;
+
     double NumElectrons(double e, double ds);
     lArTPCHitsCollection* flArTPCHitsCollection;
     G4int fHCID;

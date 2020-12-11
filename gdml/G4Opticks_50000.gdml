@@ -165,7 +165,7 @@
             <solidref ref="Obj"/>
             <colorref ref="blue"/>
             <auxiliary auxtype="StepLimit" auxvalue="0.4" auxunit="mm"/>
-            <auxiliary auxtype="SensDet" auxvalue="lArTPC"/>
+            <auxiliary auxtype="SensDet" auxvalue="Radiator"/>
             <physvol name="Det1" >
                 <volumeref ref="Det"/>
                 <position name="Det1" unit="mm" x="497.5" y="0" z="0"/>

@@ -38,8 +38,6 @@
 //#include <vector>
 using namespace std;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-int tCphotons;
-int tSphotons;
 
 lArTPCSD::lArTPCSD(G4String name)
 : G4VSensitiveDetector(name), flArTPCHitsCollection(0), fHCID(0) {

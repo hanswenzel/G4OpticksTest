@@ -157,7 +157,6 @@ void DetectorConstruction::ConstructSDandField() {
                                 << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
                     }
                 }
-
             } else if ((*vit).type == "Solid") {
                 if ((*vit).value == "True") {
                     G4VisAttributes * visibility = new G4VisAttributes();

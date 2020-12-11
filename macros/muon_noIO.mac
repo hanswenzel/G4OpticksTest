@@ -1,4 +1,4 @@
-/testConfig/enable_verbose false
+/testConfig/enable_verbose true
 /run/initialize 
 
 #

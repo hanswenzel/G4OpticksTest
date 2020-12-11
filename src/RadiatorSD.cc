@@ -18,14 +18,15 @@
 #include "G4ThreeVector.hh"
 #include "G4SDManager.hh"
 #include "G4ios.hh"
-#include "G4RunManager.hh"
+//#include "G4RunManager.hh"
+#include "G4EventManager.hh"
 #include "G4Event.hh"
 #include "G4Cerenkov.hh"
 #include "G4SteppingManager.hh"
 #include "G4Track.hh"
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
+//#include "G4PhysicalConstants.hh"
 #include "G4VRestDiscreteProcess.hh"
 #ifdef WITH_OPTICKS
 #include "G4Opticks.hh"
@@ -35,14 +36,21 @@
 // project headers
 #include "RadiatorSD.hh"
 #include "ConfigurationManager.hh"
-#define UNUSED(expr) do { (void)(expr); } while (0)
 using namespace std;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//int tCphotons;
-//int tSphotons;
+
 
 RadiatorSD::RadiatorSD(G4String name)
 : G4VSensitiveDetector(name) {
+//    G4String HCname = name + "_HC";
+//    collectionName.insert(HCname);
+//    verbose = ConfigurationManager::getInstance()->isEnable_verbose();
+//    if (verbose) {
+//        G4cout << collectionName.size() << "   RadiatorSD name:  " << name << " collection Name: "
+//                << HCname << G4endl;
+//    }
+//    fHCID = -1;
+    first = true;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -52,8 +60,16 @@ RadiatorSD::~RadiatorSD() {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void RadiatorSD::Initialize(G4HCofThisEvent* hce) {
-    UNUSED(hce); // avoiding unused parameter ‘HCE’ compiler message 
+void RadiatorSD::Initialize(G4HCofThisEvent* ) {
+//    flArTPCHitsCollection = new lArTPCHitsCollection(SensitiveDetectorName, collectionName[0]);
+ //   if (fHCID < 0) {
+ //       if (verbose) {
+ //           G4cout << "RadiatorSD::Initialize:  " << SensitiveDetectorName << "   "
+ //                   << collectionName[0] << G4endl;
+ //       }
+ //       fHCID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
+ //   }
+ //   hce->AddHitsCollection(fHCID, flArTPCHitsCollection);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -61,22 +77,25 @@ void RadiatorSD::Initialize(G4HCofThisEvent* hce) {
 G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     G4double edep = aStep->GetTotalEnergyDeposit();
     if (edep == 0.) return false;
+    // only deal with charged particles
+    G4Track* aTrack = aStep->GetTrack();
+    G4double charge = aTrack->GetDynamicParticle()->GetCharge();
+    if (charge == 0) return false;
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
 #ifdef WITH_OPTICKS
-        // only deal with charged particles
-        G4Track* aTrack = aStep->GetTrack();
-        G4double charge = aTrack->GetDynamicParticle()->GetCharge();
-        if (charge == 0) return false;
-        // G4cout << "Nr of electrons:  " << NumElectrons(edep, ds) << G4endl;
         if (first) {
             aMaterial = aTrack->GetMaterial();
             materialIndex = aMaterial->GetIndex();
-            G4cout << "RadiatorSD::ProcessHits initializing Material:  "
-                    << aMaterial->GetName() << " "
-                    << G4endl;
-            G4cout << "RadiatorSD::ProcessHits: Name " << aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() << G4endl;
+            if (verbose) {
+                G4cout << "RadiatorSD::ProcessHits initializing Material:  "
+                        << aMaterial->GetName() << " "
+                        << G4endl;
+                G4cout << "RadiatorSD::ProcessHits: Name " << aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume()->GetName() << G4endl;
+            }
             aMaterialPropertiesTable = aMaterial->GetMaterialPropertiesTable();
-            aMaterialPropertiesTable->DumpTable();
+            if (verbose) {
+                aMaterialPropertiesTable->DumpTable();
+            }
             // 
             // properties related to Scintillation
             //
@@ -97,11 +116,13 @@ G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
             Pmin = Rindex->GetMinLowEdgeEnergy();
             Pmax = Rindex->GetMaxLowEdgeEnergy();
             dp = Pmax - Pmin;
-            G4cout << "nMax: " << nMax
-                    << "Pmin: " << Pmin
-                    << "Pmax: " << Pmax
-                    << "dp: " << dp << G4endl;
-            Rindex->DumpValues();
+            if (verbose) {
+                G4cout << "nMax: " << nMax
+                        << "Pmin: " << Pmin
+                        << "Pmax: " << Pmax
+                        << "dp: " << dp << G4endl;
+                Rindex->DumpValues();
+            }
             //
             first = false;
         }
@@ -149,8 +170,8 @@ G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
                 }
             }
         }
-        //    tSphotons += Sphotons;
-        //    tCphotons += Cphotons;
+        tSphotons += Sphotons;
+        tCphotons += Cphotons;
 
         //   unsigned opticks_photon_offset = 0;
         const G4DynamicParticle* aParticle = aTrack->GetDynamicParticle();
@@ -237,4 +258,7 @@ G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void RadiatorSD::EndOfEvent(G4HCofThisEvent*) {
+    tSphotons = 0;
+    tCphotons = 0;
 }
+

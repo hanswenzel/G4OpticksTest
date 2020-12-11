@@ -69,8 +69,10 @@ void EventAction::EndOfEventAction(const G4Event* event) {
     bool verbose = ConfigurationManager::getInstance()->isEnable_verbose();
     G4HCofThisEvent* HCE = event->GetHCofThisEvent();
     assert(HCE);
+    //   if (enable_IO) {
     std::vector<G4VHit*> hitsVector;
     std::map<G4String, std::vector<G4VHit* > >* hcmap = CaTSEvt->GetHCMap();
+    //   }
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
 
 #ifdef WITH_OPTICKS
@@ -121,16 +123,19 @@ void EventAction::EndOfEventAction(const G4Event* event) {
             //                << "  cerenkov:  " << is_cerenkov
             //                << "  reemit:  " << is_reemission
             //                << G4endl;
-            hitsVector.push_back(new PhotonHit(i,
-                    0,
-                    wavelength,
-                    time,
-                    position,
-                    direction,
-                    polarization));
+            if (enable_IO) {
+                hitsVector.push_back(new PhotonHit(i,
+                        0,
+                        wavelength,
+                        time,
+                        position,
+                        direction,
+                        polarization));
+            }
         }
-
-        hcmap->insert(std::make_pair("PhotonDetector", hitsVector));
+        if (enable_IO) {
+            hcmap->insert(std::make_pair("PhotonDetector", hitsVector));
+        }
         ok->reset();
 #endif 
     }
@@ -138,38 +143,37 @@ void EventAction::EndOfEventAction(const G4Event* event) {
     // Now we deal with The geant4 Hit collections. 
     //
     // G4cout << "Number of collections:  " << HCE->GetNumberOfCollections() << G4endl;
-
-    for (int i = 0; i < HCE->GetNumberOfCollections(); i++) {
-        hitsVector.clear();
-        G4VHitsCollection* hc = HCE->GetHC(i);
-        G4String hcname = hc->GetName();
-        std::vector<std::string> y = split(hcname, '_');
-        std::string Classname = y[1];
-        if (verbose) {
-            G4cout << "Classname: " << Classname << G4endl;
-        }
-        if (Classname == "lArTPC") {
-            G4int NbHits = hc->GetSize();
-            for (G4int ii = 0; ii < NbHits; ii++) {
-                G4VHit* hit = hc->GetHit(ii);
-                lArTPCHit* Hit = dynamic_cast<lArTPCHit*> (hit);
-                hitsVector.push_back(Hit);
-            }
-            hcmap->insert(std::make_pair(hcname, hitsVector));
-        } else if (Classname == "Photondetector") {
-            G4int NbHits = hc->GetSize();
-            if (verbose) G4cout << "Photondetector size: " << hc->GetSize() << G4endl;
-            for (G4int ii = 0; ii < NbHits; ii++) {
-                G4VHit* hit = hc->GetHit(ii);
-                PhotonHit* Hit = dynamic_cast<PhotonHit*> (hit);
-                hitsVector.push_back(Hit);
-            }
-            hcmap->insert(std::make_pair(hcname, hitsVector));
-        } else {
-            G4cout << "SD type: " << Classname << " unknown" << G4endl;
-        }
-    }
     if (enable_IO) {
+        for (int i = 0; i < HCE->GetNumberOfCollections(); i++) {
+            hitsVector.clear();
+            G4VHitsCollection* hc = HCE->GetHC(i);
+            G4String hcname = hc->GetName();
+            std::vector<std::string> y = split(hcname, '_');
+            std::string Classname = y[1];
+            if (verbose) {
+                G4cout << "Classname: " << Classname << G4endl;
+            }
+            if (Classname == "lArTPC") {
+                G4int NbHits = hc->GetSize();
+                for (G4int ii = 0; ii < NbHits; ii++) {
+                    G4VHit* hit = hc->GetHit(ii);
+                    lArTPCHit* Hit = dynamic_cast<lArTPCHit*> (hit);
+                    hitsVector.push_back(Hit);
+                }
+                hcmap->insert(std::make_pair(hcname, hitsVector));
+            } else if (Classname == "Photondetector") {
+                G4int NbHits = hc->GetSize();
+                if (verbose) G4cout << "Photondetector size: " << hc->GetSize() << G4endl;
+                for (G4int ii = 0; ii < NbHits; ii++) {
+                    G4VHit* hit = hc->GetHit(ii);
+                    PhotonHit* Hit = dynamic_cast<PhotonHit*> (hit);
+                    hitsVector.push_back(Hit);
+                }
+                hcmap->insert(std::make_pair(hcname, hitsVector));
+            } else {
+                G4cout << "SD type: " << Classname << " unknown" << G4endl;
+            }
+        }
         RootIO::GetInstance()->Write(CaTSEvt);
     }
     CaTSEvt->Reset();

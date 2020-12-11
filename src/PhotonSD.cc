@@ -19,14 +19,7 @@
 #include "G4Step.hh"
 #include "G4ThreeVector.hh"
 #include "G4SDManager.hh"
-#include "G4ios.hh"
-#include "G4VVisManager.hh"
 #include "ConfigurationManager.hh"
-#include "G4RunManager.hh"
-#include "G4Event.hh"
-#include "G4UnitsTable.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -96,8 +89,6 @@ G4bool PhotonSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
 void PhotonSD::EndOfEvent(G4HCofThisEvent*) {
     G4int NbHits = fPhotonHitsCollection->entries();
     if (verbose) G4cout << " Number of PhotonHits:  " << NbHits << G4endl;
-    //    std::vector<PhotonHit*> hitsVector;
-    //    for (G4int i = 0; i < NbHits; i++) hitsVector.push_back((*fPhotonHitsCollection)[i]);
 }
 
 double PhotonSD::etolambda(double E) {

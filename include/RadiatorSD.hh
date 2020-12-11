@@ -18,11 +18,11 @@
 #include "G4MaterialPropertiesTable.hh"
 #include "G4PhysicsOrderedFreeVector.hh" 
 #include "G4ScintillationTrackInformation.hh"
+#include "lArTPCHit.hh"
 class G4Step;
 class G4HCofThisEvent;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 
 class RadiatorSD : public G4VSensitiveDetector {
 public:
@@ -58,6 +58,12 @@ private:
     G4double dp;
     G4double nMax;
     bool first;
+    bool verbose;
+    int tCphotons;
+    int tSphotons;
+    //    double NumElectrons(double e, double ds);
+    //    lArTPCHitsCollection* flArTPCHitsCollection;
+    //    G4int fHCID;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

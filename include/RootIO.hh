@@ -1,6 +1,6 @@
 #ifndef ROOTIO_HH
 #define ROOTIO_HH
-
+#ifdef WITH_ROOT
 // Include files
 #include "TROOT.h"
 #include "TFile.h"
@@ -36,5 +36,6 @@ private:
     bool evtinitialized;
     bool treeinitialized;
 };
+#endif /* WITH_ROOT */
 #endif /* ROOTIO_HH */
 

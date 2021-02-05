@@ -20,7 +20,7 @@
 
 #include <cassert>
 
-#ifdef WITH_OPTICKS
+#ifdef WITH_G4OPTICKS
 #include "G4TransportationManager.hh"
 #include "G4Opticks.hh"
 #endif
@@ -33,8 +33,9 @@ RunAction::RunAction()
 }
 
 void RunAction::BeginOfRunAction(const G4Run*) {
+   #ifdef WITH_G4OPTICKS
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
-      //#ifdef WITH_OPTICKS
+      //#ifdef WITH_G4OPTICKS
       //  G4cout << "\n\n###[ RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl;
       //  G4VPhysicalVolume* world = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume();
       //  assert(world);
@@ -43,7 +44,6 @@ void RunAction::BeginOfRunAction(const G4Run*) {
       //  G4Opticks::Get()->setGeometry(world, standardize_geant4_materials);
       //  G4cout << "\n\n###] RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl;
       //#endif
- #ifdef WITH_OPTICKS
      G4cout << "\n\n###[ RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl ;
      G4VPhysicalVolume* world = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume() ;
      assert( world ) ;
@@ -66,17 +66,17 @@ void RunAction::BeginOfRunAction(const G4Run*) {
      }
 
      G4cout << "\n\n###] RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl ;
- #endif	
     }
+#endif	
 }
 
 void RunAction::EndOfRunAction(const G4Run*) {
-    if (ConfigurationManager::getInstance()->isEnable_opticks()) {
-#ifdef WITH_OPTICKS
-        G4cout << "\n\n###[ RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
-        G4Opticks::Finalize();
-        G4cout << "\n\n###] RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
+#ifdef WITH_G4OPTICKS
+  if (ConfigurationManager::getInstance()->isEnable_opticks()) {
+    G4cout << "\n\n###[ RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
+    G4Opticks::Finalize();
+    G4cout << "\n\n###] RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
+  }
 #endif
-    }
 }
 

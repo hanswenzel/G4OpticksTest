@@ -23,52 +23,65 @@ using namespace std;
 
 ConfigurationManagerMessenger::ConfigurationManagerMessenger(ConfigurationManager * mgr1)
 : mgr(mgr1) {
-    testDir = new G4UIdirectory("/testConfig/");
-    testDir->SetGuidance("Examining stepping in geant 4.");
+    testDir = new G4UIdirectory("/G4OpticksTest/");
+    testDir->SetGuidance("Configuring G4OpticksTest");
+    #ifdef WITH_ROOT
     //
-    writeHitsCmd = new G4UIcmdWithABool("/testConfig/writeHits", this);
-    writeHitsCmd->SetGuidance("Set flag for writing hits");
-    writeHitsCmd->SetParameterName("writeHits", true);
-    writeHitsCmd->SetDefaultValue(true);
-    writeHitsCmd->AvailableForStates(G4State_Idle);
-    //    
-    enable_opticksCmd = new G4UIcmdWithABool("/testConfig/enable_opticks", this);
-    enable_opticksCmd->SetGuidance("Set flag for enabling opticks");
-    enable_opticksCmd->SetParameterName("enable_opticks", true);
-    enable_opticksCmd->SetDefaultValue(true);
-    enable_opticksCmd->AvailableForStates(G4State_Idle);
-    //
-    enable_verboseCmd = new G4UIcmdWithABool("/testConfig/enable_verbose", this);
-    enable_verboseCmd->SetGuidance("Set flag for enabling verbose diagnostic printout");
-    enable_verboseCmd->SetParameterName("enable_verbose", true);
-    enable_verboseCmd->SetDefaultValue(true);
-    enable_verboseCmd->AvailableForStates(G4State_PreInit,G4State_Init,G4State_Idle);
-    //
-    FileNameCmd = new G4UIcmdWithAString("/testConfig/FileName", this);
+    FileNameCmd = new G4UIcmdWithAString("/G4OpticksTest/FileName", this);
     FileNameCmd->SetGuidance("Enter file name for Hits collections ");
     FileNameCmd->SetParameterName("FileName", true);
     FileNameCmd->SetDefaultValue("hist.root");
     FileNameCmd->AvailableForStates(G4State_Idle);
+    //
+    writeHitsCmd = new G4UIcmdWithABool("/G4OpticksTest/writeHits", this);
+    writeHitsCmd->SetGuidance("Set flag for writing hits");
+    writeHitsCmd->SetParameterName("writeHits", true);
+    writeHitsCmd->SetDefaultValue(true);
+    writeHitsCmd->AvailableForStates(G4State_Idle);
+    #endif   
+
+    #ifdef WITH_G4OPTICKS
+    //
+    enable_opticksCmd = new G4UIcmdWithABool("/G4OpticksTest/enable_opticks", this);
+    enable_opticksCmd->SetGuidance("Set flag for enabling opticks");
+    enable_opticksCmd->SetParameterName("enable_opticks", true);
+    enable_opticksCmd->SetDefaultValue(true);
+    enable_opticksCmd->AvailableForStates(G4State_Idle);
+    #endif
+    //
+    enable_verboseCmd = new G4UIcmdWithABool("/G4OpticksTest/enable_verbose", this);
+    enable_verboseCmd->SetGuidance("Set flag for enabling verbose diagnostic printout");
+    enable_verboseCmd->SetParameterName("enable_verbose", true);
+    enable_verboseCmd->SetDefaultValue(true);
+    enable_verboseCmd->AvailableForStates(G4State_PreInit,G4State_Init,G4State_Idle);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 ConfigurationManagerMessenger::~ConfigurationManagerMessenger() {
-    delete testDir;
-    delete writeHitsCmd;
-    delete enable_opticksCmd;
-    delete enable_verboseCmd;
-    delete FileNameCmd;
+  delete testDir;
+  #ifdef WITH_ROOT
+  delete writeHitsCmd;
+  delete FileNameCmd;
+  #endif
+  #ifdef WITH_G4OPTICKS
+  delete enable_opticksCmd;
+  #endif
+  delete enable_verboseCmd;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void ConfigurationManagerMessenger::SetNewValue(G4UIcommand* command, G4String newValue) {
+  #ifdef WITH_ROOT
     if (command == writeHitsCmd) mgr->setWriteHits(writeHitsCmd->GetNewBoolValue(newValue));
-    if (command == enable_opticksCmd) mgr->setEnable_opticks(enable_opticksCmd->GetNewBoolValue(newValue));
-    if (command == enable_verboseCmd) mgr->setEnable_verbose(enable_verboseCmd->GetNewBoolValue(newValue));
     if (command == FileNameCmd) mgr->setFileName(newValue);
+    #endif
+    #ifdef WITH_G4OPTICKS
+    if (command == enable_opticksCmd) mgr->setEnable_opticks(enable_opticksCmd->GetNewBoolValue(newValue));
+    #endif
+    if (command == enable_verboseCmd) mgr->setEnable_verbose(enable_verboseCmd->GetNewBoolValue(newValue));
 }
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

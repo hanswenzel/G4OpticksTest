@@ -24,19 +24,21 @@
 #include "G4HCtable.hh"
 #include "G4ThreeVector.hh"
 #include "EventAction.hh"
+
+#include "Ctx.hh"
+#include "ConfigurationManager.hh"
+
+#ifdef WITH_ROOT
 #include "RootIO.hh"
+#endif 
 #include "Event.hh"
 #include <vector> 
-#include "PhotonHit.hh"
-#ifdef WITH_OPTICKS
+#ifdef WITH_G4OPTICKS
 #include "OpticksFlags.hh"
 #include "G4Opticks.hh"
 #include "NPho.hpp"
 #include "NPY.hpp"
 #endif
-
-#include "Ctx.hh"
-#include "ConfigurationManager.hh"
 
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
     std::stringstream ss(s);
@@ -59,9 +61,11 @@ ctx(ctx_) {
 }
 
 void EventAction::BeginOfEventAction(const G4Event* anEvent) {
-    enable_IO = ConfigurationManager::getInstance()->isWriteHits();
-    ctx->setEvent(anEvent);
-    CaTSEvt->SetEventNr(anEvent->GetEventID());
+#ifdef WITH_ROOT
+  enable_IO = ConfigurationManager::getInstance()->isWriteHits();
+#endif  
+  ctx->setEvent(anEvent);
+  CaTSEvt->SetEventNr(anEvent->GetEventID());
 }
 
 void EventAction::EndOfEventAction(const G4Event* event) {
@@ -73,9 +77,10 @@ void EventAction::EndOfEventAction(const G4Event* event) {
     std::vector<G4VHit*> hitsVector;
     std::map<G4String, std::vector<G4VHit* > >* hcmap = CaTSEvt->GetHCMap();
     //   }
+    #ifdef WITH_G4OPTICKS
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
 
-#ifdef WITH_OPTICKS
+      //#ifdef WITH_G4OPTICKS
         G4Opticks* ok = G4Opticks::Get();
         G4int eventid = event->GetEventID();
         int num_hits = ok->propagateOpticalPhotons(eventid);
@@ -123,6 +128,7 @@ void EventAction::EndOfEventAction(const G4Event* event) {
             //                << "  cerenkov:  " << is_cerenkov
             //                << "  reemit:  " << is_reemission
             //                << G4endl;
+#ifdef WITH_ROOT
             if (enable_IO) {
                 hitsVector.push_back(new PhotonHit(i,
                         0,
@@ -132,17 +138,21 @@ void EventAction::EndOfEventAction(const G4Event* event) {
                         direction,
                         polarization));
             }
+#endif
         }
+#ifdef WITH_ROOT	
         if (enable_IO) {
             hcmap->insert(std::make_pair("PhotonDetector", hitsVector));
         }
+#endif	
         ok->reset();
-#endif 
     }
+#endif   
     //
     // Now we deal with The geant4 Hit collections. 
     //
     // G4cout << "Number of collections:  " << HCE->GetNumberOfCollections() << G4endl;
+#ifdef WITH_ROOT
     if (enable_IO) {
         for (int i = 0; i < HCE->GetNumberOfCollections(); i++) {
             hitsVector.clear();
@@ -176,6 +186,8 @@ void EventAction::EndOfEventAction(const G4Event* event) {
         }
         RootIO::GetInstance()->Write(CaTSEvt);
     }
+    
+#endif    
     CaTSEvt->Reset();
 }
 

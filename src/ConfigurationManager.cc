@@ -22,14 +22,26 @@ using namespace std;
 ConfigurationManager* ConfigurationManager::instance = 0;
 
 ConfigurationManager::ConfigurationManager() {
-    confMessenger = new ConfigurationManagerMessenger(this);
-    writeHits = true;       // by default we write hits
-    enable_opticks = true;  // by default we use opticks
-    enable_verbose = false; // by default we run quiet 
-    SDNames = new std::vector<G4String>();
-    FileName="hits.root";
+  confMessenger = new ConfigurationManagerMessenger(this);
+  #ifdef WITH_ROOT
+  FileName="hits.root";
+  writeHits = true;       // by default we write hits
+  #endif
+  #ifdef WITH_G4OPTICKS 
+  enable_opticks = true;  // by default we use opticks
+  #endif 
+  enable_verbose = false; // by default we run quiet 
+  SDNames = new std::vector<G4String>();
+
+}
+#ifdef WITH_ROOT
+void ConfigurationManager::setWriteHits(bool writeHits) {
+    this->writeHits = writeHits;
 }
 
+bool ConfigurationManager::isWriteHits() const {
+    return writeHits;
+}
 void ConfigurationManager::setFileName(G4String FileName) {
     this->FileName = FileName;
 }
@@ -37,6 +49,7 @@ void ConfigurationManager::setFileName(G4String FileName) {
 G4String ConfigurationManager::getFileName() const {
     return FileName;
 }
+#endif
 
 void ConfigurationManager::setEnable_verbose(bool enable_verbose) {
     this->enable_verbose = enable_verbose;
@@ -46,6 +59,7 @@ bool ConfigurationManager::isEnable_verbose() const {
     return enable_verbose;
 }
 
+#ifdef WITH_G4OPTICKS
 void ConfigurationManager::setEnable_opticks(bool enable_opticks) {
     this->enable_opticks = enable_opticks;
 }
@@ -53,14 +67,7 @@ void ConfigurationManager::setEnable_opticks(bool enable_opticks) {
 bool ConfigurationManager::isEnable_opticks() const {
     return enable_opticks;
 }
-
-void ConfigurationManager::setWriteHits(bool writeHits) {
-    this->writeHits = writeHits;
-}
-
-bool ConfigurationManager::isWriteHits() const {
-    return writeHits;
-}
+#endif
 
 ConfigurationManager* ConfigurationManager::getInstance() {
     if (instance == 0) instance = new ConfigurationManager;

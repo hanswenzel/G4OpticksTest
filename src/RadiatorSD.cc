@@ -28,7 +28,7 @@
 #include "G4SystemOfUnits.hh"
 //#include "G4PhysicalConstants.hh"
 #include "G4VRestDiscreteProcess.hh"
-#ifdef WITH_OPTICKS
+#ifdef WITH_G4OPTICKS
 #include "G4Opticks.hh"
 #include "TrackInfo.hh"
 #include "OpticksGenstep.h"
@@ -81,8 +81,9 @@ G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     G4Track* aTrack = aStep->GetTrack();
     G4double charge = aTrack->GetDynamicParticle()->GetCharge();
     if (charge == 0) return false;
+    #ifdef WITH_G4OPTICKS
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
-#ifdef WITH_OPTICKS
+
         if (first) {
             aMaterial = aTrack->GetMaterial();
             materialIndex = aMaterial->GetIndex();
@@ -249,9 +250,8 @@ G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
                     MeanNumberOfPhotons2
                     );
         }
-
-#endif 
     }
+#endif 
     return true;
 }
 

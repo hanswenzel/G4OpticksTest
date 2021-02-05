@@ -31,14 +31,19 @@ public:
     void SetNewValue(G4UIcommand*, G4String);
 
 private:
+  
+  ConfigurationManager* mgr;
+  
+  G4UIdirectory* testDir;
+  #ifdef WITH_ROOT
+  G4UIcmdWithABool* writeHitsCmd;
+  G4UIcmdWithAString* FileNameCmd;
+  #endif
+  #ifdef WITH_G4OPTICKS
+  G4UIcmdWithABool* enable_opticksCmd;
+  #endif  
+  G4UIcmdWithABool* enable_verboseCmd;
 
-    ConfigurationManager* mgr;
-
-    G4UIdirectory* testDir;
-    G4UIcmdWithABool* writeHitsCmd;
-    G4UIcmdWithABool* enable_opticksCmd;
-    G4UIcmdWithABool* enable_verboseCmd;
-    G4UIcmdWithAString* FileNameCmd;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

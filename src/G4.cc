@@ -54,7 +54,7 @@ G4::G4(G4String fname)
 ctx(new Ctx),
 rm(new G4RunManager),
 
-sdn("SD0"),
+//sdn("SD0"),
 //sd(new SensitiveDetector(sdn)),
 dc(new DetectorConstruction(fname)),
 

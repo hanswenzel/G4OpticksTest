@@ -37,13 +37,10 @@ class G4 {
 public:
     G4(G4String fname);
     ~G4();
-    //    void beamOn(int nev);
-
     Ctx* ctx;
     G4RunManager* rm;
-    const char* sdn;
+  //    const char* sdn;
     DetectorConstruction* dc;
-    //DetConOrg* dc;
     G4VModularPhysicsList* pl;
     PrimaryGeneratorAction* ga;
     RunAction* ra;

@@ -27,7 +27,7 @@
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4VRestDiscreteProcess.hh"
-#ifdef WITH_OPTICKS
+#ifdef WITH_G4OPTICKS
 #include "G4Opticks.hh"
 #include "TrackInfo.hh"
 #include "OpticksGenstep.h"
@@ -35,7 +35,6 @@
 // project headers
 #include "lArTPCSD.hh"
 #include "ConfigurationManager.hh"
-//#include <vector>
 using namespace std;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -84,8 +83,8 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     // G4cout << "Nr of electrons:  " << NumElectrons(edep, ds) << G4endl;
     lArTPCHit* newHit = new lArTPCHit(NumElectrons(edep, ds), aStep->GetPostStepPoint()->GetPosition().getX(), aStep->GetPostStepPoint()->GetPosition().getY(), aStep->GetPostStepPoint()->GetPosition().getZ());
     flArTPCHitsCollection->insert(newHit);
+#ifdef WITH_G4OPTICKS
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
-#ifdef WITH_OPTICKS
         if (first) {
             aMaterial = aTrack->GetMaterial();
             materialIndex = aMaterial->GetIndex();
@@ -252,9 +251,8 @@ G4bool lArTPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
                     MeanNumberOfPhotons2
                     );
         }
-
-#endif 
     }
+#endif 
     return true;
 }
 

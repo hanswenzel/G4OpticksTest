@@ -23,7 +23,7 @@
 
 #include "Ctx.hh"
 
-#ifdef WITH_OPTICKS
+#ifdef WITH_G4OPTICKS
 #include "G4Opticks.hh"
 #include "TrackInfo.hh"
 #endif
@@ -66,7 +66,7 @@ void Ctx::setTrack(const G4Track* track) {
   //  _track_optical = particle == G4OpticalPhoton::OpticalPhotonDefinition();
 _track_optical=false;
     _track_pdg_encoding = particle->GetPDGEncoding();
-#ifdef WITH_OPTICKS
+#ifdef WITH_G4OPTICKS
     if (_track_optical) {
         setTrackOptical(track);
     } else {
@@ -92,8 +92,8 @@ _track_optical=false;
               const_cast<G4Track*>(track)->SetTrackStatus(fStopAndKill);
           }
          */
-#endif
     }
+#endif
 }
 
 void Ctx::postTrack(const G4Track* track) {
@@ -115,7 +115,7 @@ void Ctx::postTrack(const G4Track* track) {
 void Ctx::setTrackOptical(const G4Track* track) {
     const_cast<G4Track*> (track)->UseGivenVelocity(true);
 
-#ifdef WITH_OPTICKS
+#ifdef WITH_G4OPTICKS
     TrackInfo* info = dynamic_cast<TrackInfo*> (track->GetUserInformation());
     assert(info);
     _record_id = info->photon_record_id;
@@ -125,7 +125,7 @@ void Ctx::setTrackOptical(const G4Track* track) {
 }
 
 void Ctx::postTrackOptical(const G4Track* track) {
-#ifdef WITH_OPTICKS
+#ifdef WITH_G4OPTICKS
     TrackInfo* info = dynamic_cast<TrackInfo*> (track->GetUserInformation());
     assert(info);
     assert(_record_id == info->photon_record_id);
@@ -152,7 +152,7 @@ void Ctx::setStep(const G4Step* step) {
 
     if (_step_id == 0) _step_origin = pre->GetPosition();
 
-#ifdef WITH_OPTICKS
+#ifdef WITH_G4OPTICKS
     /*
         if(!_track_optical)
         {

@@ -1,3 +1,4 @@
+#ifdef WITH_ROOT
 #include <sstream>
 #include <cstring>
 #include "RootIO.hh"
@@ -71,6 +72,6 @@ void RootIO::Write(Event* fevent) {
 void RootIO::Close() {
     fFile->Close();
 }
-
+#endif
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

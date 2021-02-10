@@ -1,4 +1,3 @@
-
 #include "TROOT.h"
 #include "TFile.h"
 #include "TSystem.h"
@@ -12,21 +11,6 @@
 #include "PhotonHit.hh"
 using namespace std;
 
-/*
-std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim)) {
-        elems.push_back(item);
-    }
-    return elems;
-}
-
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::vector<std::string> elems;
-    return split(s, delim, elems);
-}
- */
 int main(int argc, char** argv) {
     // initialize ROOT
     TSystem ts;
@@ -47,7 +31,6 @@ int main(int argc, char** argv) {
     std::vector<lArTPCHit*>* hits;
     std::vector<PhotonHit*>* hitsp;
     fo.GetListOfKeys()->Print();
-
     Event *event = new Event();
     TTree *Tevt = (TTree*) fo.Get("Events");
     Tevt->SetBranchAddress("event.", &event);
@@ -83,13 +66,5 @@ int main(int argc, char** argv) {
         }
         outfile->Write();
     }
-
-
-
-
-
-
-
-
 }
 

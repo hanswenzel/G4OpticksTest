@@ -29,13 +29,7 @@ if(POLICY CMP0077)  # see note/issues/cmake-3.13.4-FindCUDA-warnings.rst
  find_package( G4OK CONFIG REQUIRED )
 endif()
 
-get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-
-foreach(dir ${dirs})
-  message(STATUS "dir3='${dir}'")
-endforeach()
 if(WITH_ROOT)
-  message(STATUS "WITH ROOT")
   find_package(ROOT REQUIRED)
 
 # ROOT version 6 required
@@ -75,26 +69,14 @@ set(libsuffix .so)
 set(ROOT_LIBRARY_PROPERTIES ${ROOT_LIBRARY_PROPERTIES} SUFFIX ${libsuffix})
 set_target_properties(G4OpticksTestClassesDict PROPERTIES ${ROOT_LIBRARY_PROPERTIES})
 target_link_libraries(G4OpticksTestClassesDict  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
-else()
-   message(STATUS "WITHOUT ROOT")
 endif()
 
-message(STATUS  "OPTICKS_PREFIX='${OPTICKS_PREFIX}'")
-message(STATUS  "CMAKE_CURRENT_LIST_DIR='${CMAKE_CURRENT_LIST_DIR}'")
-message(STATUS  "CMAKE_CURRENT_SOURCE_DIR='${CMAKE_CURRENT_SOURCE_DIR}'")
-get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-foreach(dir ${dirs})
-  message(STATUS "include dir1='${dir}'")
-endforeach()
 
 file(GLOB detectors ${PROJECT_SOURCE_DIR}/gdml/*.gdml)
 file(GLOB schemas ${PROJECT_SOURCE_DIR}/gdml/*.xsd)
 file(GLOB scripts ${PROJECT_SOURCE_DIR}/scripts/*)
 file(GLOB macros ${PROJECT_SOURCE_DIR}/macros/*.mac)
 
-foreach(dir ${Geant4_LIBRARIES})
-  message(STATUS "Geant4 dir='${dir}'")
-endforeach()
 add_executable(${name} ${name}.cc ${sources} ${headers})
 target_compile_definitions( ${name} PRIVATE WITH_G4OPTICKS WITH_ROOT)
 target_link_libraries(${name}  G4OpticksTestClassesDict Opticks::G4OK ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})

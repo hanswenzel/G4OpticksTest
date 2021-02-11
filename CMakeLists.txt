@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 set(name G4OpticksTest)
 project(${name} VERSION 0.1.0)
 
@@ -17,21 +17,23 @@ endif()
 # Setup Geant4 include directories and compile definitions
 #
 include(${Geant4_USE_FILE})
+#----------------------------------------------------------------------------
+# G4OpticksTest requires shared libraries
+#
+if(NOT Geant4_shared_FOUND)
+  message(FATAL_ERROR "G4OpticksTest must use shared libraries")
+endif()
 
 option(WITH_ROOT "Build example with ROOT" ON)
 option(WITH_G4OPTICKS "Build example with OPTICKS" ON)
 
 if(WITH_G4OPTICKS)
 include(OpticksBuildOptions)
-if(POLICY CMP0077)  # see note/issues/cmake-3.13.4-FindCUDA-warnings.rst
-    cmake_policy(SET CMP0077 OLD)
-  endif()
- find_package( G4OK CONFIG REQUIRED )
+find_package( G4OK CONFIG REQUIRED )
 endif()
 
 if(WITH_ROOT)
   find_package(ROOT REQUIRED)
-
 # ROOT version 6 required
 if(ROOT_FOUND)
   STRING(REGEX MATCH "6.*" VERSION6MATCH ${ROOT_VERSION})
@@ -45,21 +47,16 @@ endif()
 if(EXISTS "${ROOT_DIR}/modules/RootNewMacros.cmake")
    include("${ROOT_DIR}/modules/RootNewMacros.cmake")
 endif()
-
-#----------------------------------------------------------------------------
-# G4OpticksTest requires shared libraries
-#
-if(NOT Geant4_shared_FOUND)
-  message(FATAL_ERROR "G4OpticksTest must use shared libraries")
 endif()
+file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
+file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
+if(WITH_ROOT)
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
 #
 include_directories(${PROJECT_SOURCE_DIR}/include
                     ${Geant4_INCLUDE_DIR}
                     ${ROOT_INCLUDE_DIRS})
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
-file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 #----------------------------------------------------------------------------
 # Generate dictionaries, add ROOT libraries properties
 #
@@ -69,8 +66,10 @@ set(libsuffix .so)
 set(ROOT_LIBRARY_PROPERTIES ${ROOT_LIBRARY_PROPERTIES} SUFFIX ${libsuffix})
 set_target_properties(G4OpticksTestClassesDict PROPERTIES ${ROOT_LIBRARY_PROPERTIES})
 target_link_libraries(G4OpticksTestClassesDict  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
+else()
+include_directories(${PROJECT_SOURCE_DIR}/include
+                    ${Geant4_INCLUDE_DIR})
 endif()
-
 
 file(GLOB detectors ${PROJECT_SOURCE_DIR}/gdml/*.gdml)
 file(GLOB schemas ${PROJECT_SOURCE_DIR}/gdml/*.xsd)
@@ -90,7 +89,7 @@ endif()
 install(TARGETS ${name} DESTINATION bin)
 install(FILES ${detectors} ${schemas}  ${scripts} ${macros} DESTINATION bin)
 if(WITH_ROOT)
-  install(TARGETS G4OpticksTestClassesDict DESTINATION bin)
+  install(TARGETS G4OpticksTestClassesDict DESTINATION lib)
   install(TARGETS readHits DESTINATION bin)
-  install(FILES ${PROJECT_BINARY_DIR}/G4OpticksTestClasses_rdict.pcm DESTINATION bin)
+  install(FILES ${PROJECT_BINARY_DIR}/G4OpticksTestClasses_rdict.pcm DESTINATION lib)
 endif()

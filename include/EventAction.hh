@@ -19,8 +19,10 @@
 
 #pragma once
 #include "G4UserEventAction.hh"
+#include <boost/timer/timer.hpp>
 class Ctx;
 class Event;
+using namespace boost::timer;
 
 class EventAction : public G4UserEventAction {
 public:
@@ -31,5 +33,6 @@ public:
     Ctx* ctx;
     bool enable_IO;
 private:
-    Event* CaTSEvt;
+  Event* CaTSEvt;
+  cpu_timer timer;
 };

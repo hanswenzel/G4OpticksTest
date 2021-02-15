@@ -29,11 +29,12 @@
 #include "G4VisExecutive.hh"
 
 
-//#include <boost/timer/timer.hpp>
+#include <boost/timer/timer.hpp>
 //#include <iostream>
 //using namespace boost::timer;
 
 int main(int argc, char** argv) {
+    boost::timer::auto_cpu_timer t;
     bool interactive = false;
     G4UIExecutive* ui = nullptr;
     if (argc < 2) {

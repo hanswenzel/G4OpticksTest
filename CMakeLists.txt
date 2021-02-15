@@ -24,6 +24,13 @@ if(NOT Geant4_shared_FOUND)
   message(FATAL_ERROR "G4OpticksTest must use shared libraries")
 endif()
 
+find_package(Boost REQUIRED COMPONENTS timer)
+if(NOT BOOST_FOUND)
+message(STATUS "${name} BOOST package not found. --> ${name} disabled")
+  return()
+endif()
+
+
 option(WITH_ROOT "Build example with ROOT" ON)
 option(WITH_G4OPTICKS "Build example with OPTICKS" ON)
 
@@ -56,7 +63,8 @@ if(WITH_ROOT)
 #
 include_directories(${PROJECT_SOURCE_DIR}/include
                     ${Geant4_INCLUDE_DIR}
-                    ${ROOT_INCLUDE_DIRS})
+                    ${ROOT_INCLUDE_DIRS}
+		    ${Boost_INCLUDE_DIRS})
 #----------------------------------------------------------------------------
 # Generate dictionaries, add ROOT libraries properties
 #
@@ -65,10 +73,11 @@ add_library(G4OpticksTestClassesDict SHARED ${sources} G4OpticksTestClasses.cxx)
 set(libsuffix .so)
 set(ROOT_LIBRARY_PROPERTIES ${ROOT_LIBRARY_PROPERTIES} SUFFIX ${libsuffix})
 set_target_properties(G4OpticksTestClassesDict PROPERTIES ${ROOT_LIBRARY_PROPERTIES})
-target_link_libraries(G4OpticksTestClassesDict  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
+target_link_libraries(G4OpticksTestClassesDict  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Boost::timer)
 else()
 include_directories(${PROJECT_SOURCE_DIR}/include
-                    ${Geant4_INCLUDE_DIR})
+  ${Geant4_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIRS} )
 endif()
 
 file(GLOB detectors ${PROJECT_SOURCE_DIR}/gdml/*.gdml)
@@ -79,11 +88,11 @@ file(GLOB runscripts ${PROJECT_SOURCE_DIR}/scripts/run.sh  ${PROJECT_SOURCE_DIR}
 
 add_executable(${name} ${name}.cc ${sources} ${headers})
 target_compile_definitions( ${name} PRIVATE WITH_G4OPTICKS WITH_ROOT)
-target_link_libraries(${name}  G4OpticksTestClassesDict Opticks::G4OK ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
+target_link_libraries(${name}  G4OpticksTestClassesDict Opticks::G4OK ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Boost::timer )
 
 if(WITH_ROOT)
 add_executable(readHits readHits.cc  ${sources} ${headers})
-target_link_libraries(readHits G4OpticksTestClassesDict  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
+target_link_libraries(readHits G4OpticksTestClassesDict  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Boost::timer)
 link_directories( ${ROOT_LIBRARY_DIR} )
 endif()
 

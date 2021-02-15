@@ -32,14 +32,15 @@
 #include "RootIO.hh"
 #endif 
 #include "Event.hh"
-#include <vector> 
+#include <vector>
+
 #ifdef WITH_G4OPTICKS
 #include "OpticksFlags.hh"
 #include "G4Opticks.hh"
 #include "NPho.hpp"
 #include "NPY.hpp"
 #endif
-
+using namespace boost::timer;
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
     std::stringstream ss(s);
     std::string item;
@@ -57,7 +58,8 @@ std::vector<std::string> split(const std::string &s, char delim) {
 EventAction::EventAction(Ctx* ctx_)
 :
 ctx(ctx_) {
-    CaTSEvt = new Event();
+  timer.stop();
+  CaTSEvt = new Event();
 }
 
 void EventAction::BeginOfEventAction(const G4Event* anEvent) {
@@ -83,8 +85,10 @@ void EventAction::EndOfEventAction(const G4Event* event) {
       //#ifdef WITH_G4OPTICKS
         G4Opticks* ok = G4Opticks::Get();
         G4int eventid = event->GetEventID();
+	timer.resume();
         int num_hits = ok->propagateOpticalPhotons(eventid);
-
+	timer.stop();
+	std::cout << timer.format() << '\n';
         NPY<float>* hits = ok->getHits();
         NPho* m_hits = new NPho(hits);
         unsigned m_num_hits = m_hits->getNumPhotons();

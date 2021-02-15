@@ -1,17 +1,4 @@
-// -----------------------------------------------------
-//  _    _        _____         _   
-// | |  / \   _ _|_   _|__  ___| |_ 
-// | | / _ \ | '__|| |/ _ \/ __| __|
-// | |/ ___ \| |   | |  __/\__ \ |_ 
-// |_/_/   \_\_|   |_|\___||___/\__|
-//                                  
-// lArTest: A Geant4 application to study and profile  
-//          simulation of physics processes relevant 
-//          to liquid Ar TPCs
-//
-// Author: Hans Wenzel, Fermilab
-// Update: add a gdml interface (S.Y. Jun, Mar. 30, 2017)
-// -----------------------------------------------------
+
 // Geant4 headers
 #include "G4Tubs.hh"
 #include "G4Box.hh"

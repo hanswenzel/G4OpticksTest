@@ -20,14 +20,19 @@
 #pragma once
 
 #include "G4UserRunAction.hh"
-//class Ctx ; 
+#include <boost/timer/timer.hpp>
+using namespace boost::timer;
 
-class  RunAction : public G4UserRunAction
-{
-public: 
-//    RunAction(Ctx* ctx_); 
+
+class RunAction : public G4UserRunAction {
+private:
+    static RunAction* instance;
+    cpu_timer OpticksTimer;
+public:
     RunAction();
     virtual void BeginOfRunAction(const G4Run* run);
     virtual void EndOfRunAction(const G4Run* run);
-  //  Ctx*  ctx ; 
+    static RunAction* getInstance();
+  inline cpu_timer getOpticksTimer(){return OpticksTimer;};
+  
 };

@@ -27,6 +27,7 @@ using namespace boost::timer;
 class EventAction : public G4UserEventAction {
 public:
     EventAction(Ctx* ctx_);
+//       virtual ~EventAction(){ std::cout << timer.format() << '\n';};
     virtual void BeginOfEventAction(const G4Event* anEvent);
     virtual void EndOfEventAction(const G4Event* anEvent);
     Event* GetEvent(){return CaTSEvt;}
@@ -34,5 +35,5 @@ public:
     bool enable_IO;
 private:
   Event* CaTSEvt;
-  cpu_timer timer;
+  //  cpu_timer timer;
 };

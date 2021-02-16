@@ -27,6 +27,7 @@
 
 #include "Ctx.hh"
 #include "ConfigurationManager.hh"
+#include "RunAction.hh"
 
 #ifdef WITH_ROOT
 #include "RootIO.hh"
@@ -58,7 +59,7 @@ std::vector<std::string> split(const std::string &s, char delim) {
 EventAction::EventAction(Ctx* ctx_)
 :
 ctx(ctx_) {
-  timer.stop();
+  //  timer.stop();
   CaTSEvt = new Event();
 }
 
@@ -85,10 +86,12 @@ void EventAction::EndOfEventAction(const G4Event* event) {
       //#ifdef WITH_G4OPTICKS
         G4Opticks* ok = G4Opticks::Get();
         G4int eventid = event->GetEventID();
-	timer.resume();
+	RunAction::getInstance()->getOpticksTimer().resume();
+	//	timer.resume();
         int num_hits = ok->propagateOpticalPhotons(eventid);
-	timer.stop();
-	std::cout << timer.format() << '\n';
+		RunAction::getInstance()->getOpticksTimer().stop();
+		//	timer.stop();
+	//	std::cout << timer.format() << '\n';
         NPY<float>* hits = ok->getHits();
         NPho* m_hits = new NPho(hits);
         unsigned m_num_hits = m_hits->getNumPhotons();

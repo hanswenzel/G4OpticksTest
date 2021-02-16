@@ -27,7 +27,7 @@
 
 #include "RunAction.hh"
 #include "ConfigurationManager.hh"
-
+RunAction* RunAction::instance = 0;
 RunAction::RunAction()
 : G4UserRunAction() {
 }
@@ -44,6 +44,7 @@ void RunAction::BeginOfRunAction(const G4Run*) {
       //  G4Opticks::Get()->setGeometry(world, standardize_geant4_materials);
       //  G4cout << "\n\n###] RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl;
       //#endif
+      //      OpticksTimer
      G4cout << "\n\n###[ RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl ;
      G4VPhysicalVolume* world = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume() ;
      assert( world ) ;
@@ -73,10 +74,15 @@ void RunAction::BeginOfRunAction(const G4Run*) {
 void RunAction::EndOfRunAction(const G4Run*) {
 #ifdef WITH_G4OPTICKS
   if (ConfigurationManager::getInstance()->isEnable_opticks()) {
+    std::cout << OpticksTimer.format() << '\n';
     G4cout << "\n\n###[ RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
     G4Opticks::Finalize();
     G4cout << "\n\n###] RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
+    std::cout << OpticksTimer.format() << '\n';
   }
 #endif
 }
-
+RunAction* RunAction::getInstance() {
+    if (instance == 0) instance = new RunAction;
+    return instance;
+}

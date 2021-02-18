@@ -32,42 +32,12 @@ ConfigurationManager::ConfigurationManager() {
   #endif 
   enable_verbose = false; // by default we run quiet 
   SDNames = new std::vector<G4String>();
-
+  ReferencePhysicsList="FTFP_BERT";
+  EmOption="";
+  enableOpticalConstructor=true;
+  enableNeutronKiller=true;
+  enableStepLimiter=true;
 }
-#ifdef WITH_ROOT
-void ConfigurationManager::setWriteHits(bool writeHits) {
-    this->writeHits = writeHits;
-}
-
-bool ConfigurationManager::isWriteHits() const {
-    return writeHits;
-}
-void ConfigurationManager::setFileName(G4String FileName) {
-    this->FileName = FileName;
-}
-
-G4String ConfigurationManager::getFileName() const {
-    return FileName;
-}
-#endif
-
-void ConfigurationManager::setEnable_verbose(bool enable_verbose) {
-    this->enable_verbose = enable_verbose;
-}
-
-bool ConfigurationManager::isEnable_verbose() const {
-    return enable_verbose;
-}
-
-#ifdef WITH_G4OPTICKS
-void ConfigurationManager::setEnable_opticks(bool enable_opticks) {
-    this->enable_opticks = enable_opticks;
-}
-
-bool ConfigurationManager::isEnable_opticks() const {
-    return enable_opticks;
-}
-#endif
 
 ConfigurationManager* ConfigurationManager::getInstance() {
     if (instance == 0) instance = new ConfigurationManager;

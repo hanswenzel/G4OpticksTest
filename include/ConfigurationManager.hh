@@ -29,10 +29,13 @@ private:
     bool enable_opticks; // use opticks if available
 #endif
     bool enable_verbose; // switch on/off diagnostic printouts
-
+    G4String ReferencePhysicsList;
+    G4String EmOption;
+    bool enableOpticalConstructor;
+    bool enableNeutronKiller;
+    bool enableStepLimiter;
     std::vector<G4String> *SDNames;
     ConfigurationManagerMessenger* confMessenger;
-
 public:
     ConfigurationManager();
     ~ConfigurationManager();
@@ -42,18 +45,81 @@ public:
         return SDNames;
     }
 #ifdef WITH_ROOT
-    void setWriteHits(bool writeHits);
-    bool isWriteHits() const;
-    void setFileName(G4String FileName);
-    G4String getFileName() const;
+
+    inline void setWriteHits(bool writeHits) {
+        this->writeHits = writeHits;
+    }
+
+    inline bool isWriteHits() const {
+        return writeHits;
+    }
+
+    inline void setFileName(G4String FileName) {
+        this->FileName = FileName;
+    }
+
+    inline G4String getFileName() const {
+        return FileName;
+    }
 #endif  
-    void setEnable_verbose(bool enable_verbose);
-    bool isEnable_verbose() const;
+
+    inline void setEnable_verbose(bool enable_verbose) {
+        this->enable_verbose = enable_verbose;
+    };
+
+    inline bool isEnable_verbose() const {
+        return enable_verbose;
+    };
+
+    inline void setEnable_OpticalConstructor(bool enableOpticalConstructor) {
+        this->enableOpticalConstructor = enableOpticalConstructor;
+    };
+
+    inline bool isEnable_OpticalConstructor() const {
+        return enableOpticalConstructor;
+    };
+
+    inline void setEnable_NeutronKiller(bool enableNeutronKiller) {
+        this->enableNeutronKiller = enableNeutronKiller;
+    };
+
+    inline bool isEnable_NeutronKiller() const {
+        return enableNeutronKiller;
+    };
+
+    inline void setEnable_StepLimiter(bool enableStepLimiter) {
+        this->enableStepLimiter = enableStepLimiter;
+    };
+
+    inline bool isEnable_StepLimiter() const {
+        return enableStepLimiter;
+    };
+
+    inline void setReferencePhysicsList(G4String ReferencePhysicsList) {
+        this->ReferencePhysicsList = ReferencePhysicsList;
+    };
+
+    inline G4String getReferencePhysicsList() const {
+        return ReferencePhysicsList;
+    };
+
+    inline void setEmOption(G4String EmOption) {
+        this->EmOption = EmOption;
+    };
+
+    inline G4String getEmOption() const {
+        return EmOption;
+    };
 #ifdef WITH_G4OPTICKS 
-    void setEnable_opticks(bool enable_opticks);
-    bool isEnable_opticks() const;
+
+    inline void setEnable_opticks(bool enable_opticks) {
+        this->enable_opticks = enable_opticks;
+    };
+
+    inline bool isEnable_opticks() const {
+        return enable_opticks;
+    };
 #endif
 };
-
 #endif /* /CONFIGURATIONMANAGER */
 

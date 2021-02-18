@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and 
  * limitations under the License.
  */
-
+#include <stdlib.h>     /* exit, EXIT_FAILURE */
 //
 // Project Headers
 //
@@ -71,7 +71,7 @@ sa(NULL) {
     G4PhysicsConstructorRegistry* g4pcr = G4PhysicsConstructorRegistry::Instance();
     G4PhysListRegistry* g4plr = G4PhysListRegistry::Instance();
 
-    bool verbose= ConfigurationManager::getInstance()->isEnable_verbose();
+    bool verbose = ConfigurationManager::getInstance()->isEnable_verbose();
     if (verbose) {
         G4cout << "Available Physics Constructors:  " << g4pcr->AvailablePhysicsConstructors().size() << G4endl;
         G4cout << "Available Physics Lists:         " << g4plr->AvailablePhysLists().size() << G4endl;
@@ -91,7 +91,12 @@ sa(NULL) {
     }
     g4alt::G4PhysListFactory factory;
     G4VModularPhysicsList* phys = nullptr;
-    G4String physName = "FTFP_BERT+OPTICAL+STEPLIMIT+NEUTRONLIMIT";
+    G4String physName = ConfigurationManager::getInstance()->getReferencePhysicsList();
+    if (ConfigurationManager::getInstance()->isEnable_OpticalConstructor()) physName = physName + "+OPTICAL";
+    if (ConfigurationManager::getInstance()->isEnable_StepLimiter()) physName = physName + "+STEPLIMIT";
+    if (ConfigurationManager::getInstance()->isEnable_NeutronKiller()) physName = physName + "+NEUTRONLIMIT";
+
+    //  G4String physName = "FTFP_BERT+OPTICAL+STEPLIMIT+NEUTRONLIMIT";
     //
     // currently using the Constructor names doesn't work otherwise it would be:
     // G4String physName = "FTFP_BERT+G4OpticalPhysics+G4StepLimiterPhysics";
@@ -100,6 +105,10 @@ sa(NULL) {
     // reference PhysicsList via its name
     if (factory.IsReferencePhysList(physName)) {
         phys = factory.GetReferencePhysList(physName);
+    } else {
+        G4cout << "Not a reference physics list" << G4endl;
+        g4plr->PrintAvailablePhysLists();
+        exit(EXIT_FAILURE);
     }
     /*
         // now add optical physics constructor:

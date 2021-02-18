@@ -24,6 +24,7 @@ int main(int argc, char** argv) {
     TFile* outfile = new TFile(argv[2], "RECREATE");
     outfile->cd();
     TH1F* wl = new TH1F("wl", "wavelength", 100, 0.0, 1000.);
+    TH1F* time = new TH1F("time", "arival time", 100, 0.0, 50.);
     TH2F* pos = new TH2F("position", "position of charge deposit", 100, -5., 5., 400, 0, 500);
     TH2F* pos2 = new TH2F("pposition", "position of Photon Hits", 400, -500., 500., 400, -500, 500);
     TFile fo(argv[1]);
@@ -48,11 +49,13 @@ int main(int argc, char** argv) {
             G4int NbHits = hits.size();
             cout << (*hciter).first << " Number of Hits:  " << NbHits << endl;
 
-            if ((*hciter).first == "Det_Photondetector_HC") {
+            if ((*hciter).first == "PhotonDetector") {
                 for (G4int ii = 0; ii < NbHits; ii++) {
                     PhotonHit* pHit = dynamic_cast<PhotonHit*> (hits[ii]);
-                    wl->Fill(pHit->GetWavelength());   
-                    pos2 ->Fill(pHit->GetPosition().getY(),pHit->GetPosition().getZ());
+                    wl->Fill(pHit->GetWavelength());
+                    time->Fill(pHit->GetTime());
+                    pos2 ->Fill(pHit->GetPosition().getY(), pHit->GetPosition().getZ());
+//                    cout << "wl:  " << pHit->GetWavelength() << " Y:  " << pHit->GetPosition().getY() << "  Z:  " << pHit->GetPosition().getZ() << "  ti:  " << pHit->GetTime() << endl;
                 }
             }
             if ((*hciter).first == "Obj_lArTPC_HC") {

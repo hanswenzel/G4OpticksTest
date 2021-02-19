@@ -95,7 +95,7 @@ sa(NULL) {
     if (ConfigurationManager::getInstance()->isEnable_OpticalConstructor()) physName = physName + "+OPTICAL";
     if (ConfigurationManager::getInstance()->isEnable_StepLimiter()) physName = physName + "+STEPLIMIT";
     if (ConfigurationManager::getInstance()->isEnable_NeutronKiller()) physName = physName + "+NEUTRONLIMIT";
-
+    G4cout<<"***********************"<< physName<<G4endl;
     //  G4String physName = "FTFP_BERT+OPTICAL+STEPLIMIT+NEUTRONLIMIT";
     //
     // currently using the Constructor names doesn't work otherwise it would be:

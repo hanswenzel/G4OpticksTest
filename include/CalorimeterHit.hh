@@ -1,109 +1,100 @@
-// Calorimeter Art Hits  
+#ifndef CalorimeterHit_h
+#define CalorimeterHit_h 1
 
-#ifndef CALORIMETERHIT_HH
-#define CALORIMETERHIT_HH
+#include "G4VHit.hh"
+#include "G4THitsCollection.hh"
+#include "G4Allocator.hh"
+#include "G4ThreeVector.hh"
 
-#include <vector>
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class CalorimeterHit {
-private:
-    int ID;
-    double Edep;
-    double em_Edep;
-    double nonem_Edep;
-    double xpos;
-    double ypos;
-    double zpos;
-    double time;
-
-    // Default constructor
+class CalorimeterHit : public G4VHit {
 public:
+    CalorimeterHit();
+    ~CalorimeterHit();
+    CalorimeterHit(const CalorimeterHit&);
+    const CalorimeterHit& operator=(const CalorimeterHit&);
+    G4bool operator==(const CalorimeterHit&) const;
 
-    CalorimeterHit() {
-    }
+    inline void* operator new(size_t);
+    inline void operator delete(void*);
 
-    // Hide the following from Root
-#ifndef __GCCXML__
+    virtual void Draw();
+    virtual void Print();
 
-    CalorimeterHit(int id, double edep, double emedep, double nonemdep, double xp, double yp, double zp, double t) :
-    ID(id),
-    Edep(edep),
-    em_Edep(emedep),
-    nonem_Edep(nonemdep),
-    xpos(xp),
-    ypos(yp),
-    zpos(zp),
-    time(t) {
-    }
+    CalorimeterHit(unsigned int i,
+            double e,
+            double em,
+            double t,
+            G4ThreeVector p);
 
-    void SetID(int id) {
-        ID = id;
+    inline void SetPosition(G4ThreeVector position) {
+        this->position = position;
     };
 
-    void SetEdep(double de) {
-        Edep = de;
+    inline G4ThreeVector GetPosition() const {
+        return position;
     };
 
-    void Setem_Edep(double de) {
-        em_Edep = de;
+    inline void SetTime(double time) {
+        this->time = time;
     };
 
-    void Setnonem_Edep(double de) {
-        nonem_Edep = de;
-    };
-
-    void SetXpos(double x) {
-        xpos = x;
-    };
-
-    void SetYpos(double y) {
-        xpos = y;
-    };
-
-    void SetZpos(double z) {
-        xpos = z;
-    };
-
-    void SetTime(double t) {
-        time = t;
-    };
-
-    int GetID() const {
-        return ID;
-    };
-
-    double GetEdep() const {
-        return Edep;
-    };
-
-    double GetEdepEM() const {
-        return em_Edep;
-    };
-
-    double GetEdepnonEM() const {
-        return nonem_Edep;
-    };
-
-    double GetXpos() const {
-        return xpos;
-    };
-
-    double GetYpos() const {
-        return ypos;
-    };
-
-    double GetZpos() const {
-        return zpos;
-    };
-
-    double GetTime() const {
+    inline double GetTime() const {
         return time;
     };
 
-#endif
+    inline void SetId(unsigned int id) {
+        this->id = id;
+    };
 
+    inline unsigned int GetId() const {
+        return id;
+    };
+
+    inline void SetEdep(double Edep) {
+        this->Edep = Edep;
+    };
+
+    inline double GetEdep() const {
+        return Edep;
+    };
+
+    inline void Setem_Edep(double em_Edep) {
+        this->em_Edep = em_Edep;
+    };
+
+    inline double Getem_Edep() const {
+        return em_Edep;
+    };
+
+private:
+    unsigned int id;
+    double Edep;
+    double em_Edep;
+    double time;
+    G4ThreeVector position;
 };
 
-typedef std::vector<CalorimeterHit> CalorimeterHitCollection;
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+using CalorimeterHitsCollection = G4THitsCollection<CalorimeterHit>;
+extern G4ThreadLocal G4Allocator<CalorimeterHit>* CalorimeterHitAllocator;
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+inline void* CalorimeterHit::operator new(size_t){
+    if (!CalorimeterHitAllocator) {
+        CalorimeterHitAllocator = new G4Allocator<CalorimeterHit>;
+    }
+    return (void *) CalorimeterHitAllocator->MallocSingle();
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+inline void CalorimeterHit::operator delete(void *aHit) {
+    CalorimeterHitAllocator->FreeSingle((CalorimeterHit*) aHit);
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif

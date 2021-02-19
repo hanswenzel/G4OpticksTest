@@ -4,12 +4,17 @@
 #include "G4ThreeVector.hh"
 #include "G4SDManager.hh"
 #include "G4ios.hh"
-#include "G4VVisManager.hh"
-
+#include "ConfigurationManager.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 CalorimeterSD::CalorimeterSD(G4String name)
-: G4VSensitiveDetector(name) {
+: G4VSensitiveDetector(name), fCalorimeterHitsCollection(0), fHCID(0) {
+    G4String HCname = name + "_HC";
+    collectionName.insert(HCname);
+    G4cout << collectionName.size() << "   CalorimeterSD name:  " << name << " collection Name: "
+            << HCname << G4endl;
+    fHCID = -1;
+    verbose = ConfigurationManager::getInstance()->isEnable_verbose();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -20,34 +25,37 @@ CalorimeterSD::~CalorimeterSD() {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void CalorimeterSD::Initialize(G4HCofThisEvent* HCE) {
-  calorimeterCollection.clear();
+void CalorimeterSD::Initialize(G4HCofThisEvent* hce) {
+    fCalorimeterHitsCollection = new CalorimeterHitsCollection(SensitiveDetectorName, collectionName[0]);
+    if (fHCID < 0) {
+        if (verbose) G4cout << "CalorimeterSD::Initialize:  " << SensitiveDetectorName << "   "
+                << collectionName[0] << G4endl;
+        fHCID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
+    }
+    hce->AddHitsCollection(fHCID, fCalorimeterHitsCollection);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4bool CalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
-    G4double edep = aStep->GetTotalEnergyDeposit() / CLHEP::MeV;
+    double edep = aStep->GetTotalEnergyDeposit() / CLHEP::MeV;
     if (edep == 0.) return false;
-    const G4double time = aStep->GetPreStepPoint()->GetGlobalTime() / CLHEP::ns;
+    double time = aStep->GetPreStepPoint()->GetGlobalTime() / CLHEP::ns;
     const G4VTouchable* touch = aStep->GetPreStepPoint()->GetTouchable();
-    const G4ThreeVector cellpos = touch->GetTranslation();
-    int ID = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetCopyNo();
+    G4ThreeVector cellpos = touch->GetTranslation();
+    unsigned int ID = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetCopyNo();
     //std::cout<<"ID:  "<<ID<<"  Edep:  "<< edep<<std::endl;
     G4Track* theTrack = aStep->GetTrack();
     G4String particleType = theTrack->GetDefinition()->GetParticleName();
     // 
     //  check if this cell has been hit before
-    //
-
-    for (unsigned int j = 0; j < calorimeterCollection.size(); j++) {
-        CalorimeterHit aPreviousHit = calorimeterCollection[j];
-        if (ID == aPreviousHit.GetID()) {
-            aPreviousHit.SetEdep(aStep->GetTotalEnergyDeposit() + aPreviousHit.GetEdep());
+    //fCalorimeterHitsCollection
+    for (unsigned int j = 0; j < fCalorimeterHitsCollection->entries(); j++) {
+        CalorimeterHit* aPreviousHit = (*fCalorimeterHitsCollection)[j];
+        if (ID == aPreviousHit->GetId()) {
+            aPreviousHit->SetEdep(aStep->GetTotalEnergyDeposit() + aPreviousHit->GetEdep());
             if ((particleType == "e+") || (particleType == "gamma") || (particleType == "e-")) {
-                aPreviousHit.Setem_Edep(edep + aPreviousHit.GetEdepEM());
-            } else {
-                aPreviousHit.Setnonem_Edep(edep + aPreviousHit.GetEdepnonEM());
+                aPreviousHit->Setem_Edep(edep + aPreviousHit->Getem_Edep());
             }
             return true;
         }
@@ -55,13 +63,13 @@ G4bool CalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     //
     // otherwise create a new hit:
     //
-    CalorimeterHit newHit;
+    CalorimeterHit* newHit;
     if ((particleType == "e+") || (particleType == "gamma") || (particleType == "e-")) {
-      newHit= CalorimeterHit(ID,edep,edep,0.0,cellpos.x(),cellpos.y(),cellpos.z(),time);
+        newHit = new CalorimeterHit(ID, edep, edep, time, cellpos);
     } else {
-      newHit= CalorimeterHit(ID,edep,0.0,edep,cellpos.x(),cellpos.y(),cellpos.z(),time);
+        newHit = new CalorimeterHit(ID, edep, 0.0, time, cellpos);
     }
-    calorimeterCollection.push_back(newHit);
+    fCalorimeterHitsCollection->insert(newHit);
     return true;
 }
 

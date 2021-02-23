@@ -1,30 +1,12 @@
-/G4OpticksTest/enable_verbose false
+/G4OpticksTest/enable_verbose true
 /run/initialize 
 #
-/process/inactivate Scintillation
-/process/optical/scintillation/verbose 0
-/process/optical/scintillation/setStackPhotons true
-/process/optical/scintillation/setTrackSecondariesFirst true
-#
-# the Cerenkov process is needed even when we run on GPU (to get the number of photons to be produced) but we don't put optical photons on the stack
-#
-/process/inactivate  Cerenkov 
-/process/optical/cerenkov/verbose 0
-/process/optical/cerenkov/setStackPhotons true
-/process/optical/cerenkov/setTrackSecondariesFirst true
-#
-/process/optical/rayleigh/verbose 0
-/process/optical/absorption/verbose 0
-/process/optical/boundary/verbose 0
-#
-/process/inactivate OpAbsorption
-/process/inactivate OpRayleigh
-/process/inactivate OpBoundary
-/process/inactivate OpMieHG
+/G4OpticksTest/enableOpticalConstructor false 
+/run/physicsModified
 #
 /run/initialize 
 /random/setSeeds 7 38 
-/G4OpticksTest/FileName NewHitsG4.root
+/G4OpticksTest/FileName CaloHits.root
 /G4OpticksTest/writeHits true 
 /G4OpticksTest/enable_opticks false
 /gun/particle mu+

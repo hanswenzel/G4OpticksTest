@@ -46,8 +46,7 @@ void PhotonSD::Initialize(G4HCofThisEvent* hce) {
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PhotonSD::~PhotonSD() {
-}
+PhotonSD::~PhotonSD() {}
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4bool PhotonSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {

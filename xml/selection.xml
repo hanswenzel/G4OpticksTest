@@ -7,6 +7,10 @@
 <class name="std::vector<lArTPCHit*>"/>
 <class name="PhotonHit"/>
 <class name="std::vector<PhotonHit*>"/>
+<class name="CalorimeterHit"/>
+<class name="std::vector<CalorimeterHit*>"/>
+<class name="TrackerHit"/>
+<class name="std::vector<TrackerHit*>"/>
 <class name="G4ThreeVector"/>
 <class name="CLHEP::Hep3Vector"/>
 <class name="std::map<G4String, std::vector<G4VHit*> >"/>

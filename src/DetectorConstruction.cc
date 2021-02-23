@@ -34,6 +34,7 @@
 #include "DetectorConstruction.hh"
 #include "TrackerSD.hh"
 #include "lArTPCSD.hh"
+#include "CalorimeterSD.hh"
 #include "RadiatorSD.hh"
 #include "PhotonSD.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -42,7 +43,7 @@ using namespace std;
 DetectorConstruction::DetectorConstruction(G4String fname) {
     gdmlFile = fname;
     sdnames = ConfigurationManager::getInstance()->getSDNames();
-    verbose = ConfigurationManager::getInstance()->isEnable_verbose();
+    //  verbose = ConfigurationManager::getInstance()->isEnable_verbose();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -51,6 +52,10 @@ DetectorConstruction::~DetectorConstruction() {
 }
 
 G4VPhysicalVolume* DetectorConstruction::Construct() {
+    verbose = ConfigurationManager::getInstance()->isEnable_verbose();
+    std::cout << "verbose " << verbose << std::endl;
+    verbose=true;
+       std::cout << "verbose " << verbose << std::endl;
     ReadGDML();
     const G4GDMLAuxMapType* auxmap = parser->GetAuxMap();
     if (verbose) {
@@ -103,6 +108,9 @@ void DetectorConstruction::ConstructSDandField() {
                         << " Value: " << (*vit).value << std::endl;
             }
             if ((*vit).type == "SensDet") {
+                if (verbose) {
+                    std::cout << "Found sensitive Detector: " << (*vit).value << std::endl;
+                }
                 if ((*vit).value == "PhotonDetector") {
                     G4String name = ((*iter).first)->GetName() + "_Photondetector";
                     PhotonSD* aPhotonSD = new PhotonSD(name);
@@ -139,6 +147,16 @@ void DetectorConstruction::ConstructSDandField() {
                     SDman->AddNewDetector(aRadiatorSD);
                     sdnames->push_back(name);
                     ((*iter).first)->SetSensitiveDetector(aRadiatorSD);
+                    if (verbose) {
+                        std::cout << "Attaching sensitive Detector: " << (*vit).value
+                                << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                    }
+                } else if ((*vit).value == "Calorimeter") {
+                    G4String name = ((*iter).first)->GetName() + "_Calorimeter";
+                    CalorimeterSD* aCalorimeterSD = new CalorimeterSD(name);
+                    SDman->AddNewDetector(aCalorimeterSD);
+                    sdnames->push_back(name);
+                    ((*iter).first)->SetSensitiveDetector(aCalorimeterSD);
                     if (verbose) {
                         std::cout << "Attaching sensitive Detector: " << (*vit).value
                                 << " to Volume:  " << ((*iter).first)->GetName() << std::endl;

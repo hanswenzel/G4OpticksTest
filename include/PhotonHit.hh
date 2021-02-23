@@ -10,7 +10,6 @@
 
 class PhotonHit : public G4VHit {
 public:
-
     PhotonHit();
     ~PhotonHit();
     PhotonHit(const PhotonHit&);
@@ -47,7 +46,6 @@ public:
     unsigned GetPid() const;
     void SetId(unsigned id);
     unsigned GetId() const;
-    ;
 
 private:
     unsigned id;

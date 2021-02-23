@@ -44,27 +44,27 @@ public:
         return time;
     };
 
-    inline void SetId(unsigned int id) {
+   inline  void SetId(unsigned int id) {
         this->id = id;
     };
 
-    inline unsigned int GetId() const {
+  inline   unsigned int GetId() const {
         return id;
     };
 
-    inline void SetEdep(double Edep) {
+   inline  void SetEdep(double Edep) {
         this->Edep = Edep;
     };
 
-    inline double GetEdep() const {
+   inline  double GetEdep() const {
         return Edep;
     };
 
-    inline void Setem_Edep(double em_Edep) {
+   inline  void Setem_Edep(double em_Edep) {
         this->em_Edep = em_Edep;
     };
 
-    inline double Getem_Edep() const {
+     double Getem_Edep() const {
         return em_Edep;
     };
 

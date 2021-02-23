@@ -73,6 +73,9 @@ add_library(G4OpticksTestClassesDict SHARED ${sources} G4OpticksTestClasses.cxx)
 set(libsuffix .so)
 set(ROOT_LIBRARY_PROPERTIES ${ROOT_LIBRARY_PROPERTIES} SUFFIX ${libsuffix})
 set_target_properties(G4OpticksTestClassesDict PROPERTIES ${ROOT_LIBRARY_PROPERTIES})
+
+#set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 target_link_libraries(G4OpticksTestClassesDict  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Boost::timer)
 else()
 include_directories(${PROJECT_SOURCE_DIR}/include
@@ -102,7 +105,7 @@ install(FILES ${detectors} DESTINATION bin/gdml)
 install(FILES ${macros} DESTINATION bin/macros)
 install(PROGRAMS ${runscripts}  DESTINATION bin)
 if(WITH_ROOT)
-  install(TARGETS G4OpticksTestClassesDict DESTINATION lib)
+  install(TARGETS G4OpticksTestClassesDict DESTINATION bin)
   install(TARGETS readHits DESTINATION bin)
   install(FILES ${PROJECT_BINARY_DIR}/G4OpticksTestClasses_rdict.pcm DESTINATION lib)
 endif()

@@ -9,6 +9,7 @@
 #include "Event.hh"
 #include "lArTPCHit.hh"
 #include "PhotonHit.hh"
+#include "CalorimeterHit.hh"
 using namespace std;
 
 int main(int argc, char** argv) {
@@ -25,6 +26,7 @@ int main(int argc, char** argv) {
     outfile->cd();
     TH1F* wl = new TH1F("wl", "wavelength", 100, 0.0, 1000.);
     TH1F* time = new TH1F("time", "arival time", 100, 0.0, 50.);
+    TH1F* hedep = new TH1F("energy", "edep", 100, 0.0, 15000.);
     TH2F* pos = new TH2F("position", "position of charge deposit", 100, -5., 5., 400, 0, 500);
     TH2F* pos2 = new TH2F("pposition", "position of Photon Hits", 400, -500., 500., 400, -500, 500);
     TFile fo(argv[1]);
@@ -55,19 +57,26 @@ int main(int argc, char** argv) {
                     wl->Fill(pHit->GetWavelength());
                     time->Fill(pHit->GetTime());
                     pos2 ->Fill(pHit->GetPosition().getY(), pHit->GetPosition().getZ());
-//                    cout << "wl:  " << pHit->GetWavelength() << " Y:  " << pHit->GetPosition().getY() << "  Z:  " << pHit->GetPosition().getZ() << "  ti:  " << pHit->GetTime() << endl;
+                    //                    cout << "wl:  " << pHit->GetWavelength() << " Y:  " << pHit->GetPosition().getY() << "  Z:  " << pHit->GetPosition().getZ() << "  ti:  " << pHit->GetTime() << endl;
+                }
+            }
+            if ((*hciter).first == "CalorimeterVolume_Calorimeter_HC") {
+                for (G4int ii = 0; ii < NbHits; ii++) {
+                    CalorimeterHit* caloHit = dynamic_cast<CalorimeterHit*> (hits[ii]);
+                    const double ed = caloHit->GetEdep();
+                    std::cout << ed << std::endl;
+                    hedep->Fill(ed);
                 }
             }
             if ((*hciter).first == "Obj_lArTPC_HC") {
                 for (G4int ii = 0; ii < NbHits; ii++) {
                     lArTPCHit* tpcHit = dynamic_cast<lArTPCHit*> (hits[ii]);
                     pos->Fill(tpcHit->GetPosY(), tpcHit->GetPosZ());
-
                     //wl->Fill(pHit->GetWavelength());
                 }
             }
         }
-        outfile->Write();
     }
+    outfile->Write();
 }
 

@@ -9,6 +9,8 @@
 
 #include "PhotonHit.hh"
 #include "lArTPCHit.hh"
+#include "TrackerHit.hh"
+#include "CalorimeterHit.hh"
 #include "Event.hh"
 /// Root IO implementation for the persistency example
 
@@ -17,8 +19,6 @@ public:
     virtual ~RootIO();
 
     static RootIO* GetInstance();
- //   void Write(std::vector<lArTPCHit*>*);
- //   void Write(std::vector<PhotonHit*>*);
     void Write(Event*);
 
     void Close();

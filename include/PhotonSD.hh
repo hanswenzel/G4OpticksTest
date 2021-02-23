@@ -27,7 +27,6 @@ class PhotonSD : public G4VSensitiveDetector {
 public:
 
     PhotonSD(G4String);
-
     ~PhotonSD();
 
     void Initialize(G4HCofThisEvent*);

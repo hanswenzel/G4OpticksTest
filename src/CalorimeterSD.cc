@@ -19,9 +19,7 @@ CalorimeterSD::CalorimeterSD(G4String name)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-CalorimeterSD::~CalorimeterSD() {
-
-}
+CalorimeterSD::~CalorimeterSD() {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -74,4 +72,8 @@ G4bool CalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void CalorimeterSD::EndOfEvent(G4HCofThisEvent*) {
+    G4int NbHits = fCalorimeterHitsCollection->entries();
+    if (verbose) G4cout << " Number of CalorimeterHits:  " << NbHits << G4endl;
+}
 

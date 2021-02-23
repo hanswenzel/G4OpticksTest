@@ -42,6 +42,7 @@
 #include "NPY.hpp"
 #endif
 using namespace boost::timer;
+
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
     std::stringstream ss(s);
     std::string item;
@@ -59,16 +60,16 @@ std::vector<std::string> split(const std::string &s, char delim) {
 EventAction::EventAction(Ctx* ctx_)
 :
 ctx(ctx_) {
-  //  timer.stop();
-  CaTSEvt = new Event();
+    //  timer.stop();
+    CaTSEvt = new Event();
 }
 
 void EventAction::BeginOfEventAction(const G4Event* anEvent) {
 #ifdef WITH_ROOT
-  enable_IO = ConfigurationManager::getInstance()->isWriteHits();
+    enable_IO = ConfigurationManager::getInstance()->isWriteHits();
 #endif  
-  ctx->setEvent(anEvent);
-  CaTSEvt->SetEventNr(anEvent->GetEventID());
+    ctx->setEvent(anEvent);
+    CaTSEvt->SetEventNr(anEvent->GetEventID());
 }
 
 void EventAction::EndOfEventAction(const G4Event* event) {
@@ -80,18 +81,18 @@ void EventAction::EndOfEventAction(const G4Event* event) {
     std::vector<G4VHit*> hitsVector;
     std::map<G4String, std::vector<G4VHit* > >* hcmap = CaTSEvt->GetHCMap();
     //   }
-    #ifdef WITH_G4OPTICKS
+#ifdef WITH_G4OPTICKS
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
 
-      //#ifdef WITH_G4OPTICKS
+        //#ifdef WITH_G4OPTICKS
         G4Opticks* ok = G4Opticks::Get();
         G4int eventid = event->GetEventID();
-	RunAction::getInstance()->getOpticksTimer().resume();
-	//	timer.resume();
+        RunAction::getInstance()->getOpticksTimer().resume();
+        //	timer.resume();
         int num_hits = ok->propagateOpticalPhotons(eventid);
-		RunAction::getInstance()->getOpticksTimer().stop();
-		//	timer.stop();
-	//	std::cout << timer.format() << '\n';
+        RunAction::getInstance()->getOpticksTimer().stop();
+        //	timer.stop();
+        //	std::cout << timer.format() << '\n';
         NPY<float>* hits = ok->getHits();
         NPho* m_hits = new NPho(hits);
         unsigned m_num_hits = m_hits->getNumPhotons();
@@ -147,11 +148,11 @@ void EventAction::EndOfEventAction(const G4Event* event) {
             }
 #endif
         }
-#ifdef WITH_ROOT	
+#ifdef WITH_ROOT 
         if (enable_IO) {
             hcmap->insert(std::make_pair("PhotonDetector", hitsVector));
         }
-#endif	
+#endif 
         ok->reset();
     }
 #endif   
@@ -174,8 +175,8 @@ void EventAction::EndOfEventAction(const G4Event* event) {
                 G4int NbHits = hc->GetSize();
                 for (G4int ii = 0; ii < NbHits; ii++) {
                     G4VHit* hit = hc->GetHit(ii);
-                    lArTPCHit* Hit = dynamic_cast<lArTPCHit*> (hit);
-                    hitsVector.push_back(Hit);
+                    lArTPCHit* tpcHit = dynamic_cast<lArTPCHit*> (hit);
+                    hitsVector.push_back(tpcHit);
                 }
                 hcmap->insert(std::make_pair(hcname, hitsVector));
             } else if (Classname == "Photondetector") {
@@ -183,8 +184,26 @@ void EventAction::EndOfEventAction(const G4Event* event) {
                 if (verbose) G4cout << "Photondetector size: " << hc->GetSize() << G4endl;
                 for (G4int ii = 0; ii < NbHits; ii++) {
                     G4VHit* hit = hc->GetHit(ii);
-                    PhotonHit* Hit = dynamic_cast<PhotonHit*> (hit);
-                    hitsVector.push_back(Hit);
+                    PhotonHit* pHit = dynamic_cast<PhotonHit*> (hit);
+                    hitsVector.push_back(pHit);
+                }
+                hcmap->insert(std::make_pair(hcname, hitsVector));
+            } else if (Classname == "Tracker") {
+                G4int NbHits = hc->GetSize();
+                if (verbose) G4cout << "Tracker size: " << hc->GetSize() << G4endl;
+                for (G4int ii = 0; ii < NbHits; ii++) {
+                    G4VHit* hit = hc->GetHit(ii);
+                    TrackerHit* tHit = dynamic_cast<TrackerHit*> (hit);
+                    hitsVector.push_back(tHit);
+                }
+                hcmap->insert(std::make_pair(hcname, hitsVector));
+            } else if (Classname == "Calorimeter") {
+                G4int NbHits = hc->GetSize();
+                if (verbose) G4cout << "Calorimeter size: " << hc->GetSize() << G4endl;
+                for (G4int ii = 0; ii < NbHits; ii++) {
+                    G4VHit* hit = hc->GetHit(ii);
+                    CalorimeterHit* cHit = dynamic_cast<CalorimeterHit*> (hit);
+                    hitsVector.push_back(cHit);
                 }
                 hcmap->insert(std::make_pair(hcname, hitsVector));
             } else {
@@ -193,7 +212,7 @@ void EventAction::EndOfEventAction(const G4Event* event) {
         }
         RootIO::GetInstance()->Write(CaTSEvt);
     }
-    
+
 #endif    
     CaTSEvt->Reset();
 }

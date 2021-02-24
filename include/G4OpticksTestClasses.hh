@@ -31,12 +31,14 @@
 #include "lArTPCHit.hh"
 #include "PhotonHit.hh"
 #include "CalorimeterHit.hh"
+#include "DRCalorimeterHit.hh"
 #include "TrackerHit.hh"
 #include "Event.hh"
 Event e;
 std::vector<PhotonHit*> p;
 std::vector<lArTPCHit*> a;
 std::vector<CalorimeterHit*> c;
+std::vector<DRCalorimeterHit*> d;
 std::vector<TrackerHit*> t;
 std::vector<G4VHit*> vh;
 std::map<G4String, std::vector<G4VHit*> > hcmap; // map of Hit Collections

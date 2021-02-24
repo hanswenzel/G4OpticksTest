@@ -35,6 +35,7 @@
 #include "TrackerSD.hh"
 #include "lArTPCSD.hh"
 #include "CalorimeterSD.hh"
+#include "DRCalorimeterSD.hh"
 #include "RadiatorSD.hh"
 #include "PhotonSD.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -157,6 +158,16 @@ void DetectorConstruction::ConstructSDandField() {
                     SDman->AddNewDetector(aCalorimeterSD);
                     sdnames->push_back(name);
                     ((*iter).first)->SetSensitiveDetector(aCalorimeterSD);
+                    if (verbose) {
+                        std::cout << "Attaching sensitive Detector: " << (*vit).value
+                                << " to Volume:  " << ((*iter).first)->GetName() << std::endl;
+                    }
+                }else if ((*vit).value == "DRCalorimeter") {
+                    G4String name = ((*iter).first)->GetName() + "_DRCalorimeter";
+                    DRCalorimeterSD* aDRCalorimeterSD = new DRCalorimeterSD(name);
+                    SDman->AddNewDetector(aDRCalorimeterSD);
+                    sdnames->push_back(name);
+                    ((*iter).first)->SetSensitiveDetector(aDRCalorimeterSD);
                     if (verbose) {
                         std::cout << "Attaching sensitive Detector: " << (*vit).value
                                 << " to Volume:  " << ((*iter).first)->GetName() << std::endl;

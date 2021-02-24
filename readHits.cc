@@ -10,6 +10,7 @@
 #include "lArTPCHit.hh"
 #include "PhotonHit.hh"
 #include "CalorimeterHit.hh"
+#include "DRCalorimeterHit.hh"
 using namespace std;
 
 int main(int argc, char** argv) {
@@ -25,8 +26,9 @@ int main(int argc, char** argv) {
     TFile* outfile = new TFile(argv[2], "RECREATE");
     outfile->cd();
     TH1F* wl = new TH1F("wl", "wavelength", 100, 0.0, 1000.);
-    TH1F* time = new TH1F("time", "arival time", 100, 0.0, 50.);
+    TH2F* time = new TH2F("time", "arival time vs z ", 100, 0.0, 50., 100, -500., 500.);
     TH1F* hedep = new TH1F("energy", "edep", 100, 0.0, 15000.);
+    TH1F* hnceren = new TH1F("nceren", "nceren", 100, 0.0, 1500000.);
     TH2F* pos = new TH2F("position", "position of charge deposit", 100, -5., 5., 400, 0, 500);
     TH2F* pos2 = new TH2F("pposition", "position of Photon Hits", 400, -500., 500., 400, -500, 500);
     TFile fo(argv[1]);
@@ -55,7 +57,7 @@ int main(int argc, char** argv) {
                 for (G4int ii = 0; ii < NbHits; ii++) {
                     PhotonHit* pHit = dynamic_cast<PhotonHit*> (hits[ii]);
                     wl->Fill(pHit->GetWavelength());
-                    time->Fill(pHit->GetTime());
+                    time->Fill(pHit->GetTime(), pHit->GetPosition().getZ());
                     pos2 ->Fill(pHit->GetPosition().getY(), pHit->GetPosition().getZ());
                     //                    cout << "wl:  " << pHit->GetWavelength() << " Y:  " << pHit->GetPosition().getY() << "  Z:  " << pHit->GetPosition().getZ() << "  ti:  " << pHit->GetTime() << endl;
                 }
@@ -66,6 +68,16 @@ int main(int argc, char** argv) {
                     const double ed = caloHit->GetEdep();
                     std::cout << ed << std::endl;
                     hedep->Fill(ed);
+                }
+            }
+            if ((*hciter).first == "CalorimeterVolume_DRCalorimeter_HC") {
+                for (G4int ii = 0; ii < NbHits; ii++) {
+                    DRCalorimeterHit* drcaloHit = dynamic_cast<DRCalorimeterHit*> (hits[ii]);
+                    const double ed = drcaloHit->GetEdep();
+                    hedep->Fill(ed);
+                    std::cout << ed << std::endl;
+                    hnceren->Fill(drcaloHit->GetNceren());
+                    std::cout << "NCeren:  " << drcaloHit->GetNceren() << std::endl;
                 }
             }
             if ((*hciter).first == "Obj_lArTPC_HC") {

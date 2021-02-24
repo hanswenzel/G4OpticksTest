@@ -592,7 +592,7 @@ CMS TN / 95-184. December 1995.
       <volume name="CalorimeterVolume">
          <materialref ref="PbWO4"/>
          <solidref ref="CalorimeterCell"/>
-	 <auxiliary auxtype="SensDet" auxvalue="Calorimeter"/>
+	 <auxiliary auxtype="SensDet" auxvalue="DRCalorimeter"/>
          <colorref ref="green"/>
       </volume>
     

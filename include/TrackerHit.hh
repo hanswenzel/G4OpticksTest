@@ -1,5 +1,3 @@
-// Calorimeter Art Hits  
-
 #ifndef TRACKERHIT_HH
 #define TRACKERHIT_HH
 #include "G4VHit.hh"

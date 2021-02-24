@@ -1,34 +1,52 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "CalorimeterHit.hh"
+#include "DRCalorimeterHit.hh"
 #include "G4UnitsTable.hh"
 #include "G4VVisManager.hh"
 #include "G4Circle.hh"
 #include "G4Colour.hh"
 #include "G4VisAttributes.hh"
 
-G4ThreadLocal G4Allocator<CalorimeterHit>* CalorimeterHitAllocator = 0;
+G4ThreadLocal G4Allocator<DRCalorimeterHit>* DRCalorimeterHitAllocator = 0;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-CalorimeterHit::CalorimeterHit()
+DRCalorimeterHit::DRCalorimeterHit()
 : G4VHit(),
-id(0),
 Edep(0),
 em_Edep(0),
+Nceren(0),
 time(0),
 position(0) {
 }
 
-CalorimeterHit::CalorimeterHit(unsigned i,
+void DRCalorimeterHit::SetNceren(unsigned int Nceren) {
+    this->Nceren = Nceren;
+}
+
+unsigned int DRCalorimeterHit::GetNceren() const {
+    return Nceren;
+}
+
+void DRCalorimeterHit::SetEm_Edep(double em_Edep) {
+    this->em_Edep = em_Edep;
+}
+
+double DRCalorimeterHit::GetEm_Edep() const {
+    return em_Edep;
+}
+
+DRCalorimeterHit::DRCalorimeterHit(unsigned int i,
         G4double e,
         G4double em,
+        unsigned int nc,
         G4double t,
         G4ThreeVector p) : G4VHit() {
     id = i;
     Edep = e;
     em_Edep = em;
+    Nceren = nc;
     time = t;
     position = p;
 }
@@ -36,26 +54,28 @@ CalorimeterHit::CalorimeterHit(unsigned i,
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-CalorimeterHit::~CalorimeterHit() {
+DRCalorimeterHit::~DRCalorimeterHit() {
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-CalorimeterHit::CalorimeterHit(const CalorimeterHit& right)
+DRCalorimeterHit::DRCalorimeterHit(const DRCalorimeterHit& right)
 : G4VHit() {
     this->id = right.id;
     this->Edep = right.Edep;
     this->em_Edep = right.em_Edep;
+    this->Nceren = right.Nceren;
     this->time = right.time;
     this->position = right.position;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-const CalorimeterHit& CalorimeterHit::operator=(const CalorimeterHit& right) {
+const DRCalorimeterHit& DRCalorimeterHit::operator=(const DRCalorimeterHit& right) {
     this->id = right.id;
     this->Edep = right.Edep;
     this->em_Edep = right.em_Edep;
+    this->Nceren = right.Nceren;
     this->time = right.time;
     this->position = right.position;
     return *this;
@@ -63,13 +83,13 @@ const CalorimeterHit& CalorimeterHit::operator=(const CalorimeterHit& right) {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4bool CalorimeterHit::operator==(const CalorimeterHit& right) const {
+G4bool DRCalorimeterHit::operator==(const DRCalorimeterHit& right) const {
     return (this == &right) ? true : false;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void CalorimeterHit::Draw() {
+void DRCalorimeterHit::Draw() {
     G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
 
     if (pVVisManager) {
@@ -86,7 +106,7 @@ void CalorimeterHit::Draw() {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void CalorimeterHit::Print() {
+void DRCalorimeterHit::Print() {
 
     //    position.
     //    G4ThreeVector position;

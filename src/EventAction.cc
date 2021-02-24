@@ -206,6 +206,15 @@ void EventAction::EndOfEventAction(const G4Event* event) {
                     hitsVector.push_back(cHit);
                 }
                 hcmap->insert(std::make_pair(hcname, hitsVector));
+            } else if (Classname == "DRCalorimeter") {
+                G4int NbHits = hc->GetSize();
+                if (verbose) G4cout << "DRCalorimeter size: " << hc->GetSize() << G4endl;
+                for (G4int ii = 0; ii < NbHits; ii++) {
+                    G4VHit* hit = hc->GetHit(ii);
+                    DRCalorimeterHit* drHit = dynamic_cast<DRCalorimeterHit*> (hit);
+                    hitsVector.push_back(drHit);
+                }
+                hcmap->insert(std::make_pair(hcname, hitsVector));
             } else {
                 G4cout << "SD type: " << Classname << " unknown" << G4endl;
             }

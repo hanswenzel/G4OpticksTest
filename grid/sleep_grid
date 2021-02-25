@@ -1,0 +1,14 @@
+executable = /bin/sleep
+transfer_output = true
+transfer_error = true
+transfer_executable = true
+log = sleep_grid.log.$(Cluster).$(Process)
+notification = NEVER
+output = sleep_grid.out.$(Cluster).$(Process)
+error = sleep_grid.err.$(Cluster).$(Process)
+stream_output = false
+stream_error = false
+ShouldTransferFiles = YES
+WhenToTransferOutput = ON_EXIT
+Arguments = 10000
+queue 5

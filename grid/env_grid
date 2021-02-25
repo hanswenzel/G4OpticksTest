@@ -1,0 +1,13 @@
+executable = /data2/wenzel/gputest10/G4OpticksTest-install/bin/env_grid.sh
+transfer_output = true
+transfer_error = true
+transfer_executable = true
+log = env_grid.log.$(Cluster).$(Process)
+notification = NEVER
+output = env_grid.out.$(Cluster).$(Process)
+error = env_grid.err.$(Cluster).$(Process)
+stream_output = false
+stream_error = false
+ShouldTransferFiles = YES
+WhenToTransferOutput = ON_EXIT
+queue 1

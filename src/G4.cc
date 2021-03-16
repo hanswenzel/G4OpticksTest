@@ -53,9 +53,6 @@ G4::G4(G4String fname)
 :
 ctx(new Ctx),
 rm(new G4RunManager),
-
-//sdn("SD0"),
-//sd(new SensitiveDetector(sdn)),
 dc(new DetectorConstruction(fname)),
 
 
@@ -91,10 +88,20 @@ sa(NULL) {
     }
     g4alt::G4PhysListFactory factory;
     G4VModularPhysicsList* phys = nullptr;
-    G4String physName = ConfigurationManager::getInstance()->getReferencePhysicsList();
-    if (ConfigurationManager::getInstance()->isEnable_OpticalConstructor()) physName = physName + "+OPTICAL";
-    if (ConfigurationManager::getInstance()->isEnable_StepLimiter()) physName = physName + "+STEPLIMIT";
-    if (ConfigurationManager::getInstance()->isEnable_NeutronKiller()) physName = physName + "+NEUTRONLIMIT";
+    
+    G4String physName;
+    char* pList;
+    pList = getenv ("PHYSLIST");
+    if (pList!=NULL)
+      {
+	physName = G4String(pList);
+      } else {
+      physName = "FTFP_BERT+OPTICAL+STEPLIMIT+NEUTRONLIMIT";
+    }
+//    G4String physName = ConfigurationManager::getInstance()->getReferencePhysicsList();
+//  if (ConfigurationManager::getInstance()->isEnable_OpticalConstructor()) physName = physName + "+OPTICAL";
+    // if (ConfigurationManager::getInstance()->isEnable_StepLimiter()) physName = physName + "+STEPLIMIT";
+    //if (ConfigurationManager::getInstance()->isEnable_NeutronKiller()) physName = physName + "+NEUTRONLIMIT";
     G4cout<<"***********************"<< physName<<G4endl;
     //  G4String physName = "FTFP_BERT+OPTICAL+STEPLIMIT+NEUTRONLIMIT";
     //
@@ -137,6 +144,7 @@ sa(NULL) {
     }
     rm->SetUserInitialization(dc);
     rm->SetUserInitialization(phys);
+
     ga = new PrimaryGeneratorAction();
     ra = new RunAction();
     ea = new EventAction(ctx);

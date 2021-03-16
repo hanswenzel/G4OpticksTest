@@ -19,7 +19,6 @@
 
 #pragma once
 #include "G4String.hh"
-//#include "L4Cerenkov.hh"
 class G4RunManager;
 
 class Ctx;
@@ -39,7 +38,6 @@ public:
     ~G4();
     Ctx* ctx;
     G4RunManager* rm;
-  //    const char* sdn;
     DetectorConstruction* dc;
     G4VModularPhysicsList* pl;
     PrimaryGeneratorAction* ga;

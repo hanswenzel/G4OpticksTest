@@ -17,44 +17,40 @@
  * limitations under the License.
  */
 
-
 #include <cassert>
 
 #ifdef WITH_G4OPTICKS
 #include "G4TransportationManager.hh"
 #include "G4Opticks.hh"
 #endif
-
+//
+// Project headers:
+//
+#ifdef WITH_ROOT
+#include "RootIO.hh"
+#endif 
 #include "RunAction.hh"
 #include "ConfigurationManager.hh"
 RunAction* RunAction::instance = 0;
 RunAction::RunAction()
 : G4UserRunAction() {
+  OpticksTimer= new cpu_timer();
+  OpticksTimer->stop();
+  IOTimer = new cpu_timer();
+  IOTimer->stop();
 }
 
 void RunAction::BeginOfRunAction(const G4Run*) {
-   #ifdef WITH_G4OPTICKS
+#ifdef WITH_G4OPTICKS
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
-      //#ifdef WITH_G4OPTICKS
-      //  G4cout << "\n\n###[ RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl;
-      //  G4VPhysicalVolume* world = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume();
-      //  assert(world);
-      //  //bool standardize_geant4_materials = true; // required for alignment 
-      //  bool standardize_geant4_materials = false; // required for alignment 
-      //  G4Opticks::Get()->setGeometry(world, standardize_geant4_materials);
-      //  G4cout << "\n\n###] RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl;
-      //#endif
-      //      OpticksTimer
      G4cout << "\n\n###[ RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl ;
+     OpticksTimer->resume();
      G4VPhysicalVolume* world = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetWorldVolume() ;
      assert( world ) ;
      bool standardize_geant4_materials = false ;   // required for alignment
-
      G4Opticks* g4ok = G4Opticks::Get();
      g4ok->setGeometry(world, standardize_geant4_materials );
-
      const std::vector<G4PVPlacement*>& sensor_placements = g4ok->getSensorPlacements() ;
-     //assert( sensor_placements.size() == 1 );
      G4cout << "sensor_placements.size():  "<<sensor_placements.size()<<G4endl;
      for(unsigned i=0 ; i < sensor_placements.size()  ; i++)
      {
@@ -65,7 +61,7 @@ void RunAction::BeginOfRunAction(const G4Run*) {
          unsigned sensorIndex = 1+i ;  // 1-based
          g4ok->setSensorData( sensorIndex, efficiency_1, efficiency_2, sensor_cat, sensor_identifier );
      }
-
+     OpticksTimer->stop();
      G4cout << "\n\n###] RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl ;
     }
 #endif	
@@ -74,13 +70,22 @@ void RunAction::BeginOfRunAction(const G4Run*) {
 void RunAction::EndOfRunAction(const G4Run*) {
 #ifdef WITH_G4OPTICKS
   if (ConfigurationManager::getInstance()->isEnable_opticks()) {
-    std::cout << OpticksTimer.format() << '\n';
-    G4cout << "\n\n###[ RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
-    G4Opticks::Finalize();
-    G4cout << "\n\n###] RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
-    std::cout << OpticksTimer.format() << '\n';
+     G4cout << "\n\n###[ RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
+     OpticksTimer->resume();
+     G4Opticks::Finalize();
+     OpticksTimer->stop();
+     std::cout <<"Opticks Timer: "<<OpticksTimer->format() << '\n';
+     std::cout <<"IO Timer:      "<<IOTimer->format() << '\n';
+     G4cout << "\n\n###] RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
   }
 #endif
+#ifdef WITH_ROOT
+  if (ConfigurationManager::getInstance()->isWriteHits()) {
+    IOTimer->resume();
+    RootIO::GetInstance()->Close();
+    IOTimer->stop();
+  }
+#endif    
 }
 RunAction* RunAction::getInstance() {
     if (instance == 0) instance = new RunAction;

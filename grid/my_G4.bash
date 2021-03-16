@@ -1,9 +1,9 @@
-#!/bin/csh
+#!/bin/bash
 # 
-# File:   my_G4.csh.csh
+# File:   my_G4.bash
 # Author: wenzel
 #
-# Created on Feb 25, 2021, 10:00:04 AM
+# Created on Feb 27, 2021, 12:32:45 PM
 #
 ############################################################################
 # $1  = Nr of processes
@@ -43,8 +43,10 @@ stream_output = false
 stream_error = false
 ShouldTransferFiles = YES
 WhenToTransferOutput = ON_EXIT
-Arguments = \$(Cluster) \$(Process) ${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9} ${10} ${11}
+globusrsl = (maxwalltime=90000)(jobtype=single)
+Arguments = \$(Cluster) \$(Process) '${2}' '${3}' '${4}' '${5}' '${6}' '${7}' '${8}' '${9}' '${10}' '${11}' 
 
 queue ${1}
 +EOF
-/usr/bin/condor_submit ./run_G4_grid
+
+#condor_submit run_G4_grid

@@ -19,21 +19,19 @@
 
 #pragma once
 #include "G4UserEventAction.hh"
-#include <boost/timer/timer.hpp>
 class Ctx;
 class Event;
-using namespace boost::timer;
 
 class EventAction : public G4UserEventAction {
 public:
-    EventAction(Ctx* ctx_);
-//       virtual ~EventAction(){ std::cout << timer.format() << '\n';};
+  EventAction(Ctx* ctx_);
+  ~EventAction();
+  
     virtual void BeginOfEventAction(const G4Event* anEvent);
     virtual void EndOfEventAction(const G4Event* anEvent);
     Event* GetEvent(){return CaTSEvt;}
     Ctx* ctx;
-    bool enable_IO;
 private:
+  bool enable_IO;
   Event* CaTSEvt;
-  //  cpu_timer timer;
 };

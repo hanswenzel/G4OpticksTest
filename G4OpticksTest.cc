@@ -19,23 +19,23 @@
 #ifdef WITH_G4OPTICKS
 #include "OPTICKS_LOG.hh"
 #endif
-
+// project headers: 
 #include "G4.hh"
 #include "ConfigurationManager.hh"
-
+// Geant4 headers:
 #include "G4UImanager.hh"
 #include "G4Timer.hh"
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
-
-
+// boost headers: 
 #include <boost/timer/timer.hpp>
-//#include <iostream>
-//using namespace boost::timer;
 
 int main(int argc, char** argv) {
     boost::timer::auto_cpu_timer t;
     bool interactive = false;
+    G4String physicsconf;
+    G4String gdmlfile;
+    G4String macrofile;
     G4UIExecutive* ui = nullptr;
     if (argc < 2) {
         G4cout << "Error! Mandatory input file is not specified!" << G4endl;
@@ -53,11 +53,20 @@ int main(int argc, char** argv) {
     if (ConfigurationManager::getInstance()->isEnable_verbose()) {
         G4cout << " gdml file: " << argv[1] << G4endl;
     }
+    
+    for (G4int i = 1; i < argc; i = i + 2) {
+        if (G4String(argv[i]) == "-pl") {
+	  physicsconf = G4String(argv[i+1])
+        } else if (G4String(argv[i]) == "-gdml") {
+	  gdmlfile = G4String(argv[i+1])
+        } else (G4String(argv[i]) == "-macro") {
+	  macrofile = G4String(argv[i+1])
+        } 
+    }
+    
     //start time
     G4Timer *eventTimer = new G4Timer;
     eventTimer->Start();
-    //cpu_timer timer;
-    //    timer.start();
 
     OPTICKS_LOG(argc, argv);
     G4 g(argv[1]);
@@ -80,7 +89,6 @@ int main(int argc, char** argv) {
     }
 
     eventTimer->Stop();
-    //   timer.stop();
 
     double totalCPUTime = eventTimer->GetUserElapsed() + eventTimer->GetSystemElapsed();
     G4int precision_t = G4cout.precision(3);
@@ -90,7 +98,6 @@ int main(int argc, char** argv) {
     G4cout.setf(flags_t);
     G4cout.precision(precision_t);
     delete eventTimer;
-    //    std::cout << timer.format() << '\n';
     return 0;
 }
 

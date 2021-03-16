@@ -18,7 +18,6 @@
  */
 
 #pragma once
-
 #include "G4UserRunAction.hh"
 #include <boost/timer/timer.hpp>
 using namespace boost::timer;
@@ -26,13 +25,15 @@ using namespace boost::timer;
 
 class RunAction : public G4UserRunAction {
 private:
-    static RunAction* instance;
-    cpu_timer OpticksTimer;
-public:
-    RunAction();
-    virtual void BeginOfRunAction(const G4Run* run);
-    virtual void EndOfRunAction(const G4Run* run);
-    static RunAction* getInstance();
-  inline cpu_timer getOpticksTimer(){return OpticksTimer;};
+  static RunAction* instance;
+  cpu_timer* OpticksTimer;
+  cpu_timer* IOTimer;
   
+public:
+  RunAction();
+  virtual void BeginOfRunAction(const G4Run* run);
+  virtual void EndOfRunAction(const G4Run* run);
+  static RunAction* getInstance();
+  inline cpu_timer* getOpticksTimer(){return OpticksTimer;};
+  inline cpu_timer* getIOTimer(){return IOTimer;};
 };

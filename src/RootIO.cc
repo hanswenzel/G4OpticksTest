@@ -4,13 +4,6 @@
 #include "RootIO.hh"
 #include "ConfigurationManager.hh"
 //
-/*
-#include "G4SDManager.hh"
-#include "G4HCofThisEvent.hh"
-#include "G4EventManager.hh"
-#include "G4Event.hh"
- */
-//
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -30,7 +23,6 @@ RootIO::RootIO() : fNevents(0) {
     TTree::SetMaxTreeSize(1000 * Long64_t(2000000000));
     // Create a ROOT Tree and one superbranch
     ftree = new TTree("Events", "ROOT tree containing Hit collections");
-    G4cout << "ftree: " << ftree << G4endl;
     ftree->SetAutoSave(1000000000); // autosave when 1 Gbyte written
     //if (!treeinitialized) {
     Int_t branchStyle = 1;
@@ -65,8 +57,6 @@ void RootIO::Write(Event* fevent) {
     fFile = ftree->GetCurrentFile(); //just in case we switched to a new file
     fnb += ftree->Fill();
     fFile->Write("", TObject::kOverwrite);
-    //    fevts++;
-    //   G4cout << "fnb: " << fnb << "   " << fevts << G4endl;
 }
 
 void RootIO::Close() {

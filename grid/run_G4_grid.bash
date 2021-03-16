@@ -1,9 +1,7 @@
-#!/bin/csh
+#!/bin/bash
 # 
-# File:   run_G4_grid.csh
+# File:   run_G4_grid.bash
 # Author: wenzel
-#
-# Created on Feb 25, 2021, 10:02:31 AM
 #
 # $1 = condor Cluster
 # $2 = condor Process
@@ -18,40 +16,49 @@
 # $11= z-direction
 # $12= GEANT Physics list
 #--------------------------------------------------------------------------- 
-if ($#argv < 12) then
+#echo "Args" "$@"
+echo "Nr of Args" "$#" 
+if [[ "$#" -ne 12 ]]; then
     echo " script needs 12 input variables"
     exit
-endif
+fi
 echo " submitting process "  ${2} "to the grid"
 echo start now
 /bin/date
 pwd
-@ SEED         = $1 + $2
-set Cluster    = $1
-set Process    = $2 
-set Particle   = `echo $3  | sed s/\'//g`
-set Energy     = `echo $4  | sed s/\'//g`
-set NRofEvents = `echo $5  | sed s/\'//g`
-set xposition  = `echo $6  | sed s/\'//g`
-set yposition  = `echo $7  | sed s/\'//g`
-set zposition  = `echo $8  | sed s/\'//g`
-set xdirection = `echo $9  | sed s/\'//g`
-set ydirection = `echo $10 | sed s/\'//g`
-set zdirection = `echo $11 | sed s/\'//g`
-set PHYSLIST   = `echo $12 | sed s/\'//g`
+SEED=$((${1} + ${2})) 
+echo "seed $SEED" 
+Cluster=$1
+Process=$2 
+Particle=${3}
+echo $Cluster
+echo $Process
+echo ${Particle} 
+Energy=${4}
+echo $Energy
+NRofEvents=${5}
+xposition=${6} 
+yposition=${7} 
+zposition=${8}  
+xdirection=${9} 
+ydirection=${10} 
+zdirection=${11} 
+PHYSLIST=${12} 
 #
-set FILENAME=/data2/wenzel/G4_data/PBWO_${PHYSLIST}_${Particle}_${Energy}_${xposition}_${Cluster}_${Process}_hits.root
+FILENAME=/data2/wenzel/G4_data/PBWO_${PHYSLIST}_${Particle}_${Energy}_${xposition}_${Cluster}_${Process}_hits.root
 echo $FILENAME
 echo $PHYSLIST
 echo start
 /bin/date
 cd ${_CONDOR_SCRATCH_DIR} 
-echo Particle ${Particle}
+pwd
+#echo Particle ${Particle}
 printenv
 source /data2/wenzel/gputest10/setup_opticks.sh
-cd /data2/wenzel/gputest10/G4OpticksTest-install/bin
+export LD_LIBRARY_PATH=/data2/wenzel/gputest10/G4OpticksTest-install/bin:$LD_LIBRARY_PATH
+#cd /data2/wenzel/gputest10/G4OpticksTest-install/bin
 
-/bin/cat > pip_IO_DR.mac << EOF+ 
+/bin/cat > pip_IO_DR2.mac << EOF
 /run/initialize 
 #
 #
@@ -63,36 +70,22 @@ cd /data2/wenzel/gputest10/G4OpticksTest-install/bin
 /process/activate  Cerenkov 
 /process/optical/cerenkov/verbose 0
 /process/optical/cerenkov/setStackPhotons false
-#
 /run/physicsModified
 #
 /run/initialize 
-/random/setSeeds ${SEED}
+/random/setSeeds ${SEED} ${SEED}
 /G4OpticksTest/ReferencePhysicsList ${PHYSLIST}
 /G4OpticksTest/FileName ${FILENAME}
 /G4OpticksTest/writeHits true 
 /G4OpticksTest/enable_opticks false
 /gun/particle ${Particle}
 /gun/direction ${xdirection} ${ydirection} ${zdirection}
-/gun/position  ${xposition}  ${yposition}  ${zposition}
+/gun/position  ${xposition}  ${yposition}  ${zposition} cm
 /gun/energy ${Energy} GeV
 /run/beamOn ${NRofEvents}
- EOF+ 
-/bin/cat > /tmp/run_G4.mac << EOF+ 
-/G4/random/randomSeed  ${SEED}
-/G4/RootIO/Filename ${FILENAME}
-/G4/Analysis/Filename ${HISTONAME}
-/tracking/verbose 0
-/gun/particle ${Particle}
-/gun/direction ${xdirection} ${ydirection} ${zdirection}
-/gun/position  ${xposition}  ${yposition}  ${zposition}
-/gun/energy ${Energy} GeV
-/run/beamOn ${NRofEvents}
-EOF+
-
+EOF
 #/bin/more run_G4.mac
-#cp  /grid/app/wenzel/Grid/G4-build-local/vis.mac .
+cp  /data2/wenzel/gputest10/G4OpticksTest/macros/*.mac .
+/data2/wenzel/gputest10/G4OpticksTest-install/bin/G4OpticksTest /data2/wenzel/gputest10/G4OpticksTest-install/bin/crystalcal_pbwo.gdml pip_IO_DR2.mac
 #/grid/app/wenzel/Grid/G4-build-local/G4  /grid/app/wenzel/Grid/G4/gdml/crystalcal_bgo.gdml /tmp/run_G4.mac
-#/bin/date
-
-
+/bin/date

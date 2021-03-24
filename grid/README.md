@@ -12,7 +12,6 @@ The processing consists of the following steps:
 ./my_G4.csh 10 pi+ 2. 1000 0. 0. -400. 0 0 1 QGSP_BERT
 
 the meaning of the parameters is as follows:
-############################################################################
 # $1  = Nr of processes
 # $2  = name of Particle
 # $3  = Energy of Particle

@@ -38,18 +38,6 @@ public:
 
     void UpdateGeometry();
 
-    // calculates the scintillation emission spectrum of  LAr 
-    G4double ArScintillationSpectrum(const G4double k);
-
-    // Calculates the dielectric constant of LAr from the Bideau-Sellmeier formula.
-    // See : A. Bideau-Mehu et al., "Measurement of refractive indices of Ne, Ar,
-    // Kr and Xe ...", J. Quant. Spectrosc. Radiat. Transfer, Vol. 25 (1981), 395
-    G4double LArEpsilon(const G4double lambda);
-
-    // Calculates the refractive index of LAr
-    G4double LArRefIndex(const G4double lam);
-
-
 private:
 
     DetectorConstruction & operator=(const DetectorConstruction &right);

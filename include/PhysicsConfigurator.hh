@@ -19,32 +19,15 @@
 
 #pragma once
 #include "G4String.hh"
-class G4RunManager;
-
-class Ctx;
-class SensitiveDetector;
-class DetectorConstruction;
-class DetConOrg;
-class G4VModularPhysicsList;
-class PrimaryGeneratorAction;
-class RunAction;
-class EventAction;
-class TrackingAction;
-class SteppingAction;
-
-class G4 {
+#include "G4VModularPhysicsList.hh"
+class PhysicsConfigurator {
+private:
+    static PhysicsConfigurator* instance;
 public:
-    G4(G4String fname);
-    ~G4();
-    Ctx* ctx;
-    G4RunManager* rm;
-    DetectorConstruction* dc;
-    G4VModularPhysicsList* pl;
-    PrimaryGeneratorAction* ga;
-    RunAction* ra;
-    EventAction* ea;
-    TrackingAction* ta;
-    SteppingAction* sa;
+    PhysicsConfigurator();
+    G4VModularPhysicsList* Construct(G4String physName);
+    ~PhysicsConfigurator();
+    static PhysicsConfigurator* getInstance();
 };
 
 

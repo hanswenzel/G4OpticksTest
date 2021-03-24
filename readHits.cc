@@ -30,23 +30,26 @@ int main(int argc, char** argv) {
     TFile fo(argv[1]);
     std::vector<lArTPCHit*>* hits;
     std::vector<PhotonHit*>* hitsp;
+//  avoid unused variable warning
+    (void) hits;
+    (void) hitsp;
     fo.GetListOfKeys()->Print();
     Event *event = new Event();
     TTree *Tevt = (TTree*) fo.Get("Events");
     Tevt->SetBranchAddress("event.", &event);
     TBranch* fevtbranch = Tevt->GetBranch("event.");
     Int_t nevent = fevtbranch->GetEntries();
-    bool verbose=false;
-    if(verbose) cout << " Nr. of Events:  " << nevent << endl;
-    double max=0.;
+    bool verbose = false;
+    if (verbose) cout << " Nr. of Events:  " << nevent << endl;
+    double max = 0.;
     double min = 1000000;
-    double nmax=0.;
+    double nmax = 0.;
     double nmin = 1000000000;
     for (Int_t i = 0; i < nevent; i++) {
         fevtbranch->GetEntry(i);
         std::map<G4String, std::vector<G4VHit*> >* hcmap = event->GetHCMap();
         std::map<G4String, std::vector<G4VHit*> >::iterator hciter;
-	//        cout << " Number of Hit collections:  " << hcmap->size() << endl;
+        //        cout << " Number of Hit collections:  " << hcmap->size() << endl;
         for (hciter = hcmap->begin(); hciter != hcmap->end(); hciter++) {
             std::vector<G4VHit*> hits = (*hciter).second;
             //std::vector<G4String> hits;
@@ -55,11 +58,11 @@ int main(int argc, char** argv) {
                 for (G4int ii = 0; ii < NbHits; ii++) {
                     DRCalorimeterHit* drcaloHit = dynamic_cast<DRCalorimeterHit*> (hits[ii]);
                     const double ed = drcaloHit->GetEdep();
-		    if (ed>max) max=ed;
-		    if (ed<min) min=ed;
-                    const unsigned int nceren= drcaloHit->GetNceren();
-		    if (nceren>nmax) nmax=nceren;
-		    if (nceren<nmin) nmin=nceren;
+                    if (ed > max) max = ed;
+                    if (ed < min) min = ed;
+                    const unsigned int nceren = drcaloHit->GetNceren();
+                    if (nceren > nmax) nmax = nceren;
+                    if (nceren < nmin) nmin = nceren;
                 }
             }
         }
@@ -68,24 +71,24 @@ int main(int argc, char** argv) {
     //std::cout << nmax <<"   "<<nmin<<std::endl;
     outfile->cd();
     TH1F* hedep = new TH1F("energy", "edep", 100, min, max);
-    TH1F* hnceren = new TH1F("nceren", "nceren", 100,nmin,nmax);
+    TH1F* hnceren = new TH1F("nceren", "nceren", 100, nmin, nmax);
     for (Int_t i = 0; i < nevent; i++) {
-      fevtbranch->GetEntry(i);
-      std::map<G4String, std::vector<G4VHit*> >* hcmap = event->GetHCMap();
-      std::map<G4String, std::vector<G4VHit*> >::iterator hciter;
-      //cout << " Number of Hit collections:  " << hcmap->size() << endl;
-      for (hciter = hcmap->begin(); hciter != hcmap->end(); hciter++) {
-	std::vector<G4VHit*> hits = (*hciter).second;
-	G4int NbHits = hits.size();
-	
-	if ((*hciter).first == "CalorimeterVolume_DRCalorimeter_HC") {
-	  for (G4int ii = 0; ii < NbHits; ii++) {
-	    DRCalorimeterHit* drcaloHit = dynamic_cast<DRCalorimeterHit*> (hits[ii]);
-	    hedep->Fill(drcaloHit->GetEdep());
-	    hnceren->Fill(drcaloHit->GetNceren());
-	  }
-	}
-      }
+        fevtbranch->GetEntry(i);
+        std::map<G4String, std::vector<G4VHit*> >* hcmap = event->GetHCMap();
+        std::map<G4String, std::vector<G4VHit*> >::iterator hciter;
+        //cout << " Number of Hit collections:  " << hcmap->size() << endl;
+        for (hciter = hcmap->begin(); hciter != hcmap->end(); hciter++) {
+            std::vector<G4VHit*> hits = (*hciter).second;
+            G4int NbHits = hits.size();
+
+            if ((*hciter).first == "CalorimeterVolume_DRCalorimeter_HC") {
+                for (G4int ii = 0; ii < NbHits; ii++) {
+                    DRCalorimeterHit* drcaloHit = dynamic_cast<DRCalorimeterHit*> (hits[ii]);
+                    hedep->Fill(drcaloHit->GetEdep());
+                    hnceren->Fill(drcaloHit->GetNceren());
+                }
+            }
+        }
     }
     hedep->Fit("gaus");
     //hnceren->Fit("gaus");

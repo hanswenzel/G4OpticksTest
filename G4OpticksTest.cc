@@ -19,58 +19,80 @@
 #ifdef WITH_G4OPTICKS
 #include "OPTICKS_LOG.hh"
 #endif
-// project headers: 
-#include "G4.hh"
+// project headers:
+#include "ActionInitialization.hh"
+#include "DetectorConstruction.hh"
+#include "PhysicsConfigurator.hh"
 #include "ConfigurationManager.hh"
 // Geant4 headers:
+#include "G4RunManager.hh"
 #include "G4UImanager.hh"
 #include "G4Timer.hh"
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
+#include "G4VModularPhysicsList.hh"
+#include "G4Version.hh"
 // boost headers: 
 #include <boost/timer/timer.hpp>
 
 int main(int argc, char** argv) {
     boost::timer::auto_cpu_timer t;
     bool interactive = false;
-    G4String physicsconf;
-    G4String gdmlfile;
-    G4String macrofile;
+    G4String physicsconf = "";
+    G4String gdmlfile = "";
+    G4String macrofile = "";
     G4UIExecutive* ui = nullptr;
-    if (argc < 2) {
+    for (G4int i = 1; i < argc; i = i + 2) {
+        if (G4String(argv[i]) == "-gdml") {
+            gdmlfile = argv[i + 1];
+        } else if (G4String(argv[i]) == "-pl") {
+            physicsconf = G4String(argv[i + 1]);
+        } else if (G4String(argv[i]) == "-macro") {
+            macrofile = G4String(argv[i + 1]);
+        }
+    }
+    if (gdmlfile == "") {
         G4cout << "Error! Mandatory input file is not specified!" << G4endl;
         G4cout << G4endl;
         G4cout << G4endl;
-        G4cout << "Usage: lArTest <intput_gdml_file:mandatory>" << G4endl;
+        G4cout << "Usage:  G4OpticksTest -gdml intput_gdml_file:mandatory" << G4endl;
         G4cout << G4endl;
         return -1;
     }
-
-    if (argc == 2) {
+    if (physicsconf == "") {
+        G4cout << "Warning! no physics configuration specified!" << G4endl;
+        G4cout << "Using default FTFP_BERT" << G4endl;
+        physicsconf = "FTFP_BERT";
+        G4cout << G4endl;
+        G4cout << G4endl;
+        G4cout << "Usage:  G4OpticksTest -pl physicsconfiguration" << G4endl;
+        G4cout << G4endl;
+    }
+    if (macrofile == "") {
+        G4cout << "Warning! no macro specified!" << G4endl;
+        G4cout << "assume interactive mode" << G4endl;
         interactive = true;
         ui = new G4UIExecutive(argc, argv);
+        G4cout << G4endl;
+        G4cout << G4endl;
+        G4cout << "Usage:  G4OpticksTest -pl physicsconfiguration" << G4endl;
+        G4cout << G4endl;
     }
-    if (ConfigurationManager::getInstance()->isEnable_verbose()) {
-        G4cout << " gdml file: " << argv[1] << G4endl;
-    }
-    
-    for (G4int i = 1; i < argc; i = i + 2) {
-        if (G4String(argv[i]) == "-pl") {
-	  physicsconf = G4String(argv[i+1])
-        } else if (G4String(argv[i]) == "-gdml") {
-	  gdmlfile = G4String(argv[i+1])
-        } else (G4String(argv[i]) == "-macro") {
-	  macrofile = G4String(argv[i+1])
-        } 
-    }
-    
-    //start time
+//    G4cout << G4VERSION_TAG << G4endl;
+//    G4cout << G4VERSION_NUMBER << G4endl;
     G4Timer *eventTimer = new G4Timer;
     eventTimer->Start();
 
     OPTICKS_LOG(argc, argv);
-    G4 g(argv[1]);
-
+    G4VModularPhysicsList* phys = PhysicsConfigurator::getInstance()->Construct(physicsconf);
+    DetectorConstruction* dc = new DetectorConstruction(gdmlfile);
+    G4RunManager* rm = new G4RunManager();
+    rm->SetUserInitialization(dc);
+    rm->SetUserInitialization(phys);
+    ActionInitialization* actionInitialization = new ActionInitialization();
+    rm->SetUserInitialization(actionInitialization);
+    //
+    //   rm->Initialize();
     G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
     if (interactive) {
@@ -84,8 +106,9 @@ int main(int argc, char** argv) {
     } else {
         // batch mode
         G4String command = "/control/execute ";
-        G4String fileName = argv[2];
-        UImanager->ApplyCommand(command + fileName);
+        //        G4String fileName = argv[2];
+        UImanager->ApplyCommand(command + macrofile);
+        delete ui;
     }
 
     eventTimer->Stop();
@@ -98,6 +121,7 @@ int main(int argc, char** argv) {
     G4cout.setf(flags_t);
     G4cout.precision(precision_t);
     delete eventTimer;
+    delete rm;
     return 0;
 }
 

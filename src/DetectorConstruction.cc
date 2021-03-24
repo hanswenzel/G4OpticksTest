@@ -1,28 +1,18 @@
-
 // Geant4 headers
-#include "G4Tubs.hh"
-#include "G4Box.hh"
-#include "G4LogicalVolume.hh"
-#include "G4PVPlacement.hh"
 #include "G4RunManager.hh"
-#include "G4GeometryManager.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4LogicalVolumeStore.hh"
-#include "G4SolidStore.hh"
 #include "G4StepLimiter.hh"
-#include "G4HadronicProcessStore.hh"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 #include "G4UserLimits.hh"
 #include "G4UnitsTable.hh"
 #include "G4ios.hh"
 #include "G4NistManager.hh"
-#include "G4ParticleTable.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4SDManager.hh"
 #include "globals.hh"
-#include "G4VPhysicalVolume.hh"
 #include "G4ElectricField.hh"
 #include "G4UniformElectricField.hh"
 #include "G4FieldManager.hh"
@@ -236,43 +226,3 @@ void DetectorConstruction::UpdateGeometry() {
     G4RunManager::GetRunManager()->DefineWorldVolume(Construct());
 }
 
-// The following 3 functions are described in
-// https://indico.cern.ch/event/44566/contributions/1101918/attachments/943057/1337650/dipompeo.pdf
-// and references therein
-//
-
-G4double DetectorConstruction::ArScintillationSpectrum(G4double kk) {
-    G4double waveL;
-    waveL = exp(-0.5 * ((kk - 128.0) / (2.929))*((kk - 128.0) / (2.929)));
-    return waveL;
-}
-
-// Calculates the dielectric constant of LAr from the Bideau-Sellmeier formula.
-// See : A. Bideau-Mehu et al., "Measurement of refractive indices of Ne, Ar,
-// Kr and Xe ...", J. Quant. Spectrosc. Radiat. Transfer, Vol. 25 (1981), 395
-
-G4double DetectorConstruction::LArEpsilon(const G4double lambda) {
-    G4double epsilon;
-    G4double lowLambda = 110.0; // lowLambda in  nanometer
-    if (lambda < lowLambda) return 1.0e4; // lambda MUST be > 110.0 nm
-    epsilon = lambda / 1000; // switch to micrometers
-    epsilon = 1.0 / (epsilon * epsilon); // 1 / (lambda)^2
-    epsilon = 1.2055e-2 * (0.2075 / (91.012 - epsilon) +
-            0.0415 / (87.892 - epsilon) +
-            4.3330 / (214.02 - epsilon));
-    epsilon *= (8. / 12.); // Bideau-Sellmeier -> Clausius-Mossotti
-    G4double GArRho = 0.001784; // density in g/cm3
-    G4double LArRho = 1.3954; // density in g/cm3
-    epsilon *= (LArRho / GArRho); // density correction (Ar gas -> LAr liquid)
-    if (epsilon < 0.0 || epsilon > 0.999999) return 4.0e6;
-    epsilon = (1.0 + 2.0 * epsilon) / (1.0 - epsilon); // solve Clausius-Mossotti
-    return epsilon;
-}
-//
-// Calculates the refractive index of LAr
-//
-
-G4double DetectorConstruction::LArRefIndex(const G4double lambda) {
-    return ( sqrt(LArEpsilon(lambda))); // square root of dielectric constant
-}
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

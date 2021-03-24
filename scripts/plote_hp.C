@@ -155,13 +155,13 @@ void plote()
   FTFP_BERT_HP_71_Edep_gr->SetMarkerColor(kMagenta);
   FTFP_BERT_HP_71_Edep_gr->SetLineColor(kMagenta);
   FTFP_BERT_HP_71_Edep_gr->SetMarkerStyle(23);
-  //  mg->Add( FTFP_BERT_HP_71_Edep_gr);
-  //leg->AddEntry(FTFP_BERT_HP_71_Edep_gr,"#pi^{+} FTFP_BERT_HP Geant4.10.7.p01");
+  mg->Add( FTFP_BERT_HP_71_Edep_gr);
+  leg->AddEntry(FTFP_BERT_HP_71_Edep_gr,"#pi^{+} FTFP_BERT_HP Geant4.10.7.p01");
   //
   mg->GetXaxis()->SetTitle("Ekin [GeV]");
   mg->GetYaxis()->SetTitle("relative difference (Edep-Eavail/Eavail) [%]");
   mg->SetMinimum(-20.);
-  mg->SetMaximum(20.);
+  mg->SetMaximum(40.);
   mg->Draw("lap");
   leg->Draw();
   c1->Update();

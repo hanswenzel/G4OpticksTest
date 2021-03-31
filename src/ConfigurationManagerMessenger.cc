@@ -54,7 +54,7 @@ ConfigurationManagerMessenger::ConfigurationManagerMessenger(ConfigurationManage
     enable_verboseCmd->SetParameterName("enable_verbose", true);
     enable_verboseCmd->SetDefaultValue(true);
     enable_verboseCmd->AvailableForStates(G4State_PreInit, G4State_Init, G4State_Idle);
-
+/*
     ReferencePhysicsListCmd = new G4UIcmdWithAString("/G4OpticksTest/ReferencePhysicsList", this);
     ReferencePhysicsListCmd->SetGuidance("Enter name of Reference Physics List");
     ReferencePhysicsListCmd->SetParameterName("ReferencePhysicsList", true);
@@ -84,7 +84,7 @@ ConfigurationManagerMessenger::ConfigurationManagerMessenger(ConfigurationManage
     enableStepLimiterCmd->SetParameterName("enableStepLimiter", true);
     enableStepLimiterCmd->SetDefaultValue(true);
     enableStepLimiterCmd->AvailableForStates(G4State_PreInit, G4State_Init, G4State_Idle);
-
+*/
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -99,11 +99,13 @@ ConfigurationManagerMessenger::~ConfigurationManagerMessenger() {
     delete enable_opticksCmd;
 #endif
     delete enable_verboseCmd;
+    /*
     delete ReferencePhysicsListCmd;
     delete EmOptionCmd;
     delete enableOpticalConstructorCmd;
     delete enableNeutronKillerCmd;
     delete enableStepLimiterCmd;
+     */
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

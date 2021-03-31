@@ -32,11 +32,13 @@ ConfigurationManager::ConfigurationManager() {
   #endif 
   enable_verbose = false; // by default we run quiet 
   SDNames = new std::vector<G4String>();
+/*
   ReferencePhysicsList="FTFP_BERT";
   EmOption="";
   enableOpticalConstructor=true;
   enableNeutronKiller=true;
   enableStepLimiter=true;
+ */
 }
 
 ConfigurationManager* ConfigurationManager::getInstance() {

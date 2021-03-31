@@ -61,9 +61,6 @@ private:
     bool verbose;
     int tCphotons;
     int tSphotons;
-    //    double NumElectrons(double e, double ds);
-    //    lArTPCHitsCollection* flArTPCHitsCollection;
-    //    G4int fHCID;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

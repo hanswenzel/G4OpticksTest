@@ -1,6 +1,7 @@
 #include "ActionInitialization.hh"
 #include "PrimaryGeneratorAction.hh"
 #include "RunAction.hh"
+#include "StackingAction.hh"
 #include "EventAction.hh"
 #include "SteppingAction.hh"
 #include "TrackingAction.hh"
@@ -19,6 +20,8 @@ void ActionInitialization::BuildForMaster() const {
 void ActionInitialization::Build() const {
     SetUserAction(new PrimaryGeneratorAction);
     SetUserAction(new RunAction);
+    SetUserAction(new StackingAction);
+
     Ctx* ctx = new Ctx();
     EventAction* eventAction = new EventAction(ctx);
     TrackingAction* ta = new TrackingAction(ctx);

@@ -31,8 +31,8 @@ int main(int argc, char** argv) {
     std::vector<lArTPCHit*>* hits;
     std::vector<PhotonHit*>* hitsp;
 //  avoid unused variable warning
-    (void) hits;
-    (void) hitsp;
+//    (void) hits;
+//    (void) hitsp;
     fo.GetListOfKeys()->Print();
     Event *event = new Event();
     TTree *Tevt = (TTree*) fo.Get("Events");

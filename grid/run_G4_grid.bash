@@ -54,8 +54,8 @@ cd ${_CONDOR_SCRATCH_DIR}
 pwd
 #echo Particle ${Particle}
 printenv
-source /data2/wenzel/gputest10/setup_opticks.sh
-export LD_LIBRARY_PATH=/data2/wenzel/gputest10/G4OpticksTest-install/bin:$LD_LIBRARY_PATH
+source /data2/wenzel/gputest1_10.7.p01/setup_opticks.sh
+export LD_LIBRARY_PATH=/data2/wenzel/gputest1_10.7.p01/G4OpticksTest-install/bin/:$LD_LIBRARY_PATH
 #cd /data2/wenzel/gputest10/G4OpticksTest-install/bin
 
 /bin/cat > pip_IO_DR2.mac << EOF
@@ -74,7 +74,6 @@ export LD_LIBRARY_PATH=/data2/wenzel/gputest10/G4OpticksTest-install/bin:$LD_LIB
 #
 /run/initialize 
 /random/setSeeds ${SEED} ${SEED}
-/G4OpticksTest/ReferencePhysicsList ${PHYSLIST}
 /G4OpticksTest/FileName ${FILENAME}
 /G4OpticksTest/writeHits true 
 /G4OpticksTest/enable_opticks false
@@ -85,7 +84,6 @@ export LD_LIBRARY_PATH=/data2/wenzel/gputest10/G4OpticksTest-install/bin:$LD_LIB
 /run/beamOn ${NRofEvents}
 EOF
 #/bin/more run_G4.mac
-cp  /data2/wenzel/gputest10/G4OpticksTest/macros/*.mac .
-/data2/wenzel/gputest10/G4OpticksTest-install/bin/G4OpticksTest /data2/wenzel/gputest10/G4OpticksTest-install/bin/crystalcal_pbwo.gdml pip_IO_DR2.mac
-#/grid/app/wenzel/Grid/G4-build-local/G4  /grid/app/wenzel/Grid/G4/gdml/crystalcal_bgo.gdml /tmp/run_G4.mac
+cp  /data2/wenzel/gputest1_10.7.p01/G4OpticksTest/macros/*.mac .
+/data2/wenzel/gputest1_10.7.p01/G4OpticksTest-install/bin/G4OpticksTest -gdml /data2/wenzel/gputest10/G4OpticksTest-install/bin/crystalcal_pbwo.gdml -pl ${PHYSLIST} -macro pip_IO_DR2.mac
 /bin/date

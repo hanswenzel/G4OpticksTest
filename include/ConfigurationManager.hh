@@ -29,11 +29,11 @@ private:
     bool enable_opticks; // use opticks if available
 #endif
     bool enable_verbose; // switch on/off diagnostic printouts
-    G4String ReferencePhysicsList;
-    G4String EmOption;
-    bool enableOpticalConstructor;
-    bool enableNeutronKiller;
-    bool enableStepLimiter;
+    //G4String ReferencePhysicsList;
+    //G4String EmOption;
+    //bool enableOpticalConstructor;
+    //bool enableNeutronKiller;
+    //bool enableStepLimiter;
     std::vector<G4String> *SDNames;
     ConfigurationManagerMessenger* confMessenger;
 public:
@@ -70,7 +70,7 @@ public:
     inline bool isEnable_verbose() const {
         return enable_verbose;
     };
-
+/*
     inline void setEnable_OpticalConstructor(bool enableOpticalConstructor) {
         this->enableOpticalConstructor = enableOpticalConstructor;
     };
@@ -110,6 +110,7 @@ public:
     inline G4String getEmOption() const {
         return EmOption;
     };
+ */
 #ifdef WITH_G4OPTICKS 
 
     inline void setEnable_opticks(bool enable_opticks) {

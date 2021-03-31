@@ -39,11 +39,6 @@ private:
     G4UIcmdWithABool* enable_opticksCmd;
 #endif  
     G4UIcmdWithABool* enable_verboseCmd;
-    G4UIcmdWithAString* ReferencePhysicsListCmd;
-    G4UIcmdWithAString* EmOptionCmd;
-    G4UIcmdWithABool* enableOpticalConstructorCmd;
-    G4UIcmdWithABool* enableNeutronKillerCmd;
-    G4UIcmdWithABool* enableStepLimiterCmd;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

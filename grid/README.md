@@ -45,7 +45,7 @@ an example how to use awk to create a processing script (using readHits)
 ls -1  /data2/wenzel/G4_data/merged/*e-* | sed 's&/data&./readHits /data&g'  |awk '{print $1" "$2 " " $2 }' | sed 's&/data2/wenzel/G4_data/merged/&/data2/wenzel/G4_data/results&2' | sed 's/_allhits//2' > process63.sh
 
 run it: 
-source process63.sh > fit63.sh
+source process63.sh > fit63.txt
 
 now one can extract the results using:
 grep Mean fit63.txt | sed 's/   2  Mean         //g' |awk '{print $1}'

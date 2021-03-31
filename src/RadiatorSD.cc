@@ -18,7 +18,6 @@
 #include "G4ThreeVector.hh"
 #include "G4SDManager.hh"
 #include "G4ios.hh"
-//#include "G4RunManager.hh"
 #include "G4EventManager.hh"
 #include "G4Event.hh"
 #include "G4Cerenkov.hh"
@@ -26,7 +25,6 @@
 #include "G4Track.hh"
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
-//#include "G4PhysicalConstants.hh"
 #include "G4VRestDiscreteProcess.hh"
 #ifdef WITH_G4OPTICKS
 #include "G4Opticks.hh"
@@ -42,14 +40,6 @@ using namespace std;
 
 RadiatorSD::RadiatorSD(G4String name)
 : G4VSensitiveDetector(name) {
-//    G4String HCname = name + "_HC";
-//    collectionName.insert(HCname);
-//    verbose = ConfigurationManager::getInstance()->isEnable_verbose();
-//    if (verbose) {
-//        G4cout << collectionName.size() << "   RadiatorSD name:  " << name << " collection Name: "
-//                << HCname << G4endl;
-//    }
-//    fHCID = -1;
     first = true;
 }
 
@@ -61,15 +51,7 @@ RadiatorSD::~RadiatorSD() {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void RadiatorSD::Initialize(G4HCofThisEvent* ) {
-//    flArTPCHitsCollection = new lArTPCHitsCollection(SensitiveDetectorName, collectionName[0]);
- //   if (fHCID < 0) {
- //       if (verbose) {
- //           G4cout << "RadiatorSD::Initialize:  " << SensitiveDetectorName << "   "
- //                   << collectionName[0] << G4endl;
- //       }
- //       fHCID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
- //   }
- //   hce->AddHitsCollection(fHCID, flArTPCHitsCollection);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

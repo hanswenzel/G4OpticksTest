@@ -13,17 +13,17 @@ The processing consists of the following steps:
 
 the meaning of the parameters is as follows:
 
- $1  = Nr of processes
- $2  = name of Particle
- $3  = Energy of Particle
- $4  = Number of events per process
- $5  = x-position 
- $6  = y-position
- $7  = z-position
- $8  = x-direction 
- $9  = y-direction
- $10 = z-direction
- $11 = GEANT Physics list
+ $1  = Nr of processes\
+ $2  = name of Particle\
+ $3  = Energy of Particle\
+ $4  = Number of events per process\
+ $5  = x-position \
+ $6  = y-position\
+ $7  = z-position\
+ $8  = x-direction \
+ $9  = y-direction\
+ $10 = z-direction\
+ $11 = GEANT Physics list\
 
 this will create a file containing the condor classad:
 run_G4_grid

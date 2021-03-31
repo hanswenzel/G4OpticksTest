@@ -43,5 +43,5 @@ cmake -DCMAKE_BUILD_TYPE=Debug   -DCMAKE_PREFIX_PATH="${LOCAL_BASE}/opticks/exte
 make install
 cd ../G4OpticksTest-install/bin
 export OPTICKS_EMBEDDED_COMMANDLINE_EXTRA="--rngmax 10"
-time ./G4OpticksTest G4Opticks_50000.gdml muon_IO.mac
+time ./G4OpticksTest -gdml G4Opticks_50000.gdml -pl 'FTFP_BERT+OPTICAL'  -macro muon_IO.mac
 ```

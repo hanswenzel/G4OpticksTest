@@ -37,7 +37,6 @@
 using namespace std;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-
 RadiatorSD::RadiatorSD(G4String name)
 : G4VSensitiveDetector(name) {
     first = true;
@@ -50,7 +49,7 @@ RadiatorSD::~RadiatorSD() {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void RadiatorSD::Initialize(G4HCofThisEvent* ) {
+void RadiatorSD::Initialize(G4HCofThisEvent*) {
 
 }
 
@@ -63,7 +62,7 @@ G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     G4Track* aTrack = aStep->GetTrack();
     G4double charge = aTrack->GetDynamicParticle()->GetCharge();
     if (charge == 0) return false;
-    #ifdef WITH_G4OPTICKS
+#ifdef WITH_G4OPTICKS
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
 
         if (first) {
@@ -176,9 +175,9 @@ G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
         if (Sphotons > 0) {
             // total number of photons for all gensteps collected before this one
             // within this OpticksEvent (potentially crossing multiple G4Event)
-            //        opticks_photon_offset = G4Opticks::Get()->getNumPhotons();
-            //        G4cout << "RadiatorSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
-            //        G4cout << "RadiatorSD::ProcessHits:  Scint. photons " << Sphotons << G4endl;
+            int opticks_photon_offset = G4Opticks::Get()->getNumPhotons();
+            G4cout << "RadiatorSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
+            G4cout << "RadiatorSD::ProcessHits:  Scint. photons " << Sphotons << G4endl;
             G4Opticks::Get()->collectScintillationStep(
                     //1, // 0    id:zero means use scintillation step count
                     OpticksGenstep_G4Scintillation_1042,

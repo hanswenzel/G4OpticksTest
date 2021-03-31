@@ -33,7 +33,9 @@ private:
     G4UIdirectory* testDir;
 #ifdef WITH_ROOT
     G4UIcmdWithABool* writeHitsCmd;
+    G4UIcmdWithABool* doAnalysisCmd; 
     G4UIcmdWithAString* FileNameCmd;
+    G4UIcmdWithAString* HistoFileNameCmd;
 #endif
 #ifdef WITH_G4OPTICKS
     G4UIcmdWithABool* enable_opticksCmd;

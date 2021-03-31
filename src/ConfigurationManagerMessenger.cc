@@ -38,6 +38,18 @@ ConfigurationManagerMessenger::ConfigurationManagerMessenger(ConfigurationManage
     writeHitsCmd->SetParameterName("writeHits", true);
     writeHitsCmd->SetDefaultValue(true);
     writeHitsCmd->AvailableForStates(G4State_Idle);
+        //
+    HistoFileNameCmd = new G4UIcmdWithAString("/G4OpticksTest/FileName", this);
+    HistoFileNameCmd->SetGuidance("Enter file name for Hits collections ");
+    HistoFileNameCmd->SetParameterName("FileName", true);
+    HistoFileNameCmd->SetDefaultValue("hist.root");
+    HistoFileNameCmd->AvailableForStates(G4State_Idle);
+    //
+    doAnalysisCmd = new G4UIcmdWithABool("/G4OpticksTest/doAnalysis", this);
+    doAnalysisCmd->SetGuidance("Set flag for writing hits");
+    doAnalysisCmd->SetParameterName("doAnalysis", true);
+    doAnalysisCmd->SetDefaultValue(true);
+    doAnalysisCmd->AvailableForStates(G4State_Idle);
 #endif   
 
 #ifdef WITH_G4OPTICKS
@@ -93,7 +105,10 @@ ConfigurationManagerMessenger::~ConfigurationManagerMessenger() {
     delete testDir;
 #ifdef WITH_ROOT
     delete writeHitsCmd;
+    delete doAnalysisCmd;
     delete FileNameCmd;
+    delete HistoFileNameCmd;
+    
 #endif
 #ifdef WITH_G4OPTICKS
     delete enable_opticksCmd;
@@ -114,6 +129,8 @@ void ConfigurationManagerMessenger::SetNewValue(G4UIcommand* command, G4String n
 #ifdef WITH_ROOT
     if (command == writeHitsCmd) mgr->setWriteHits(writeHitsCmd->GetNewBoolValue(newValue));
     if (command == FileNameCmd) mgr->setFileName(newValue);
+    if (command == doAnalysisCmd) mgr->setWriteHits(doAnalysisCmd->GetNewBoolValue(newValue));
+    if (command == HistoFileNameCmd) mgr->setFileName(newValue);
 #endif
 #ifdef WITH_G4OPTICKS
     if (command == enable_opticksCmd) mgr->setEnable_opticks(enable_opticksCmd->GetNewBoolValue(newValue));

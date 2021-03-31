@@ -19,8 +19,9 @@ class ConfigurationManagerMessenger;
 
 class ConfigurationManager {
 private:
-
     static ConfigurationManager* instance;
+    bool doAnalysis; // variable determines if we are doing analysis
+    G4String HistoFileName; // File name for histos and  ntuples
 #ifdef WITH_ROOT 
     bool writeHits; // variable determines if hits are written out into Root File
     G4String FileName; // File name for root io
@@ -29,11 +30,6 @@ private:
     bool enable_opticks; // use opticks if available
 #endif
     bool enable_verbose; // switch on/off diagnostic printouts
-    //G4String ReferencePhysicsList;
-    //G4String EmOption;
-    //bool enableOpticalConstructor;
-    //bool enableNeutronKiller;
-    //bool enableStepLimiter;
     std::vector<G4String> *SDNames;
     ConfigurationManagerMessenger* confMessenger;
 public:
@@ -43,6 +39,14 @@ public:
 
     std::vector<G4String>* getSDNames() {
         return SDNames;
+    }
+
+    inline void setHistoFileName(G4String HistoFileName) {
+        this->HistoFileName = HistoFileName;
+    }
+
+    inline G4String getHistoFileName() const {
+        return HistoFileName;
     }
 #ifdef WITH_ROOT
 
@@ -54,6 +58,14 @@ public:
         return writeHits;
     }
 
+    inline void setdoAnalysis(bool writeHits) {
+        this->doAnalysis = doAnalysis;
+    }
+
+    inline bool isdoAnalysis() const {
+        return doAnalysis;
+    }
+
     inline void setFileName(G4String FileName) {
         this->FileName = FileName;
     }
@@ -61,6 +73,7 @@ public:
     inline G4String getFileName() const {
         return FileName;
     }
+
 #endif  
 
     inline void setEnable_verbose(bool enable_verbose) {
@@ -70,47 +83,6 @@ public:
     inline bool isEnable_verbose() const {
         return enable_verbose;
     };
-/*
-    inline void setEnable_OpticalConstructor(bool enableOpticalConstructor) {
-        this->enableOpticalConstructor = enableOpticalConstructor;
-    };
-
-    inline bool isEnable_OpticalConstructor() const {
-        return enableOpticalConstructor;
-    };
-
-    inline void setEnable_NeutronKiller(bool enableNeutronKiller) {
-        this->enableNeutronKiller = enableNeutronKiller;
-    };
-
-    inline bool isEnable_NeutronKiller() const {
-        return enableNeutronKiller;
-    };
-
-    inline void setEnable_StepLimiter(bool enableStepLimiter) {
-        this->enableStepLimiter = enableStepLimiter;
-    };
-
-    inline bool isEnable_StepLimiter() const {
-        return enableStepLimiter;
-    };
-
-    inline void setReferencePhysicsList(G4String ReferencePhysicsList) {
-        this->ReferencePhysicsList = ReferencePhysicsList;
-    };
-
-    inline G4String getReferencePhysicsList() const {
-        return ReferencePhysicsList;
-    };
-
-    inline void setEmOption(G4String EmOption) {
-        this->EmOption = EmOption;
-    };
-
-    inline G4String getEmOption() const {
-        return EmOption;
-    };
- */
 #ifdef WITH_G4OPTICKS 
 
     inline void setEnable_opticks(bool enable_opticks) {

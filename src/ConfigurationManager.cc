@@ -22,23 +22,20 @@ using namespace std;
 ConfigurationManager* ConfigurationManager::instance = 0;
 
 ConfigurationManager::ConfigurationManager() {
-  confMessenger = new ConfigurationManagerMessenger(this);
-  #ifdef WITH_ROOT
-  FileName="hits.root";
-  writeHits = true;       // by default we write hits
-  #endif
-  #ifdef WITH_G4OPTICKS 
-  enable_opticks = true;  // by default we use opticks
-  #endif 
-  enable_verbose = false; // by default we run quiet 
-  SDNames = new std::vector<G4String>();
-/*
-  ReferencePhysicsList="FTFP_BERT";
-  EmOption="";
-  enableOpticalConstructor=true;
-  enableNeutronKiller=true;
-  enableStepLimiter=true;
- */
+    confMessenger = new ConfigurationManagerMessenger(this);
+    HistoFileName = "histograms.root";
+    doAnalysis = true; // by default do analysis
+#ifdef WITH_ROOT
+    FileName = "hits.root";
+    writeHits = true; // by default we write hits
+
+#endif
+#ifdef WITH_G4OPTICKS 
+    enable_opticks = true; // by default we use opticks
+#endif 
+    enable_verbose = false; // by default we run quiet 
+    SDNames = new std::vector<G4String>();
+
 }
 
 ConfigurationManager* ConfigurationManager::getInstance() {

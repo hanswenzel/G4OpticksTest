@@ -58,7 +58,9 @@ void RunAction::BeginOfRunAction(const G4Run* aRun) {
     //analysisManager->SetNtupleMerging(true);
     // Note: merging ntuples is available only with Root output
     analysisManager->SetVerboseLevel(1);
-    analysisManager->SetFileName("CaTS");
+    G4String HistoFileName = ConfigurationManager::getInstance()->getHistoFileName();
+    G4cout << "Opening Analysis output File: " << HistoFileName << G4endl;
+    analysisManager->SetFileName(HistoFileName);
     analysisManager->OpenFile();
     //
     // Book histograms, ntuple
@@ -97,9 +99,7 @@ void RunAction::BeginOfRunAction(const G4Run* aRun) {
 }
 
 void RunAction::EndOfRunAction(const G4Run*) {
-    auto analysisManager = G4AnalysisManager::Instance();
-    analysisManager->Write();
-    analysisManager->CloseFile();
+
 #ifdef WITH_G4OPTICKS
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
         G4cout << "\n\n###[ RunAction::EndOfRunAction G4Opticks.Finalize\n\n" << G4endl;
@@ -116,6 +116,11 @@ void RunAction::EndOfRunAction(const G4Run*) {
         IOTimer->resume();
         RootIO::GetInstance()->Close();
         IOTimer->stop();
+    }
+    if (ConfigurationManager::getInstance()->isdoAnalysis()) {
+        auto analysisManager = G4AnalysisManager::Instance();
+        analysisManager->Write();
+        analysisManager->CloseFile();
     }
 #endif    
 }

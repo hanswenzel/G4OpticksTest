@@ -1,3 +1,10 @@
+<!-- ![alt text](https://github.com/hanswenzel/G4OpticksTest/blob/master/images/CaTS.png?raw=true)
+![plot](https://github.com/hanswenzel/G4OpticksTest/blob/master/images/CaTS.png?raw=true)
+-->
+<p align="left">
+  <img src="https://github.com/hanswenzel/G4OpticksTest/blob/master/images/CaTS.png" width="250" title="hover text">
+</p>
+
 Scripts are provided in  G4OpticksTest/grid to do processing on a condor cluster.
  
 The processing consists of the following steps:

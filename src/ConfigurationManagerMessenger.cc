@@ -63,8 +63,8 @@ ConfigurationManagerMessenger::ConfigurationManagerMessenger(ConfigurationManage
     //
     enable_verboseCmd = new G4UIcmdWithABool("/G4OpticksTest/enable_verbose", this);
     enable_verboseCmd->SetGuidance("Set flag for enabling verbose diagnostic printout");
-    enable_verboseCmd->SetParameterName("enable_verbose", true);
-    enable_verboseCmd->SetDefaultValue(true);
+    enable_verboseCmd->SetParameterName("enable_verbose", false);
+    enable_verboseCmd->SetDefaultValue(false);
     enable_verboseCmd->AvailableForStates(G4State_PreInit, G4State_Init, G4State_Idle);
 /*
     ReferencePhysicsListCmd = new G4UIcmdWithAString("/G4OpticksTest/ReferencePhysicsList", this);

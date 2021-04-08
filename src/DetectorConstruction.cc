@@ -21,6 +21,7 @@
 #include "G4GDMLParser.hh"
 // project headers
 #include "ConfigurationManager.hh"
+#include "Event.hh"
 #include "DetectorConstruction.hh"
 #include "TrackerSD.hh"
 #include "lArTPCSD.hh"
@@ -34,7 +35,7 @@ using namespace std;
 DetectorConstruction::DetectorConstruction(G4String fname) {
     gdmlFile = fname;
     sdnames = ConfigurationManager::getInstance()->getSDNames();
-    //  verbose = ConfigurationManager::getInstance()->isEnable_verbose();
+    CaTSEvt = Event::getInstance();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -44,9 +45,6 @@ DetectorConstruction::~DetectorConstruction() {
 
 G4VPhysicalVolume* DetectorConstruction::Construct() {
     verbose = ConfigurationManager::getInstance()->isEnable_verbose();
-    std::cout << "verbose " << verbose << std::endl;
-    verbose=true;
-       std::cout << "verbose " << verbose << std::endl;
     ReadGDML();
     const G4GDMLAuxMapType* auxmap = parser->GetAuxMap();
     if (verbose) {

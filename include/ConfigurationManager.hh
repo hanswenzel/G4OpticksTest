@@ -20,26 +20,36 @@ class ConfigurationManagerMessenger;
 class ConfigurationManager {
 private:
     static ConfigurationManager* instance;
+
+#ifdef WITH_ROOT 
     bool doAnalysis; // variable determines if we are doing analysis
     G4String HistoFileName; // File name for histos and  ntuples
-#ifdef WITH_ROOT 
     bool writeHits; // variable determines if hits are written out into Root File
     G4String FileName; // File name for root io
 #endif
 #ifdef WITH_G4OPTICKS  
     bool enable_opticks; // use opticks if available
+    unsigned int MaxGenSteps;
+    unsigned int MaxPhotons;
 #endif
     bool enable_verbose; // switch on/off diagnostic printouts
     std::vector<G4String> *SDNames;
     ConfigurationManagerMessenger* confMessenger;
-public:
     ConfigurationManager();
+public:
+
     ~ConfigurationManager();
     static ConfigurationManager* getInstance();
+    //    inline static ConfigurationManager* getInstance()
+    //    {
+    //      return instance;  
+    //    }
 
     std::vector<G4String>* getSDNames() {
         return SDNames;
     }
+
+#ifdef WITH_ROOT
 
     inline void setHistoFileName(G4String HistoFileName) {
         this->HistoFileName = HistoFileName;
@@ -48,7 +58,6 @@ public:
     inline G4String getHistoFileName() const {
         return HistoFileName;
     }
-#ifdef WITH_ROOT
 
     inline void setWriteHits(bool writeHits) {
         this->writeHits = writeHits;
@@ -73,7 +82,6 @@ public:
     inline G4String getFileName() const {
         return FileName;
     }
-
 #endif  
 
     inline void setEnable_verbose(bool enable_verbose) {
@@ -91,7 +99,12 @@ public:
 
     inline bool isEnable_opticks() const {
         return enable_opticks;
-    };
+    }
+    void setMaxPhotons(unsigned int MaxPhotons);
+    unsigned int getMaxPhotons() const;
+    void setMaxGenSteps(unsigned int MaxGenSteps);
+    unsigned int getMaxGenSteps() const;
+    ;
 #endif
 };
 #endif /* /CONFIGURATIONMANAGER */

@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------*/
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 #ifndef Event_HH
-#define	Event_HH
+#define Event_HH
 #include <vector>
 #include <map>
 
@@ -23,22 +23,24 @@
 #include "G4VHit.hh"
 
 class Event {
-
 private:
+
     G4int fEvtNum;
     // Hit Maps:
-    std::map<G4String, std::vector<G4VHit*> > hcmap; // map of Hit Collections
-
+    std::map<G4String, std::vector<G4VHit*>> hcmap; // map of Hit Collections
+    static Event* instance;
 public:
 
     Event() : fEvtNum(0) {
+       // hcmap = std::map<G4String, std::vector<G4VHit* >* > ; // map of Hit Collections
+        // std::map<G4String, std::vector<G4VHit* >* > hcmap=; // map of Hit Collections
     }
+    static Event* getInstance();
 
     virtual ~Event() {
     }
 
     void SetEventNr(G4int i) {
-
         fEvtNum = i;
     }
 
@@ -47,10 +49,10 @@ public:
     }
 
 
-    std::map<G4String, std::vector<G4VHit* > >* GetHCMap() {
+    std::map<G4String, std::vector<G4VHit*>>* GetHCMap() {
         return &hcmap;
     }
     void Reset();
 };
-#endif	/* Event_HH */
+#endif /* Event_HH */
 

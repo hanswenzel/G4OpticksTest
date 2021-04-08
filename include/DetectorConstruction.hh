@@ -14,7 +14,7 @@
 #ifndef DetectorConstruction_h
 #define DetectorConstruction_h 1
 #include "G4VUserDetectorConstruction.hh"
-
+#include "Event.hh"
 
 class ColorReader;
 class G4GDMLParser;
@@ -46,6 +46,7 @@ private:
     G4String gdmlFile;
     G4LogicalVolume* logicTarget;
     std::vector<G4String> *sdnames;
+    Event* CaTSEvt;
     // GDMLparser
     G4GDMLParser *parser;
     ColorReader* fReader;

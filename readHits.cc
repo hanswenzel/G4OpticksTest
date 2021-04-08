@@ -30,9 +30,9 @@ int main(int argc, char** argv) {
     TFile fo(argv[1]);
     std::vector<lArTPCHit*>* hits;
     std::vector<PhotonHit*>* hitsp;
-//  avoid unused variable warning
-//    (void) hits;
-//    (void) hitsp;
+    //  avoid unused variable warning
+    //    (void) hits;
+    //    (void) hitsp;
     fo.GetListOfKeys()->Print();
     Event *event = new Event();
     TTree *Tevt = (TTree*) fo.Get("Events");
@@ -47,16 +47,17 @@ int main(int argc, char** argv) {
     double nmin = 1000000000;
     for (Int_t i = 0; i < nevent; i++) {
         fevtbranch->GetEntry(i);
-        std::map<G4String, std::vector<G4VHit*> >* hcmap = event->GetHCMap();
+        std::map<G4String, std::vector<G4VHit*> > *hcmap = event->GetHCMap();
         std::map<G4String, std::vector<G4VHit*> >::iterator hciter;
-        //        cout << " Number of Hit collections:  " << hcmap->size() << endl;
+        cout << "Number of Hit collections:  " << hcmap->size() << endl;
         for (hciter = hcmap->begin(); hciter != hcmap->end(); hciter++) {
+            cout << (*hciter).first << endl;
             std::vector<G4VHit*> hits = (*hciter).second;
             //std::vector<G4String> hits;
             G4int NbHits = hits.size();
             if ((*hciter).first == "CalorimeterVolume_DRCalorimeter_HC") {
                 for (G4int ii = 0; ii < NbHits; ii++) {
-                    DRCalorimeterHit* drcaloHit = dynamic_cast<DRCalorimeterHit*> (hits[ii]);
+                    DRCalorimeterHit* drcaloHit = dynamic_cast<DRCalorimeterHit*> (hits.at(ii));
                     const double ed = drcaloHit->GetEdep();
                     if (ed > max) max = ed;
                     if (ed < min) min = ed;
@@ -67,8 +68,6 @@ int main(int argc, char** argv) {
             }
         }
     }
-    //    std::cout << max <<"   "<<min<<std::endl;
-    //std::cout << nmax <<"   "<<nmin<<std::endl;
     outfile->cd();
     TH1F* hedep = new TH1F("energy", "edep", 100, min, max);
     TH1F* hnceren = new TH1F("nceren", "nceren", 100, nmin, nmax);
@@ -76,21 +75,28 @@ int main(int argc, char** argv) {
         fevtbranch->GetEntry(i);
         std::map<G4String, std::vector<G4VHit*> >* hcmap = event->GetHCMap();
         std::map<G4String, std::vector<G4VHit*> >::iterator hciter;
-        //cout << " Number of Hit collections:  " << hcmap->size() << endl;
         for (hciter = hcmap->begin(); hciter != hcmap->end(); hciter++) {
             std::vector<G4VHit*> hits = (*hciter).second;
             G4int NbHits = hits.size();
-
-            if ((*hciter).first == "CalorimeterVolume_DRCalorimeter_HC") {
+            cout << "Number of Hits   :  " << hits.size() << endl;
+            if ((hciter)->first == "CalorimeterVolume_DRCalorimeter_HC") {
                 for (G4int ii = 0; ii < NbHits; ii++) {
-                    DRCalorimeterHit* drcaloHit = dynamic_cast<DRCalorimeterHit*> (hits[ii]);
+                    DRCalorimeterHit* drcaloHit = dynamic_cast<DRCalorimeterHit*> (hits.at(ii));
                     hedep->Fill(drcaloHit->GetEdep());
                     hnceren->Fill(drcaloHit->GetNceren());
                 }
             }
+            if ((hciter)->first == "Det_Photondetector") {
+                for (G4int ii = 0; ii < NbHits; ii++) {
+                    PhotonHit* photonHit = dynamic_cast<PhotonHit*> (hits.at(ii));
+                    cout << "X: " << photonHit->GetPosition().getX() << endl;
+                    cout << "Y: " << photonHit->GetPosition().getY() << endl;
+                    cout << "Z: " << photonHit->GetPosition().getZ() << endl;
+                }
+            }
         }
     }
-    hedep->Fit("gaus");
+    //hedep->Fit("gaus");
     //hnceren->Fit("gaus");
     outfile->Write();
 }

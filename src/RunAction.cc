@@ -16,9 +16,10 @@
  * See the License for the specific language governing permissions and 
  * limitations under the License.
  */
-
+// Geant4 headers
 #include <cassert>
 #include "G4Run.hh"
+#include "G4SDManager.hh"
 #include "g4analysis.hh"
 //#define G4ANALYSIS_USE TRUE
 //#ifdef G4ANALYSIS_USE
@@ -35,8 +36,14 @@
 #ifdef WITH_ROOT
 #include "RootIO.hh"
 #endif 
+// project headers
+#include "RadiatorSD.hh"
+#include "PhotonSD.hh"
 #include "RunAction.hh"
 #include "ConfigurationManager.hh"
+#include "Event.hh"
+// C++ headers 
+#include <vector>
 RunAction* RunAction::instance = 0;
 
 RunAction::RunAction()
@@ -49,9 +56,32 @@ RunAction::RunAction()
 
 void RunAction::BeginOfRunAction(const G4Run* aRun) {
 
-#ifdef G4ANALYSIS_USE
+#ifdef WITH_ROOT
+    std::map<G4String, std::vector<G4VHit*> >* hcmap = Event::getInstance()->GetHCMap();
+    std::vector<G4VHit*> hitsVector;
+    //#ifdef G4ANALYSIS_USE
     // Create the analysis manager using a new factory method.
     // The choice of analysis technology is done via the function argument.
+
+    std::vector<G4String>* SDNames = ConfigurationManager::getInstance()->getSDNames();
+    std::size_t found;
+    for (std::size_t i = 0; i < SDNames->size(); ++i) {
+        std::cout << SDNames->at(i) << "\n";
+        G4String sdn = SDNames->at(i);
+        found = sdn.find("Photondetector");
+        if (found != std::string::npos) {
+            std::cout << "************** Photondetector found at: " << found << '\n';
+           hcmap->insert(std::make_pair(sdn, hitsVector));
+           // hcmap->insert(std::make_pair(sdn, new std::vector<G4VHit*>()));
+        }
+        //hjw        PhotonSD* aSD = (PhotonSD*) G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdn);
+        found = sdn.find("Radiator");
+        if (found != std::string::npos) {
+            std::cout << "************ Radiator found at: " << found << '\n';
+        }
+    }
+    //hjw     std::map<G4String, std::vector<G4VHit*>* >* hcmap=Event::getInstance()->GetHCMap();
+    std::cout << "***********size of hitvector map:  " << hcmap->size() << std::endl;
     auto analysisManager = G4Analysis::ManagerInstance("root");
     G4cout << "Using " << analysisManager->GetType() << G4endl;
     // Default settings
@@ -72,7 +102,8 @@ void RunAction::BeginOfRunAction(const G4Run* aRun) {
     //   Analysis* analysis = Analysis::getInstance();
     //   analysis->BeginOfRun(aRun->GetRunID());
     //   StackingAction::getInstance()->BeginRun();
-#endif
+    //#endif
+#endif   
 #ifdef WITH_G4OPTICKS
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
         G4cout << "\n\n###[ RunAction::BeginOfRunAction G4Opticks.setGeometry\n\n" << G4endl;

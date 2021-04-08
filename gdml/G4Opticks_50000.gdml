@@ -144,7 +144,7 @@
 <box lunit="mm" name="GlassPlate" x="800" y="800" z="20"/>
         -->
         <tube name="GlassPlate"        rmax="3" z="0.5" deltaphi="360" aunit="deg" lunit="cm" />
-        <box lunit="mm" name="Obj" x="1000" y="1000" z="1000"/>
+        <box lunit="mm" name="Obj" x="1000" y="1000" z="2000"/>
         <opticalsurface finish="0" model="0" name="ScintWrap" type="0" value="1">
             <property name="REFLECTIVITY" ref="REFLECTIVITY"/>
             <property name="EFFICIENCY" ref="EFFICIENCY"/>
@@ -173,22 +173,22 @@
             </physvol>
             <physvol name="Det2">
                 <volumeref ref="Det"/>
-                <position name="Det2" unit="mm" x="497.5" y="450" z="450"/>
+                <position name="Det2" unit="mm" x="497.5" y="450" z="950"/>
                 <rotationref ref="rPMTRotation1"/>
             </physvol>
             <physvol name="Det3" >
                 <volumeref ref="Det"/>
-                <position name="Det3" unit="mm" x="497.5" y="450" z="-450"/>
+                <position name="Det3" unit="mm" x="497.5" y="450" z="-950"/>
                 <rotationref ref="rPMTRotation1"/>
             </physvol>
             <physvol name="Det4" >
                 <volumeref ref="Det"/>
-                <position name="Det4" unit="mm" x="497.5" y="-450" z="450"/>
+                <position name="Det4" unit="mm" x="497.5" y="-450" z="950"/>
                 <rotationref ref="rPMTRotation1"/>
             </physvol>
             <physvol name="Det5" >
                 <volumeref ref="Det"/>
-                <position name="Det5" unit="mm" x="497.5" y="-450" z="-450"/>
+                <position name="Det5" unit="mm" x="497.5" y="-450" z="-950"/>
                 <rotationref ref="rPMTRotation1"/>
             </physvol>
         </volume>

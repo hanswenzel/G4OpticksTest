@@ -7,7 +7,7 @@
 //                                  
 // lArTest: A Geant4 application to study and profile  
 //          simulation of physics processes relevant 
-//          to liquid Ar TPCs
+//          to liquid Ar TPC
 //
 // Author: Hans Wenzel, Fermilab
 // -----------------------------------------------------
@@ -26,20 +26,27 @@
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4VRestDiscreteProcess.hh"
+#include "G4RunManager.hh"
 #ifdef WITH_G4OPTICKS
 #include "G4Opticks.hh"
 #include "TrackInfo.hh"
 #include "OpticksGenstep.h"
+#include "OpticksFlags.hh"
+#include "G4OpticksHit.hh"
 #endif
 // project headers
 #include "RadiatorSD.hh"
+#include "PhotonSD.hh"
 #include "ConfigurationManager.hh"
+#include "Event.hh"
+#include <string>
 using namespace std;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 RadiatorSD::RadiatorSD(G4String name)
 : G4VSensitiveDetector(name) {
     first = true;
+    verbose = ConfigurationManager::getInstance()->isEnable_verbose();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -175,9 +182,9 @@ G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
         if (Sphotons > 0) {
             // total number of photons for all gensteps collected before this one
             // within this OpticksEvent (potentially crossing multiple G4Event)
-            int opticks_photon_offset = G4Opticks::Get()->getNumPhotons();
-            G4cout << "RadiatorSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
-            G4cout << "RadiatorSD::ProcessHits:  Scint. photons " << Sphotons << G4endl;
+            //           int opticks_photon_offset = G4Opticks::Get()->getNumPhotons();
+            //            G4cout << "RadiatorSD::ProcessHits: offset " << opticks_photon_offset << G4endl;
+            //            G4cout << "RadiatorSD::ProcessHits:  Scint. photons " << Sphotons << G4endl;
             G4Opticks::Get()->collectScintillationStep(
                     //1, // 0    id:zero means use scintillation step count
                     OpticksGenstep_G4Scintillation_1042,
@@ -232,6 +239,99 @@ G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
                     );
         }
     }
+    //    std::vector<G4String>* SDNames = ConfigurationManager::getInstance()->getSDNames();
+    //    for (std::size_t i = 0; i < SDNames->size(); ++i) {
+    //        std::cout << SDNames->at(i) << "\n";
+    //        std::string sdn = SDNames->at(i);
+    //        std::size_t found = sdn.find("Photondetector");
+    //        if (found != std::string::npos) std::cout << "first Photondetector found at: " << found << '\n';
+    //        PhotonSD* aSD = (PhotonSD*) G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdn);
+    //aSD->AddHits();
+
+    //
+
+    //}
+
+
+#ifdef WITH_G4OPTICKS
+    if (ConfigurationManager::getInstance()->isEnable_opticks()) {
+        //      RunAction::getInstance()->getOpticksTimer()->resume();
+        G4Opticks* g4ok = G4Opticks::Get();
+        G4RunManager* rm = G4RunManager::GetRunManager();
+        const G4Event*event = rm->GetCurrentEvent();
+        G4int eventid = event->GetEventID();
+        //        g4ok->propagateOpticalPhotons(eventid);
+        G4OpticksHit hit;
+        G4OpticksHitExtra hit_extra;
+
+        unsigned num_hits = g4ok->getNumHit();
+        bool way_enabled = g4ok->isWayEnabled();
+        unsigned num_gensteps = g4ok->getNumGensteps();
+        unsigned num_photons = g4ok->getNumPhotons();
+        if (num_photons > ConfigurationManager::getInstance()->getMaxPhotons()) {
+            g4ok->propagateOpticalPhotons(eventid);
+            G4OpticksHit hit;
+            G4OpticksHitExtra hit_extra;
+            unsigned num_gensteps = g4ok->getNumGensteps();
+            unsigned num_photons = g4ok->getNumPhotons();
+            unsigned num_hits = g4ok->getNumHit();
+            bool way_enabled = g4ok->isWayEnabled();
+            //        if (verbose) {
+
+            G4OpticksHitExtra* hit_extra_ptr = way_enabled ? &hit_extra : NULL;
+            std::map<G4String, std::vector<G4VHit*> >* hcmap = Event::getInstance()->GetHCMap();
+            std::vector<G4VHit*>* hitsVector = &(hcmap->at("Det_Photondetector"));
+//            if (verbose) {
+                std::cout << "RadiatorSD::ProcessHits numphotons reached max "
+                        << " eventid " << eventid
+                        << " num_gensteps " << num_gensteps
+                        << " num_photons " << num_photons
+                        << " num_hits " << num_hits
+                        << " way_enabled " << way_enabled
+                        << " hitsVector->size():  " << hitsVector->size()
+                        << std::endl;
+//            }
+            for (unsigned i = 0; i < num_hits; i++) {
+                g4ok->getHit(i, &hit, hit_extra_ptr);
+#ifdef WITH_ROOT
+                if (ConfigurationManager::getInstance()->isWriteHits()) {
+
+                    //RunAction::getInstance()->getIOTimer()->resume();
+                    //                    G4cout << "RadiatorSD::ProcessHits numphotons reached max" << hitsVector->size() << G4endl;
+                    hitsVector->push_back(new PhotonHit(i,
+                            0,
+                            hit.wavelength,
+                            hit.time,
+                            hit.global_position,
+                            hit.global_direction,
+                            hit.global_polarization));
+                    //   RunAction::getInstance()->getIOTimer()->stop();
+                }
+#endif
+            }
+            g4ok->reset();
+        }
+        if (verbose) {
+            G4cout << "Radiator"
+                    << " eventid " << eventid
+                    << " num_gensteps " << num_gensteps
+                    << " num_photons " << num_photons
+                    << " num_hits " << num_hits
+                    << " way_enabled " << way_enabled
+                    << G4endl;
+        }
+        std::vector<G4String>* SDNames = ConfigurationManager::getInstance()->getSDNames();
+        for (std::vector<G4String>::iterator it = SDNames->begin(); it != SDNames->end(); ++it) {
+            std::string junk = *it;
+
+        }
+
+    }
+#endif 
+
+
+
+
 #endif 
     return true;
 }

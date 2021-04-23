@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
     G4cout.setf(flags_t);
     G4cout.precision(precision_t);
     delete eventTimer;
-    delete rm;
+    //delete rm;
     return 0;
 }
 

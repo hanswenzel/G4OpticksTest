@@ -11,6 +11,7 @@
 #include "PhotonHit.hh"
 #include "CalorimeterHit.hh"
 #include "DRCalorimeterHit.hh"
+#include "InteractionHit.hh"
 using namespace std;
 
 int main(int argc, char** argv) {
@@ -27,9 +28,14 @@ int main(int argc, char** argv) {
     outfile->cd();
     //    TH1F* hedep = new TH1F("energy", "edep", 1100, 0.0, 105000.);
     //TH1F* hnceren = new TH1F("nceren", "nceren", 70000, 0.0, 7000000.);
+    TH2F* pos2 = new TH2F("pposition", "position of Photon Hits", 400, -1000., 1000., 400, -500, 500);
+    TH1F* time = new TH1F("time", "timing of photon hits", 400, 0., 100.);
+    TH1F* time0 = new TH1F("time0", "timing of photon hits", 400, 0., 100.);
+    TH1F* time1 = new TH1F("time1", "timing of photon hits", 400, 0., 100.);
+    TH1F* time2 = new TH1F("time2", "timing of photon hits", 400, 0., 100.);
     TFile fo(argv[1]);
-    std::vector<lArTPCHit*>* hits;
-    std::vector<PhotonHit*>* hitsp;
+    std::vector<lArTPCHit*> hits;
+    std::vector<PhotonHit*> hitsp;
     //  avoid unused variable warning
     //    (void) hits;
     //    (void) hitsp;
@@ -49,9 +55,9 @@ int main(int argc, char** argv) {
         fevtbranch->GetEntry(i);
         std::map<G4String, std::vector<G4VHit*> > *hcmap = event->GetHCMap();
         std::map<G4String, std::vector<G4VHit*> >::iterator hciter;
-        cout << "Number of Hit collections:  " << hcmap->size() << endl;
+        //cout << "Number of Hit collections:  " << hcmap->size() << endl;
         for (hciter = hcmap->begin(); hciter != hcmap->end(); hciter++) {
-            cout << (*hciter).first << endl;
+            //cout << (*hciter).first << endl;
             std::vector<G4VHit*> hits = (*hciter).second;
             //std::vector<G4String> hits;
             G4int NbHits = hits.size();
@@ -66,6 +72,29 @@ int main(int argc, char** argv) {
                     if (nceren < nmin) nmin = nceren;
                 }
             }
+            if ((*hciter).first == "volArgon_Target_HC") {
+                
+                cout << "=================================" << endl;
+                for (G4int ii = 0; ii < NbHits; ii++) {
+                    InteractionHit* interHit = dynamic_cast<InteractionHit*> (hits.at(ii));
+                    cout << interHit->GetPname() << endl;
+                }
+            }
+            if ((hciter)->first == "Det_Photondetector_HC") {
+                cout << "Number of Hits   :  " << hits.size() << endl;
+                for (G4int ii = 0; ii < NbHits; ii++) {
+                    PhotonHit* photonHit = dynamic_cast<PhotonHit*> (hits.at(ii));
+                    //                  cout << "X: " << photonHit->GetPosition().getX() << endl;
+                    //                  cout << "Y: " << photonHit->GetPosition().getY() << endl;
+                    //                  cout << "Z: " << photonHit->GetPosition().getZ() << endl;
+                    time->Fill(photonHit->GetTime());
+                    if (photonHit->GetPosition().getZ()<-100.) time0->Fill(photonHit->GetTime());
+                    if (photonHit->GetPosition().getZ()>-100. && photonHit->GetPosition().getZ() < 100) time1->Fill(photonHit->GetTime());
+                    if (photonHit->GetPosition().getZ() < 100.) time2->Fill(photonHit->GetTime());
+                    pos2->Fill(photonHit->GetPosition().getZ(), photonHit->GetPosition().getY());
+
+                }
+            }
         }
     }
     outfile->cd();
@@ -78,20 +107,11 @@ int main(int argc, char** argv) {
         for (hciter = hcmap->begin(); hciter != hcmap->end(); hciter++) {
             std::vector<G4VHit*> hits = (*hciter).second;
             G4int NbHits = hits.size();
-            cout << "Number of Hits   :  " << hits.size() << endl;
             if ((hciter)->first == "CalorimeterVolume_DRCalorimeter_HC") {
                 for (G4int ii = 0; ii < NbHits; ii++) {
                     DRCalorimeterHit* drcaloHit = dynamic_cast<DRCalorimeterHit*> (hits.at(ii));
                     hedep->Fill(drcaloHit->GetEdep());
                     hnceren->Fill(drcaloHit->GetNceren());
-                }
-            }
-            if ((hciter)->first == "Det_Photondetector") {
-                for (G4int ii = 0; ii < NbHits; ii++) {
-                    PhotonHit* photonHit = dynamic_cast<PhotonHit*> (hits.at(ii));
-                    cout << "X: " << photonHit->GetPosition().getX() << endl;
-                    cout << "Y: " << photonHit->GetPosition().getY() << endl;
-                    cout << "Z: " << photonHit->GetPosition().getZ() << endl;
                 }
             }
         }

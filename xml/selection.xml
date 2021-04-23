@@ -7,6 +7,8 @@
 <class name="std::vector<lArTPCHit*>"/>
 <class name="PhotonHit"/>
 <class name="std::vector<PhotonHit*>"/>
+<class name="InteractionHit"/>
+<class name="std::vector<InteractionHit*>"/>
 <class name="CalorimeterHit"/>
 <class name="std::vector<CalorimeterHit*>"/>
 <class name="DRCalorimeterHit"/>

@@ -26,16 +26,14 @@ class Event {
 private:
 
     G4int fEvtNum;
-    // Hit Maps:
-    std::map<G4String, std::vector<G4VHit*>> hcmap; // map of Hit Collections
-    static Event* instance;
+    // Hit Map:
+    std::map<G4String, std::vector<G4VHit*> > hcmap; // map of Hit Collections
+  //  static Event* instance;
 public:
 
     Event() : fEvtNum(0) {
-       // hcmap = std::map<G4String, std::vector<G4VHit* >* > ; // map of Hit Collections
-        // std::map<G4String, std::vector<G4VHit* >* > hcmap=; // map of Hit Collections
     }
-    static Event* getInstance();
+  //  static Event* getInstance();
 
     virtual ~Event() {
     }
@@ -49,7 +47,7 @@ public:
     }
 
 
-    std::map<G4String, std::vector<G4VHit*>>* GetHCMap() {
+    std::map<G4String, std::vector<G4VHit*> >* GetHCMap() {
         return &hcmap;
     }
     void Reset();

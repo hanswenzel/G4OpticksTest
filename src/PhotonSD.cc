@@ -20,7 +20,13 @@
 #include "G4ThreeVector.hh"
 #include "G4SDManager.hh"
 #include "ConfigurationManager.hh"
-
+#ifdef WITH_G4OPTICKS
+#include "G4Opticks.hh"
+#include "TrackInfo.hh"
+#include "OpticksGenstep.h"
+#include "OpticksFlags.hh"
+#include "G4OpticksHit.hh"
+#endif
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -46,7 +52,8 @@ void PhotonSD::Initialize(G4HCofThisEvent* hce) {
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PhotonSD::~PhotonSD() {}
+PhotonSD::~PhotonSD() {
+}
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4bool PhotonSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
@@ -95,3 +102,28 @@ double PhotonSD::etolambda(double E) {
     // return   wavelength in nm 
     return (h * c) / (E * 1.e-9);
 }
+#ifdef WITH_G4OPTICKS
+void PhotonSD::AddOpticksHits() {
+    G4Opticks* g4ok = G4Opticks::Get();
+    bool way_enabled = g4ok->isWayEnabled();
+    unsigned num_hits = g4ok->getNumHit();
+    G4OpticksHit hit;
+    G4OpticksHitExtra hit_extra;
+    G4OpticksHitExtra* hit_extra_ptr = way_enabled ? &hit_extra : NULL;
+    for (unsigned i = 0; i < num_hits; i++) {
+        g4ok->getHit(i, &hit, hit_extra_ptr);
+      //  G4cout << "AddOpticksHits"<<G4endl;
+        
+        PhotonHit* newHit = new PhotonHit(
+                i,
+                0,
+                hit.wavelength,
+                hit.time,
+                hit.global_position,
+                hit.global_direction,
+                hit.global_polarization);
+        fPhotonHitsCollection->insert(newHit);
+    }
+    G4cout << "AddOpticksHits size:  " <<fPhotonHitsCollection->entries() <<G4endl;
+}
+#endif

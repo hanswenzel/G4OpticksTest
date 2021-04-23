@@ -30,16 +30,18 @@
 #include "G4VHit.hh"
 #include "lArTPCHit.hh"
 #include "PhotonHit.hh"
+#include "InteractionHit.hh"
 #include "CalorimeterHit.hh"
 #include "DRCalorimeterHit.hh"
 #include "TrackerHit.hh"
 #include "Event.hh"
 Event e;
-std::vector<PhotonHit*> p;
-std::vector<lArTPCHit*> a;
-std::vector<CalorimeterHit*> c;
-std::vector<DRCalorimeterHit*> d;
-std::vector<TrackerHit*> t;
-std::vector<G4VHit*> vh;
-std::map<G4String, std::vector<G4VHit*> > hcmap; // map of Hit Collections
+std::vector<PhotonHit*>p;
+std::vector<InteractionHit*>i;
+std::vector<lArTPCHit*>a;
+std::vector<CalorimeterHit*>c;
+std::vector<DRCalorimeterHit*>d;
+std::vector<TrackerHit*>t;
+std::vector<G4VHit*>vh;
+std::map<G4String, std::vector<G4VHit*> > hm; // map of Hit Collections
 #undef __G4String

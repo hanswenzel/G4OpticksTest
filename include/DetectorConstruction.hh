@@ -45,9 +45,6 @@ private:
 
     G4String gdmlFile;
     G4LogicalVolume* logicTarget;
-    std::vector<G4String> *sdnames;
-    Event* CaTSEvt;
-    // GDMLparser
     G4GDMLParser *parser;
     ColorReader* fReader;
     bool verbose;

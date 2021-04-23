@@ -6,10 +6,9 @@
 #include "G4ThreeVector.hh"
 
 class TrackerHit : public G4VHit {
-
     // Default constructor
 public:
-   TrackerHit();
+    TrackerHit();
     ~TrackerHit();
     TrackerHit(const TrackerHit&);
     const TrackerHit& operator=(const TrackerHit&);
@@ -21,12 +20,12 @@ public:
     virtual void Draw();
     virtual void Print();
 
-    TrackerHit(G4double edep,  G4ThreeVector position, G4double time);
+    TrackerHit(G4double edep, G4ThreeVector position, G4double time);
 
     G4double GetEdep() {
         return Edep;
     }
-private: 
+private:
 
     G4double Edep;
     G4ThreeVector position;
@@ -51,7 +50,6 @@ inline void* TrackerHit::operator new(size_t){
 inline void TrackerHit::operator delete(void *aHit) {
     TrackerHitAllocator->FreeSingle((TrackerHit*) aHit);
 }
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif

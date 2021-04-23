@@ -38,11 +38,11 @@ ConfigurationManagerMessenger::ConfigurationManagerMessenger(ConfigurationManage
     writeHitsCmd->SetParameterName("writeHits", true);
     writeHitsCmd->SetDefaultValue(true);
     writeHitsCmd->AvailableForStates(G4State_Idle);
-        //
+    //
     HistoFileNameCmd = new G4UIcmdWithAString("/G4OpticksTest/FileName", this);
-    HistoFileNameCmd->SetGuidance("Enter file name for Hits collections ");
+    HistoFileNameCmd->SetGuidance("Enter file name for Hits collections (note: _RunID and  .root extension will be added automatically");
     HistoFileNameCmd->SetParameterName("FileName", true);
-    HistoFileNameCmd->SetDefaultValue("hist.root");
+    HistoFileNameCmd->SetDefaultValue("hits");
     HistoFileNameCmd->AvailableForStates(G4State_Idle);
     //
     doAnalysisCmd = new G4UIcmdWithABool("/G4OpticksTest/doAnalysis", this);
@@ -66,37 +66,6 @@ ConfigurationManagerMessenger::ConfigurationManagerMessenger(ConfigurationManage
     enable_verboseCmd->SetParameterName("enable_verbose", false);
     enable_verboseCmd->SetDefaultValue(false);
     enable_verboseCmd->AvailableForStates(G4State_PreInit, G4State_Init, G4State_Idle);
-/*
-    ReferencePhysicsListCmd = new G4UIcmdWithAString("/G4OpticksTest/ReferencePhysicsList", this);
-    ReferencePhysicsListCmd->SetGuidance("Enter name of Reference Physics List");
-    ReferencePhysicsListCmd->SetParameterName("ReferencePhysicsList", true);
-    ReferencePhysicsListCmd->SetDefaultValue("FTFP_BERT");
-    ReferencePhysicsListCmd->AvailableForStates(G4State_Idle);
-
-    EmOptionCmd = new G4UIcmdWithAString("/G4OpticksTest/EmOption", this);
-    EmOptionCmd->SetGuidance("Enter name of em option");
-    EmOptionCmd->SetParameterName("EmOption", true);
-    EmOptionCmd->SetDefaultValue("");
-    EmOptionCmd->AvailableForStates(G4State_Idle);
-    
-    enableOpticalConstructorCmd = new G4UIcmdWithABool("/G4OpticksTest/enableOpticalConstructor", this);
-    enableOpticalConstructorCmd->SetGuidance("Set flag for enabling optical constructor");
-    enableOpticalConstructorCmd->SetParameterName("enableOpticalConstructor", true);
-    enableOpticalConstructorCmd->SetDefaultValue(true);
-    enableOpticalConstructorCmd->AvailableForStates(G4State_PreInit, G4State_Init, G4State_Idle);
-    
-    enableNeutronKillerCmd = new G4UIcmdWithABool("/G4OpticksTest/enableNeutronKiller", this);
-    enableNeutronKillerCmd->SetGuidance("Set flag for enabling verbose diagnostic printout");
-    enableNeutronKillerCmd->SetParameterName("enableNeutronKiller", true);
-    enableNeutronKillerCmd->SetDefaultValue(true);
-    enableNeutronKillerCmd->AvailableForStates(G4State_PreInit, G4State_Init, G4State_Idle);
-    
-    enableStepLimiterCmd = new G4UIcmdWithABool("/G4OpticksTest/enableStepLimiter", this);
-    enableStepLimiterCmd->SetGuidance("Set flag for enabling verbose diagnostic printout");
-    enableStepLimiterCmd->SetParameterName("enableStepLimiter", true);
-    enableStepLimiterCmd->SetDefaultValue(true);
-    enableStepLimiterCmd->AvailableForStates(G4State_PreInit, G4State_Init, G4State_Idle);
-*/
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -108,19 +77,12 @@ ConfigurationManagerMessenger::~ConfigurationManagerMessenger() {
     delete doAnalysisCmd;
     delete FileNameCmd;
     delete HistoFileNameCmd;
-    
+
 #endif
 #ifdef WITH_G4OPTICKS
     delete enable_opticksCmd;
 #endif
     delete enable_verboseCmd;
-    /*
-    delete ReferencePhysicsListCmd;
-    delete EmOptionCmd;
-    delete enableOpticalConstructorCmd;
-    delete enableNeutronKillerCmd;
-    delete enableStepLimiterCmd;
-     */
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -18,11 +18,6 @@
 #include "globals.hh"
 #include "G4UserStackingAction.hh"
 #include "StackingActionMessenger.hh"
-#define G4ANALYSIS_USE TRUE
-#ifdef G4ANALYSIS_USE
-//#include "CaTS_Analysis.hh"
-//#include "TH1.h"
-#endif
 #include <map>
 #include <set>
 
@@ -58,44 +53,8 @@ private:
     G4bool killeta;
     G4bool killGammafromnCapture;
     StackingActionMessenger* pMessenger;
-#ifdef G4ANALYSIS_USE
-/*
-//    static Analysis* analysis;
-    TDirectory *partdir;
-    TDirectory *procdir;
-    TDirectory *ebypartdir;
-    TDirectory *Volumesdir;
-    //
-    TH1F* histo_beta;
-    TH1F* EGammahisto;
-    TH1F* ENeutronhisto;
-    TH1F* EProtonhisto;
-    TH1F* EP_ev_protonhisto;
-    TH1F* EP_sp_protonhisto;
-    TH1F* EP_he_protonhisto;
-    TH1F* CaptureGammahisto;
-    //
-    // The following histograms are filled for each Volume
-    //
-    std::map<G4String, std::map<G4String, G4int> >Particles;
-    std::map<G4String, std::map<G4String, G4int> >Processes;
-    std::map<G4String, std::map<G4String, TH1F*> >NHistosbyproc;
-    std::map<G4String, std::map<G4String, TH1F*> >NHistosbypart;
-    //
-    std::map<G4String, std::map<G4String, TH1F*> > ENeutronhistosbyproc;
-    std::map<G4String, std::map<G4String, TH1F*> > EProtonhistosbyproc;
-    std::map<G4String, std::map<G4String, TH1F*> > EP_ev_protonhistosbyproc;
-    std::map<G4String, std::map<G4String, TH1F*> > EP_sp_protonhistosbyproc;
-    std::map<G4String, std::map<G4String, TH1F*> > EP_he_protonhistosbyproc;
-    std::map<G4String, std::map<G4String, TH1F*> > BetaHistosbypart;
-    //  
-    std::set<G4String> Volumeset;
-    std::map<G4String, TDirectory *> VolumeDirset;
-*/
     static StackingAction* instance;
-
     void FillHistos(const G4Track* aTrack);
-#endif
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

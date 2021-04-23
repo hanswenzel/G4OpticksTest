@@ -14,7 +14,7 @@
               (_(
 -------------------------------------------------------------------------*/
 #include "Event.hh"
-Event* Event::instance = 0;
+//Event* Event::instance = 0;
 void Event::Reset() {
       std::map<G4String, std::vector<G4VHit*>>::iterator it; 
        for (it = hcmap.begin(); it != hcmap.end(); it++)
@@ -23,7 +23,7 @@ void Event::Reset() {
        }
 }
 
-Event* Event::getInstance() {
-    if (instance == 0) instance = new Event;
-    return instance;
-}
+//Event* Event::getInstance() {
+//    if (instance == 0) instance = new Event;
+//    return instance;
+//}

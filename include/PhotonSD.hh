@@ -31,7 +31,9 @@ public:
 
     void Initialize(G4HCofThisEvent*);
     G4bool ProcessHits(G4Step*, G4TouchableHistory*);
-    G4bool AddHits();
+#ifdef WITH_G4OPTICKS
+    void AddOpticksHits();
+#endif
     virtual void EndOfEvent(G4HCofThisEvent* hitCollection);
 
 private:

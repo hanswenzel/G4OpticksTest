@@ -8,6 +8,7 @@
 #include "TSystem.h"
 
 #include "PhotonHit.hh"
+#include "InteractionHit.hh"
 #include "lArTPCHit.hh"
 #include "TrackerHit.hh"
 #include "CalorimeterHit.hh"
@@ -35,7 +36,7 @@ private:
     TBranch* fevtbranch;
     Long64_t fnb;
     bool evtinitialized;
-    bool treeinitialized;
+  //  bool treeinitialized;
 };
 #endif /* WITH_ROOT */
 #endif /* ROOTIO_HH */

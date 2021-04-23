@@ -12,12 +12,11 @@ static RootIO* instance = 0;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 RootIO::RootIO() : fNevents(0) {
-    treeinitialized = false;
+  //  treeinitialized = false;
     evtinitialized = false;
-    // initialize ROOT
     TSystem ts;
     gSystem->Load("libG4OpticksTestClassesDict");
-    G4String FileName = ConfigurationManager::getInstance()->getFileName();
+    G4String FileName = ConfigurationManager::getInstance()->getfname();
     G4cout<< "Opening File: "<< FileName<< G4endl;
     fFile = new TFile(FileName.c_str(), "RECREATE");
     TTree::SetMaxTreeSize(1000 * Long64_t(2000000000));

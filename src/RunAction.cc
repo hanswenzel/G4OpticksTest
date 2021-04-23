@@ -21,10 +21,6 @@
 #include "G4Run.hh"
 #include "G4SDManager.hh"
 #include "g4analysis.hh"
-//#define G4ANALYSIS_USE TRUE
-//#ifdef G4ANALYSIS_USE
-//#include "CaTS_Analysis.hh"
-//#endif
 #include "StackingAction.hh"
 #ifdef WITH_G4OPTICKS
 #include "G4TransportationManager.hh"
@@ -41,9 +37,9 @@
 #include "PhotonSD.hh"
 #include "RunAction.hh"
 #include "ConfigurationManager.hh"
-#include "Event.hh"
 // C++ headers 
 #include <vector>
+#include<string>
 RunAction* RunAction::instance = 0;
 
 RunAction::RunAction()
@@ -55,54 +51,25 @@ RunAction::RunAction()
 }
 
 void RunAction::BeginOfRunAction(const G4Run* aRun) {
-
 #ifdef WITH_ROOT
-    std::map<G4String, std::vector<G4VHit*> >* hcmap = Event::getInstance()->GetHCMap();
-    std::vector<G4VHit*> hitsVector;
-    //#ifdef G4ANALYSIS_USE
-    // Create the analysis manager using a new factory method.
-    // The choice of analysis technology is done via the function argument.
-
-    std::vector<G4String>* SDNames = ConfigurationManager::getInstance()->getSDNames();
-    std::size_t found;
-    for (std::size_t i = 0; i < SDNames->size(); ++i) {
-        std::cout << SDNames->at(i) << "\n";
-        G4String sdn = SDNames->at(i);
-        found = sdn.find("Photondetector");
-        if (found != std::string::npos) {
-            std::cout << "************** Photondetector found at: " << found << '\n';
-           hcmap->insert(std::make_pair(sdn, hitsVector));
-           // hcmap->insert(std::make_pair(sdn, new std::vector<G4VHit*>()));
-        }
-        //hjw        PhotonSD* aSD = (PhotonSD*) G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdn);
-        found = sdn.find("Radiator");
-        if (found != std::string::npos) {
-            std::cout << "************ Radiator found at: " << found << '\n';
-        }
+    G4String fname = ConfigurationManager::getInstance()->getFileName();
+    fname = fname + "_Run" + std::to_string(aRun->GetRunID()) + ".root";
+    ConfigurationManager::getInstance()->setfname(fname);
+    if (ConfigurationManager::getInstance()->isdoAnalysis()) {
+        auto analysisManager = G4Analysis::ManagerInstance("root");
+        G4cout << "Using " << analysisManager->GetType() << G4endl;
+        analysisManager->SetVerboseLevel(1);
+        G4String HistoFileName = ConfigurationManager::getInstance()->getHistoFileName();
+        G4cout << "Opening Analysis output File: " << HistoFileName << G4endl;
+        analysisManager->SetFileName(HistoFileName);
+        analysisManager->OpenFile();
+        //
+        // Book histograms, ntuple
+        //
+        // Creating 1D histograms
+        analysisManager->CreateH1("ENeutron", "Energy of created Neutrons", 200, 0, 100);
+        analysisManager->CreateH1("EProton", "Energy of created Protons", 200, 0, 100);
     }
-    //hjw     std::map<G4String, std::vector<G4VHit*>* >* hcmap=Event::getInstance()->GetHCMap();
-    std::cout << "***********size of hitvector map:  " << hcmap->size() << std::endl;
-    auto analysisManager = G4Analysis::ManagerInstance("root");
-    G4cout << "Using " << analysisManager->GetType() << G4endl;
-    // Default settings
-    //analysisManager->SetNtupleMerging(true);
-    // Note: merging ntuples is available only with Root output
-    analysisManager->SetVerboseLevel(1);
-    G4String HistoFileName = ConfigurationManager::getInstance()->getHistoFileName();
-    G4cout << "Opening Analysis output File: " << HistoFileName << G4endl;
-    analysisManager->SetFileName(HistoFileName);
-    analysisManager->OpenFile();
-    //
-    // Book histograms, ntuple
-    //
-    // Creating 1D histograms
-    analysisManager->CreateH1("ENeutron", "Energy of created Neutrons", 200, 0, 100);
-    analysisManager->CreateH1("EProton", "Energy of created Protons", 200, 0, 100);
-    //   G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
-    //   Analysis* analysis = Analysis::getInstance();
-    //   analysis->BeginOfRun(aRun->GetRunID());
-    //   StackingAction::getInstance()->BeginRun();
-    //#endif
 #endif   
 #ifdef WITH_G4OPTICKS
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {

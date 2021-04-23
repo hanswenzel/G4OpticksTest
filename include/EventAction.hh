@@ -23,20 +23,13 @@ class Ctx;
 class Event;
 
 class EventAction : public G4UserEventAction {
-   private:
-    bool enable_IO;
-    Event* CaTSEvt;
-//    static EventAction* instance; 
 public:
     EventAction(Ctx* ctx_);
     ~EventAction();
     virtual void BeginOfEventAction(const G4Event* anEvent);
     virtual void EndOfEventAction(const G4Event* anEvent);
- //   static EventAction* getInstance();
-
-//    Event* GetEvent() {
-//        return CaTSEvt;
-//    }
     Ctx* ctx;
-
+private:
+  bool enable_IO;
+    
 };

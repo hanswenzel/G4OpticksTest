@@ -71,7 +71,6 @@ G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
     if (charge == 0) return false;
 #ifdef WITH_G4OPTICKS
     if (ConfigurationManager::getInstance()->isEnable_opticks()) {
-
         if (first) {
             aMaterial = aTrack->GetMaterial();
             materialIndex = aMaterial->GetIndex();
@@ -88,8 +87,8 @@ G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
             // 
             // properties related to Scintillation
             //
-            Fast_Intensity = aMaterialPropertiesTable->GetProperty(kFASTCOMPONENT);
-            Slow_Intensity = aMaterialPropertiesTable->GetProperty(kSLOWCOMPONENT);
+            //            Fast_Intensity = aMaterialPropertiesTable->GetProperty(kFASTCOMPONENT);
+            //            Slow_Intensity = aMaterialPropertiesTable->GetProperty(kSLOWCOMPONENT);
             YieldRatio = aMaterialPropertiesTable->GetConstProperty(kYIELDRATIO); // slowerRatio,
             FastTimeConstant = aMaterialPropertiesTable->GetConstProperty(kFASTTIMECONSTANT); // TimeConstant,
             SlowTimeConstant = aMaterialPropertiesTable->GetConstProperty(kSLOWTIMECONSTANT); //slowerTimeConstant,
@@ -114,14 +113,12 @@ G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
             }
             //
             first = false;
-        }
+        } // end if first
         G4int Sphotons = 0; // number of scintillation photons this step 
         G4int Cphotons = 0; // number of Cerenkov photons this step 
-
         //
         // info needed for generating Cerenkov photons on the GPU;
         //
-
         G4double maxCos = 0.0;
         G4double maxSin2 = 0.0;
         G4double beta = 0.0;
@@ -238,100 +235,26 @@ G4bool RadiatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
                     MeanNumberOfPhotons2
                     );
         }
-    }
-    //    std::vector<G4String>* SDNames = ConfigurationManager::getInstance()->getSDNames();
-    //    for (std::size_t i = 0; i < SDNames->size(); ++i) {
-    //        std::cout << SDNames->at(i) << "\n";
-    //        std::string sdn = SDNames->at(i);
-    //        std::size_t found = sdn.find("Photondetector");
-    //        if (found != std::string::npos) std::cout << "first Photondetector found at: " << found << '\n';
-    //        PhotonSD* aSD = (PhotonSD*) G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdn);
-    //aSD->AddHits();
-
-    //
-
-    //}
-
-
-#ifdef WITH_G4OPTICKS
-    if (ConfigurationManager::getInstance()->isEnable_opticks()) {
-        //      RunAction::getInstance()->getOpticksTimer()->resume();
         G4Opticks* g4ok = G4Opticks::Get();
         G4RunManager* rm = G4RunManager::GetRunManager();
         const G4Event*event = rm->GetCurrentEvent();
         G4int eventid = event->GetEventID();
-        //        g4ok->propagateOpticalPhotons(eventid);
         G4OpticksHit hit;
-        G4OpticksHitExtra hit_extra;
-
-        unsigned num_hits = g4ok->getNumHit();
-        bool way_enabled = g4ok->isWayEnabled();
-        unsigned num_gensteps = g4ok->getNumGensteps();
         unsigned num_photons = g4ok->getNumPhotons();
         if (num_photons > ConfigurationManager::getInstance()->getMaxPhotons()) {
             g4ok->propagateOpticalPhotons(eventid);
-            G4OpticksHit hit;
-            G4OpticksHitExtra hit_extra;
-            unsigned num_gensteps = g4ok->getNumGensteps();
-            unsigned num_photons = g4ok->getNumPhotons();
-            unsigned num_hits = g4ok->getNumHit();
-            bool way_enabled = g4ok->isWayEnabled();
-            //        if (verbose) {
-
-            G4OpticksHitExtra* hit_extra_ptr = way_enabled ? &hit_extra : NULL;
-            std::map<G4String, std::vector<G4VHit*> >* hcmap = Event::getInstance()->GetHCMap();
-            std::vector<G4VHit*>* hitsVector = &(hcmap->at("Det_Photondetector"));
-//            if (verbose) {
-                std::cout << "RadiatorSD::ProcessHits numphotons reached max "
-                        << " eventid " << eventid
-                        << " num_gensteps " << num_gensteps
-                        << " num_photons " << num_photons
-                        << " num_hits " << num_hits
-                        << " way_enabled " << way_enabled
-                        << " hitsVector->size():  " << hitsVector->size()
-                        << std::endl;
-//            }
-            for (unsigned i = 0; i < num_hits; i++) {
-                g4ok->getHit(i, &hit, hit_extra_ptr);
-#ifdef WITH_ROOT
-                if (ConfigurationManager::getInstance()->isWriteHits()) {
-
-                    //RunAction::getInstance()->getIOTimer()->resume();
-                    //                    G4cout << "RadiatorSD::ProcessHits numphotons reached max" << hitsVector->size() << G4endl;
-                    hitsVector->push_back(new PhotonHit(i,
-                            0,
-                            hit.wavelength,
-                            hit.time,
-                            hit.global_position,
-                            hit.global_direction,
-                            hit.global_polarization));
-                    //   RunAction::getInstance()->getIOTimer()->stop();
+            G4HCtable* hctable = G4SDManager::GetSDMpointer()->GetHCtable();
+            for (G4int  i = 0; i < hctable->entries(); ++i) {
+                std::string sdn= hctable->GetSDname(i);
+                std::size_t found = sdn.find("Photondetector");
+                if (found != std::string::npos) {
+                    PhotonSD* aSD = (PhotonSD*) G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdn);
+                    aSD->AddOpticksHits();
                 }
-#endif
             }
             g4ok->reset();
         }
-        if (verbose) {
-            G4cout << "Radiator"
-                    << " eventid " << eventid
-                    << " num_gensteps " << num_gensteps
-                    << " num_photons " << num_photons
-                    << " num_hits " << num_hits
-                    << " way_enabled " << way_enabled
-                    << G4endl;
-        }
-        std::vector<G4String>* SDNames = ConfigurationManager::getInstance()->getSDNames();
-        for (std::vector<G4String>::iterator it = SDNames->begin(); it != SDNames->end(); ++it) {
-            std::string junk = *it;
-
-        }
-
     }
-#endif 
-
-
-
-
 #endif 
     return true;
 }

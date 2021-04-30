@@ -1,4 +1,8 @@
 # G4OpticksTest
+
+# This project isreplaced by CaTS: https://github.com/hanswenzel/CaTS
+
+
 Example that demonstrates how to use opticks from within Geant4 for the creation and propagation of optical photons. This requires the opticks environment to be set up properly. (for instructions how to install opticks see e.g. https://cdcvs.fnal.gov/redmine/projects/g4gpu/wiki/Installation_on_the_LQ_cluster . At the moment we use the following external packages and versions thereof:  
 
 - nvidia Optix 6.5
